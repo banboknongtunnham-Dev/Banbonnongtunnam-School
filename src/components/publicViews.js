@@ -829,41 +829,90 @@ class PublicViews {
   }
 
   /**
-   * ตารางแสดงข้อมูลพื้นฐานโรงเรียนบ้านบกหนองทันน้ำ ครบทุกฟิลด์ตามข้อมูลจริงและลิงก์ schoolthai.in.th
+   * ตารางแสดงข้อมูลพื้นฐานโรงเรียนบ้านบกหนองทันน้ำ จัดระเบียบแยกเป็น 4 หมวดหมู่ชัดเจน สวยงาม ไม่ปะปนกัน
    */
   renderSchoolBasicInfoTable(profile) {
-    const infoRows = [
-      { label: 'ชื่อสถานศึกษา (ไทย)', value: profile.school_name_th || 'โรงเรียนบ้านบกหนองทันน้ำ', highlight: true },
-      { label: 'ชื่อสถานศึกษา (อังกฤษ)', value: profile.school_name_en || 'BOKNONGTUNNAM', highlight: true },
-      { label: 'รหัสโรงเรียน 10 หลัก', value: profile.school_code_10 || profile.school_code || '1034710083', mono: true },
-      { label: 'รหัส SMIS 8 หลัก', value: profile.smis_code_8 || '34020157', mono: true },
-      { label: 'รหัส OBEC 6 หลัก', value: profile.obec_code_6 || '710083', mono: true },
-      { label: 'คำขวัญของโรงเรียน', value: profile.motto || 'เรียนรู้สู่ความเป็นเลิศ เชิดชูคุณธรรม นำพาชุมชน', highlight: true },
-      { label: 'วิสัยทัศน์ (Vision)', value: profile.vision || '-' },
-      { label: 'อัตลักษณ์ (Identity)', value: profile.identity || 'มีวินัย ใส่ใจจิตอาสา', highlight: true },
-      { label: 'เอกลักษณ์ (Uniqueness)', value: profile.uniqueness || 'โรงเรียนสะอาด บรรยากาศร่มรื่น', highlight: true },
-      { label: 'ระดับที่เปิดสอน', value: profile.education_level || 'อนุบาล-มัธยมศึกษาตอนต้น' },
-      { label: 'วัน-เดือน-ปี ก่อตั้ง', value: `${profile.established_date || '12052512'} (12 พฤษภาคม พ.ศ. 2512)` },
-      { label: 'ที่อยู่สถานศึกษา', value: profile.address || 'หมู่ที่ 2 บ้านบก ตำบลหนองทันน้ำ อำเภอกุดข้าวปุ้น จังหวัดอุบลราชธานี 34270' },
-      { label: 'โทรศัพท์', value: profile.phone || '0892867399' },
-      { label: 'โทรสาร', value: profile.fax || '-' },
-      { label: 'อีเมล (Email)', value: profile.email || 'banboknongtannham@gmail.com', isEmail: true },
-      { label: 'เว็บไซต์', value: profile.website_url || 'http://www.banbok-ntn.ac.th', isLink: true },
-      { label: 'Facebook โรงเรียน', value: profile.facebook_url || 'https://www.facebook.com/profile.php?id=100014526581847', isLink: true },
-      { label: 'LINE OA', value: profile.line_oa || '-' },
-      { label: 'กลุ่มโรงเรียน', value: profile.school_group || '-' },
-      { label: 'องค์กรปกครองส่วนท้องถิ่น (อปท.)', value: profile.local_gov || 'หนองทันน้ำ' },
-      { label: 'ระยะทางจาก รร. ถึง สพท.', value: profile.distance_to_area_office || '30 กม.' },
-      { label: 'ระยะทางจาก รร. ถึง อำเภอ', value: profile.distance_to_district || '10 กม.' },
-      { label: 'หน่วยงานต้นสังกัด', value: profile.affiliation || 'สำนักงานเขตพื้นที่การศึกษาประถมศึกษาอุบลราชธานี เขต 2' }
+    const categories = [
+      {
+        id: 'CAT_GENERAL',
+        title: 'ข้อมูลทั่วไปและรหัสสถานศึกษา',
+        subtitle: 'General Information & Official Identifiers',
+        icon: '🏛️',
+        iconBg: 'bg-gradient-to-br from-amber-400 via-orange-500 to-red-600',
+        badgeColor: 'bg-amber-100 text-amber-900 border-amber-300',
+        items: [
+          { label: 'ชื่อสถานศึกษา (ไทย)', value: profile.school_name_th || 'โรงเรียนบ้านบกหนองทันน้ำ', highlight: true },
+          { label: 'ชื่อสถานศึกษา (อังกฤษ)', value: profile.school_name_en || 'BOKNONGTUNNAM SCHOOL', highlight: true },
+          { label: 'รหัสโรงเรียน 10 หลัก', value: profile.school_code_10 || profile.school_code || '1034710083', mono: true },
+          { label: 'รหัส SMIS 8 หลัก', value: profile.smis_code_8 || '34020157', mono: true },
+          { label: 'รหัส OBEC 6 หลัก', value: profile.obec_code_6 || '710083', mono: true },
+          { label: 'วัน-เดือน-ปี ก่อตั้ง', value: `${profile.established_date || '12052512'} (12 พฤษภาคม พ.ศ. 2512)` },
+          { label: 'ระดับชั้นที่เปิดสอน', value: profile.education_level || 'อนุบาล-มัธยมศึกษาตอนต้น (ขยายโอกาสทางการศึกษา)', highlight: true },
+          { label: 'หน่วยงานต้นสังกัด', value: profile.affiliation || 'สำนักงานเขตพื้นที่การศึกษาประถมศึกษาอุบลราชธานี เขต 2' }
+        ]
+      },
+      {
+        id: 'CAT_PHILOSOPHY',
+        title: 'ปรัชญา คำขวัญ วิสัยทัศน์ และอัตลักษณ์',
+        subtitle: 'Motto, Vision & Institutional Identity',
+        icon: '🎯',
+        iconBg: 'bg-gradient-to-br from-purple-500 via-violet-600 to-indigo-600',
+        badgeColor: 'bg-purple-100 text-purple-900 border-purple-300',
+        items: [
+          { label: 'คำขวัญของโรงเรียน', value: `“${profile.motto || 'เรียนรู้สู่ความเป็นเลิศ เชิดชูคุณธรรม นำพาชุมชน'}”`, highlight: true, fullWidth: true },
+          { label: 'อัตลักษณ์สถานศึกษา (Identity)', value: profile.identity || 'มีวินัย ใส่ใจจิตอาสา', highlight: true },
+          { label: 'เอกลักษณ์สถานศึกษา (Uniqueness)', value: profile.uniqueness || 'โรงเรียนสะอาด บรรยากาศร่มรื่น', highlight: true },
+          { label: 'วิสัยทัศน์ (Vision)', value: profile.vision || 'โรงเรียนบ้านบกหนองทันน้ำ มุ่งพัฒนาผู้เรียนทุกคนให้มีความรู้คู่คุณธรรม มีสุขภาพร่างกายแข็งแรง มีคุณภาพตามมาตรฐานการศึกษา ส่งเสริมวิชาการและเทคโนโลยี มีนิสัยรักการอ่าน สืบสานงานประเพณีวัฒนธรรมไทย มีใจรักสิ่งแวดล้อม ผสานกิจกรรมเพิ่มเวลารู้ สู่ประชาคมอาเซียน พัฒนาคุณภาพชีวิตให้มีทักษะอาชีพ น้อมนำศาสตร์พระราชา สู่การจัดการเรียนรู้ เน้นประสานความร่วมมือจากทุกภาคส่วน', fullWidth: true, isParagraph: true }
+        ]
+      },
+      {
+        id: 'CAT_LOCATION',
+        title: 'ข้อมูลที่ตั้ง การปกครอง และระยะทาง',
+        subtitle: 'School Location, Administrative Area & Distances',
+        icon: '📍',
+        iconBg: 'bg-gradient-to-br from-emerald-400 via-teal-500 to-green-600',
+        badgeColor: 'bg-emerald-100 text-emerald-900 border-emerald-300',
+        items: [
+          { label: 'ที่อยู่สถานศึกษา', value: profile.address || 'หมู่ที่ 2 บ้านบก ตำบลหนองทันน้ำ อำเภอกุดข้าวปุ้น จังหวัดอุบลราชธานี 34270', fullWidth: true },
+          { label: 'กลุ่มโรงเรียน', value: profile.school_group || 'กลุ่มโรงเรียนหนองทันน้ำ' },
+          { label: 'องค์กรปกครองส่วนท้องถิ่น (อปท.)', value: profile.local_gov ? `องค์การบริหารส่วนตำบล${profile.local_gov}` : 'องค์การบริหารส่วนตำบลหนองทันน้ำ' },
+          { label: 'ระยะทางจาก รร. ถึง อำเภอ (กุดข้าวปุ้น)', value: profile.distance_to_district || '10 กิโลเมตร' },
+          { label: 'ระยะทางจาก รร. ถึง สพท. (ตระการพืชผล)', value: profile.distance_to_area_office || '30 กิโลเมตร' }
+        ]
+      },
+      {
+        id: 'CAT_CONTACT',
+        title: 'ช่องทางการติดต่อและเครือข่ายดิจิทัล',
+        subtitle: 'Contact Details & Digital School Channels',
+        icon: '📞',
+        iconBg: 'bg-gradient-to-br from-sky-400 via-blue-500 to-indigo-600',
+        badgeColor: 'bg-blue-100 text-blue-900 border-blue-300',
+        items: [
+          { label: 'หมายเลขโทรศัพท์', value: profile.phone || '0892867399', isPhone: true },
+          { label: 'โทรสาร (Fax)', value: profile.fax || '-' },
+          { label: 'อีเมลทางการ (Email)', value: profile.email || 'banboknongtannham@gmail.com', isEmail: true },
+          { label: 'เว็บไซต์โรงเรียน', value: 'https://banboknongtunnham-dev.github.io/Banbonnongtunnam-School/', isLink: true },
+          { label: 'Facebook โรงเรียน', value: profile.facebook_url || 'https://www.facebook.com/profile.php?id=100014526581847', isLink: true },
+          { label: 'LINE Official Account', value: profile.line_oa || '@322rfuuz (บ้านบกหนองทันน้ำWeb)', isLine: true }
+        ]
+      }
     ];
 
     return `
-      <div class="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200/90 shadow-2xs space-y-5">
-        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-100 pb-4">
+      <div class="space-y-6">
+        <!-- แถบหัวข้อส่วนข้อมูลพื้นฐานโรงเรียน -->
+        <div class="bg-white rounded-3xl p-6 sm:p-7 border border-slate-200/90 shadow-2xs flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
-            <span class="text-xs font-bold text-amber-700 uppercase">OFFICIAL SCHOOL INFORMATION • ข้อมูลพื้นฐานสารสนเทศ</span>
-            <h3 class="text-xl font-extrabold text-slate-900">ข้อมูลพื้นฐานโรงเรียนบ้านบกหนองทันน้ำ (รหัส 10 หลัก: 1034710083)</h3>
+            <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-50 border border-amber-200 text-amber-800 text-xs font-bold mb-1.5">
+              <i data-lucide="info" class="w-3.5 h-3.5"></i>
+              OFFICIAL SCHOOL PROFILE • ข้อมูลสารสนเทศสถานศึกษา 4 หมวดหมู่
+            </span>
+            <h3 class="text-xl sm:text-2xl font-extrabold text-slate-900">
+              ข้อมูลพื้นฐานโรงเรียนบ้านบกหนองทันน้ำ (รหัส 10 หลัก: 1034710083)
+            </h3>
+            <p class="text-xs text-slate-500 mt-0.5">
+              จัดระเบียบตามมาตรฐานข้อมูลสถานศึกษา สพฐ. กระทรวงศึกษาธิการ
+            </p>
           </div>
           <div class="flex flex-wrap items-center gap-2">
             <a
@@ -880,7 +929,7 @@ class PublicViews {
                 ? `
                 <button
                   onclick="window.app.navigate('admin'); window.adminDashboardView.activeTab='school_info'; window.app.render();"
-                  class="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-slate-900 text-amber-300 text-xs font-bold cursor-pointer"
+                  class="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-slate-900 text-amber-300 hover:bg-amber-500 hover:text-slate-950 text-xs font-bold transition cursor-pointer"
                 >
                   <i data-lucide="edit" class="w-3.5 h-3.5"></i>
                   <span>แก้ไขข้อมูลพื้นฐาน</span>
@@ -891,24 +940,79 @@ class PublicViews {
           </div>
         </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
-          ${infoRows
-            .map((r) => {
-              let valHtml = window.authService.sanitizeHTML(r.value);
-              if (r.isEmail && r.value && r.value !== '-') {
-                valHtml = `<a href="mailto:${window.authService.sanitizeHTML(r.value)}" class="text-amber-700 hover:underline font-bold">${valHtml}</a>`;
-              } else if (r.isLink && r.value && r.value !== '-') {
-                valHtml = `<a href="${window.authService.sanitizeHTML(r.value)}" target="_blank" rel="noopener" class="text-blue-600 hover:underline font-bold break-all">${valHtml}</a>`;
-              }
-              return `
-                <div class="p-3.5 rounded-2xl ${r.highlight ? 'bg-amber-50/40 border border-amber-200/80' : 'bg-slate-50/80 border border-slate-200/70'} flex flex-col sm:flex-row sm:items-center justify-between gap-1 sm:gap-4">
-                  <span class="text-xs font-bold text-slate-500 shrink-0">${window.authService.sanitizeHTML(r.label)}</span>
-                  <span class="text-xs sm:text-sm ${r.mono ? 'font-mono font-extrabold text-slate-900 bg-white px-2.5 py-0.5 rounded-lg border border-slate-200' : 'font-bold text-slate-900'} sm:text-right">
-                    ${valHtml}
-                  </span>
+        <!-- รายการหมวดหมู่ทั้ง 4 หมวด (Modular Bento Category Cards) -->
+        <div class="space-y-6">
+          ${categories
+            .map(
+              (cat) => `
+              <div class="bg-white rounded-3xl p-5 sm:p-7 border border-slate-200/90 shadow-2xs space-y-4 hover:shadow-md transition">
+                <!-- หัวข้อหมวดหมู่ -->
+                <div class="flex items-center gap-3.5 border-b border-slate-100 pb-3.5">
+                  <div class="w-11 h-11 rounded-2xl ${cat.iconBg} text-white flex items-center justify-center shrink-0 shadow-sm text-xl select-none">
+                    ${cat.icon}
+                  </div>
+                  <div>
+                    <span class="text-[10px] font-extrabold uppercase tracking-wider text-slate-400">
+                      ${cat.subtitle}
+                    </span>
+                    <h4 class="text-base sm:text-lg font-extrabold text-slate-900">
+                      ${cat.title}
+                    </h4>
+                  </div>
                 </div>
-              `;
-            })
+
+                <!-- รายการข้อมูลภายในหมวดหมู่ -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                  ${cat.items
+                    .map((r) => {
+                      let valHtml = window.authService.sanitizeHTML(r.value);
+                      if (r.isEmail && r.value && r.value !== '-') {
+                        valHtml = `<a href="mailto:${window.authService.sanitizeHTML(r.value)}" class="text-amber-700 hover:underline font-bold">${valHtml}</a>`;
+                      } else if (r.isPhone && r.value && r.value !== '-') {
+                        valHtml = `<a href="tel:${window.authService.sanitizeHTML(r.value)}" class="text-slate-900 hover:text-blue-600 font-bold">${valHtml}</a>`;
+                      } else if (r.isLink && r.value && r.value !== '-') {
+                        valHtml = `<a href="${window.authService.sanitizeHTML(r.value)}" target="_blank" rel="noopener" class="text-blue-600 hover:underline font-bold break-all">${valHtml}</a>`;
+                      } else if (r.isLine && r.value) {
+                        valHtml = `<span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-lg bg-emerald-50 text-emerald-800 border border-emerald-200 font-bold text-xs"><span class="w-2 h-2 rounded-full bg-emerald-500"></span>${valHtml}</span>`;
+                      }
+
+                      if (r.isParagraph) {
+                        return `
+                          <div class="md:col-span-2 p-4 rounded-2xl bg-slate-50/80 border border-slate-200/80 space-y-2">
+                            <span class="text-xs font-bold text-slate-500 uppercase tracking-wide block">
+                              ${window.authService.sanitizeHTML(r.label)}
+                            </span>
+                            <p class="text-xs sm:text-sm font-semibold text-slate-800 leading-relaxed indent-6">
+                              ${valHtml}
+                            </p>
+                          </div>
+                        `;
+                      }
+
+                      return `
+                        <div class="${r.fullWidth ? 'md:col-span-2' : ''} p-3.5 rounded-2xl ${
+                          r.highlight
+                            ? 'bg-amber-50/40 border border-amber-200/80'
+                            : 'bg-slate-50/80 border border-slate-200/70'
+                        } flex flex-col sm:flex-row sm:items-center justify-between gap-1 sm:gap-4">
+                          <span class="text-xs font-bold text-slate-500 shrink-0">
+                            ${window.authService.sanitizeHTML(r.label)}
+                          </span>
+                          <span class="text-xs sm:text-sm ${
+                            r.mono
+                              ? 'font-mono font-extrabold text-slate-900 bg-white px-2.5 py-0.5 rounded-lg border border-slate-200 shrink-0 self-start sm:self-auto'
+                              : 'font-bold text-slate-900'
+                          } sm:text-right">
+                            ${valHtml}
+                          </span>
+                        </div>
+                      `;
+                    })
+                    .join('')}
+                </div>
+              </div>
+            `
+            )
             .join('')}
         </div>
       </div>
