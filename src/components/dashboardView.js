@@ -162,6 +162,17 @@ class DashboardView {
               <div>
                 <span class="text-[11px] font-bold text-amber-700 uppercase">3-YEAR STUDENT GRAPH • ย้อนหลัง 3 ปีการศึกษา</span>
                 <h3 class="text-base sm:text-lg font-bold text-slate-900">กราฟจำนวนนักเรียน 3 ปีย้อนหลัง (ปีการศึกษา 2567 – 2569)</h3>
+                <div class="flex flex-wrap items-center gap-2 mt-2">
+                  <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-md bg-blue-50 border border-blue-200 text-blue-700 text-[11px] font-bold">
+                    <span class="w-2 h-2 rounded-full bg-blue-600"></span> ปี 2567
+                  </span>
+                  <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-md bg-emerald-50 border border-emerald-200 text-emerald-700 text-[11px] font-bold">
+                    <span class="w-2 h-2 rounded-full bg-emerald-600"></span> ปี 2568
+                  </span>
+                  <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-md bg-red-50 border border-red-200 text-red-700 text-[11px] font-bold">
+                    <span class="w-2 h-2 rounded-full bg-red-600"></span> ปี 2569
+                  </span>
+                </div>
               </div>
               ${
                 window.authService.isTeacherOrAbove()
@@ -318,7 +329,7 @@ class DashboardView {
       });
     }
 
-    // 3. Bar/Line Chart: กราฟจำนวนนักเรียน 3 ปีย้อนหลัง (แสดงแค่ 3 ปีย้อนหลัง: 2567, 2568, 2569)
+    // 3. Bar/Line Chart: กราฟจำนวนนักเรียน 3 ปีย้อนหลัง (แสดง 3 ปีย้อนหลัง แยกสีตามปีการศึกษา)
     const lineCtx = document.getElementById('chart-trend-line');
     if (lineCtx) {
       const trends = window.dbAdapter
@@ -326,6 +337,13 @@ class DashboardView {
         .filter((k) => k.metric_group === 'STUDENT_TREND')
         .sort((a, b) => Number(a.academic_year) - Number(b.academic_year))
         .slice(-3);
+
+      const yearColors = {
+        '2567': '#2563EB', // น้ำเงิน
+        '2568': '#059669', // เขียวมรกต
+        '2569': '#DC2626'  // แดง
+      };
+      const fallbackPalette = ['#2563EB', '#059669', '#DC2626', '#D97706', '#7C3AED'];
 
       this.chartInstances.line = new Chart(lineCtx, {
         type: 'bar',
@@ -341,10 +359,17 @@ class DashboardView {
                 const n = Number(t.metric_value);
                 return Number.isFinite(n) && n > 0 ? n : 0;
               }),
-              backgroundColor: trends.map((t) => {
+              backgroundColor: trends.map((t, idx) => {
                 const n = Number(t.metric_value);
-                return Number.isFinite(n) && n > 0 ? '#D97706' : '#CBD5E1';
+                if (!Number.isFinite(n) || n <= 0) return '#CBD5E1';
+                return yearColors[String(t.academic_year)] || fallbackPalette[idx % fallbackPalette.length];
               }),
+              borderColor: trends.map((t, idx) => {
+                const n = Number(t.metric_value);
+                if (!Number.isFinite(n) || n <= 0) return '#94A3B8';
+                return yearColors[String(t.academic_year)] || fallbackPalette[idx % fallbackPalette.length];
+              }),
+              borderWidth: 1.5,
               borderRadius: 10,
               maxBarThickness: 64
             }
@@ -354,7 +379,9 @@ class DashboardView {
           responsive: true,
           maintainAspectRatio: false,
           plugins: {
-            legend: { position: 'top' },
+            legend: {
+              display: false // ซ่อน legend เดี่ยว เพื่อให้แท่งกราฟแสดงแต่ละสีอย่างชัดเจน
+            },
             tooltip: {
               callbacks: {
                 label: (ctx) => {
