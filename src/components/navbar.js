@@ -71,36 +71,36 @@ class NavbarComponent {
 
       <!-- Main Modern Tech Header -->
       <header class="bg-white/95 backdrop-blur-md sticky top-0 z-40 border-b-2 border-red-700/15 shadow-xs">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div class="flex items-center justify-between py-3 gap-4">
-            <!-- ซ้าย: โลโก้โรงเรียนและชื่อโรงเรียน (ไม่มีกรอบสี่เหลี่ยมครอบ) -->
-            <div class="flex items-center gap-4 cursor-pointer group shrink-0" onclick="window.app.navigate('home')">
+        <div class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
+          <div class="flex items-center justify-between py-2 sm:py-3 gap-2 sm:gap-4">
+            <!-- ซ้าย: โลโก้โรงเรียนและชื่อโรงเรียน (ปรับขนาดสมดุลทั้งมือถือและคอมพิวเตอร์) -->
+            <div class="flex items-center gap-2 sm:gap-3.5 cursor-pointer group min-w-0 flex-1" onclick="window.app.navigate('home')">
               <img
                 src="${logoUrl}"
                 alt="โลโก้โรงเรียนบ้านบกหนองทันน้ำ"
-                class="w-24 h-24 sm:w-32 sm:h-32 object-contain drop-shadow-md group-hover:scale-105 transition duration-300 shrink-0"
+                class="w-12 h-12 sm:w-16 sm:h-16 md:w-20 md:h-20 lg:w-24 lg:h-24 object-contain drop-shadow-md group-hover:scale-105 transition duration-300 shrink-0"
                 onerror="this.src='assets/img/logo.png'"
               />
-              <div>
-                <div class="flex items-center gap-1.5">
-                  <span class="text-[10px] font-extrabold tracking-wider uppercase text-red-700 bg-red-50 border border-red-200 px-2 py-0.5 rounded">
+              <div class="min-w-0">
+                <div class="hidden xs:flex items-center gap-1.5">
+                  <span class="text-[9px] sm:text-[10px] font-extrabold tracking-wider uppercase text-red-700 bg-red-50 border border-red-200 px-1.5 sm:px-2 py-0.5 rounded leading-none">
                     SMART DIGITAL SCHOOL
                   </span>
                 </div>
-                <h1 class="text-2xl sm:text-4xl font-extrabold text-slate-900 tracking-tight group-hover:text-red-700 transition leading-tight mt-0.5">
+                <h1 class="text-sm sm:text-xl md:text-2xl lg:text-3xl font-extrabold text-slate-900 tracking-tight group-hover:text-red-700 transition leading-tight mt-0.5 truncate sm:whitespace-normal">
                   ${window.authService.sanitizeHTML(profile.school_name_th || 'โรงเรียนบ้านบกหนองทันน้ำ')}
                 </h1>
-                <p class="text-sm sm:text-lg font-extrabold tracking-wide text-red-700 leading-tight">
+                <p class="text-[10px] sm:text-xs md:text-sm font-extrabold tracking-tight sm:tracking-wide text-red-700 leading-tight">
                   BANBOKNONGTUNNAM SCHOOL
                 </p>
-                <p class="text-xs sm:text-sm text-slate-500 font-semibold hidden sm:block">
+                <p class="text-[11px] text-slate-500 font-semibold hidden md:block">
                   ${window.authService.sanitizeHTML(profile.education_level || 'อนุบาล-มัธยมศึกษาตอนต้น')}
                 </p>
               </div>
             </div>
 
             <!-- ขวา: ปุ่มระบบครู / แอดมิน / เข้าสู่ระบบ (จัดระเบียบไม่ให้รก) -->
-            <div class="flex items-center gap-2">
+            <div class="flex items-center gap-1.5 sm:gap-2 shrink-0">
               <button
                 onclick="window.app.openGoogleWorkspaceHubModal()"
                 class="hidden md:inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-amber-50 text-red-900 border border-amber-300 text-xs font-bold hover:bg-amber-100 transition cursor-pointer whitespace-nowrap"
@@ -172,9 +172,9 @@ class NavbarComponent {
                   : `
                   <button
                     onclick="window.app.openLoginModal()"
-                    class="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs sm:text-sm font-bold bg-gradient-to-r from-red-700 to-red-600 text-white hover:from-red-800 hover:to-red-700 shadow-xs transition cursor-pointer"
+                    class="inline-flex items-center gap-1 sm:gap-1.5 px-2.5 sm:px-4 py-1.5 sm:py-2 rounded-xl text-xs sm:text-sm font-bold bg-gradient-to-r from-red-700 to-red-600 text-white hover:from-red-800 hover:to-red-700 shadow-xs transition cursor-pointer whitespace-nowrap"
                   >
-                    <i data-lucide="log-in" class="w-4 h-4 text-yellow-300"></i>
+                    <i data-lucide="log-in" class="w-3.5 h-3.5 sm:w-4 sm:h-4 text-yellow-300"></i>
                     <span>เข้าสู่ระบบ</span>
                   </button>
                   `
@@ -182,10 +182,10 @@ class NavbarComponent {
 
               <button
                 onclick="window.app.toggleMobileMenu()"
-                class="xl:hidden inline-flex items-center justify-center p-2 rounded-xl text-slate-700 hover:bg-red-50 border border-slate-200"
+                class="xl:hidden inline-flex items-center justify-center p-1.5 sm:p-2 rounded-xl text-slate-700 hover:bg-red-50 border border-slate-200 cursor-pointer"
                 aria-label="เปิดเมนูนำทาง"
               >
-                <i data-lucide="menu" class="w-5 h-5"></i>
+                <i data-lucide="menu" class="w-4 h-4 sm:w-5 sm:h-5"></i>
               </button>
             </div>
           </div>

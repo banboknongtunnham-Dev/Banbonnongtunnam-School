@@ -963,56 +963,56 @@ class PublicViews {
         <div class="absolute -top-28 -right-24 w-96 h-96 rounded-full bg-amber-400/25 blur-3xl pointer-events-none"></div>
         <div class="absolute -bottom-28 -left-24 w-80 h-80 rounded-full bg-red-500/25 blur-3xl pointer-events-none"></div>
 
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 pb-8 lg:py-10 relative z-10">
-          <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 items-center">
+        <div class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 pt-5 pb-6 sm:py-8 lg:py-10 relative z-10">
+          <div class="grid grid-cols-1 lg:grid-cols-12 gap-5 sm:gap-6 lg:gap-8 items-center">
             <!-- Left: ข้อมูลโรงเรียนขนาดพอดี สบายตา สมส่วน (8 Cols) -->
-            <div class="lg:col-span-8 space-y-4 sm:space-y-5">
-              <div class="inline-flex items-center gap-2.5 px-3.5 py-1.5 rounded-full bg-white/10 border border-amber-400/40 text-amber-300 text-xs sm:text-sm font-bold backdrop-blur-md">
-                <img src="assets/img/obec_logo.png" alt="โลโก้ สพป.อุบลราชธานี เขต 2" class="w-6 h-6 object-contain shrink-0" />
-                <span>${window.authService.sanitizeHTML(heroBadge)}</span>
+            <div class="lg:col-span-8 space-y-3.5 sm:space-y-5">
+              <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 border border-amber-400/40 text-amber-300 text-[11px] sm:text-xs font-bold backdrop-blur-md max-w-full">
+                <img src="assets/img/obec_logo.png" alt="โลโก้ สพป.อุบลราชธานี เขต 2" class="w-5 h-5 sm:w-6 sm:h-6 object-contain shrink-0" />
+                <span class="truncate">${window.authService.sanitizeHTML(heroBadge)}</span>
               </div>
 
-              <div class="space-y-2">
-                <div class="flex flex-wrap items-center gap-2 text-xs sm:text-sm font-extrabold tracking-wider uppercase text-amber-300">
+              <div class="space-y-1.5 sm:space-y-2">
+                <div class="flex flex-wrap items-center gap-1.5 sm:gap-2 text-[11px] sm:text-sm font-extrabold tracking-wider uppercase text-amber-300">
                   <span>BANBOKNONGTUNNAM SCHOOL</span>
                   <span class="text-white/40">•</span>
-                  <span class="px-2.5 py-0.5 rounded-lg bg-amber-400/20 border border-amber-400/40 text-amber-200 font-mono text-xs">
+                  <span class="px-2 py-0.5 rounded-lg bg-amber-400/20 border border-amber-400/40 text-amber-200 font-mono text-[10px] sm:text-xs">
                     ID: ${window.authService.sanitizeHTML(profile.school_code_10 || profile.school_code || '1034710083')}
                   </span>
                 </div>
-                <h2 class="text-3xl sm:text-4xl lg:text-5xl xl:text-6xl font-extrabold text-white tracking-tight leading-tight">
+                <h2 class="text-2xl sm:text-4xl lg:text-5xl font-extrabold text-white tracking-tight leading-tight">
                   ${window.authService.sanitizeHTML(heroTitle)}
                 </h2>
-                <p class="text-sm sm:text-base lg:text-lg font-bold text-amber-300">
+                <p class="text-xs sm:text-base lg:text-lg font-bold text-amber-300">
                   “${window.authService.sanitizeHTML(profile.motto || 'เรียนรู้สู่ความเป็นเลิศ เชิดชูคุณธรรม นำพาชุมชน')}”
                 </p>
               </div>
 
-              <p class="text-xs sm:text-sm text-red-100/90 leading-relaxed max-w-3xl">
+              <p class="text-[11px] sm:text-sm text-red-100/90 leading-relaxed max-w-3xl">
                 📍 ${window.authService.sanitizeHTML(profile.address || 'หมู่ที่ 2 บ้านบก ตำบลหนองทันน้ำ อำเภอกุดข้าวปุ้น จังหวัดอุบลราชธานี 34270')} • เปิดสอนระดับชั้น <strong class="text-amber-300">${window.authService.sanitizeHTML(profile.education_level || 'อนุบาล-มัธยมศึกษาตอนต้น')}</strong>
               </p>
 
-              <!-- Primary Action Bar (ขนาดกระชับ สบายตา พร้อมไอคอนสีสันสดใส) -->
-              <div class="flex flex-wrap items-center gap-3 pt-1">
+              <!-- Primary Action Bar (ขนาดกระชับ สมดุลทั้งมือถือและคอมพิวเตอร์) -->
+              <div class="grid grid-cols-1 sm:flex sm:flex-wrap items-stretch sm:items-center gap-2 sm:gap-3 pt-1">
                 <button
                   onclick="window.app.navigate('about')"
-                  class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-gradient-to-r from-amber-400 to-yellow-300 text-slate-950 text-xs sm:text-sm font-extrabold hover:from-amber-300 hover:to-yellow-200 shadow-md transition cursor-pointer"
+                  class="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-gradient-to-r from-amber-400 to-yellow-300 text-slate-950 text-xs sm:text-sm font-extrabold hover:from-amber-300 hover:to-yellow-200 shadow-md transition cursor-pointer w-full sm:w-auto"
                 >
-                  <span class="w-6 h-6 rounded-lg bg-gradient-to-br from-blue-500 to-indigo-600 text-white flex items-center justify-center shadow-xs text-xs">🏫</span>
+                  <span class="w-6 h-6 rounded-lg bg-gradient-to-br from-blue-500 to-indigo-600 text-white flex items-center justify-center shadow-xs text-xs shrink-0">🏫</span>
                   <span>ข้อมูลพื้นฐานโรงเรียน</span>
                 </button>
                 <button
                   onclick="window.app.navigate('personnel')"
-                  class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-white/10 hover:bg-white/20 text-white border border-white/25 text-xs sm:text-sm font-bold backdrop-blur-xs transition cursor-pointer"
+                  class="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-white/10 hover:bg-white/20 text-white border border-white/25 text-xs sm:text-sm font-bold backdrop-blur-xs transition cursor-pointer w-full sm:w-auto"
                 >
-                  <span class="w-6 h-6 rounded-lg bg-gradient-to-br from-emerald-400 to-teal-600 text-white flex items-center justify-center shadow-xs text-xs">👨‍🏫</span>
+                  <span class="w-6 h-6 rounded-lg bg-gradient-to-br from-emerald-400 to-teal-600 text-white flex items-center justify-center shadow-xs text-xs shrink-0">👨‍🏫</span>
                   <span>ทำเนียบบุคลากร (${stats.totalPersonnel})</span>
                 </button>
                 <a
                   href="${window.authService.sanitizeHTML(fbSchoolUrl)}"
                   target="_blank"
                   rel="noopener"
-                  class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-gradient-to-r from-[#1877F2] to-blue-600 hover:from-blue-500 hover:to-blue-600 text-white text-xs sm:text-sm font-bold shadow-md transition"
+                  class="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-gradient-to-r from-[#1877F2] to-blue-600 hover:from-blue-500 hover:to-blue-600 text-white text-xs sm:text-sm font-bold shadow-md transition w-full sm:w-auto"
                 >
                   <span class="w-6 h-6 rounded-full bg-white flex items-center justify-center shadow-xs overflow-hidden shrink-0">
                     <img src="assets/img/facebook_logo.png" alt="Facebook" class="w-6 h-6 object-contain shrink-0 inline-block" />
@@ -1021,48 +1021,48 @@ class PublicViews {
                 </a>
               </div>
 
-              <!-- 4 Tech KPI Cards (ขนาดพอดี ไม่เทอะทะ พร้อมไอคอนสีสันสดใส) -->
-              <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-1">
+              <!-- 4 Tech KPI Cards (จัดวางสวยงาม ไม่ล้นจอในมือถือ) -->
+              <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-3 pt-1">
                 <div
                   onclick="window.app.navigate('dashboard')"
-                  class="p-3 sm:p-3.5 rounded-2xl bg-slate-950/45 hover:bg-slate-950/65 border border-amber-400/35 transition cursor-pointer flex items-center gap-2.5"
+                  class="p-2 sm:p-3.5 rounded-xl sm:rounded-2xl bg-slate-950/45 hover:bg-slate-950/65 border border-amber-400/35 transition cursor-pointer flex items-center gap-2 sm:gap-2.5 min-w-0"
                 >
-                  <div class="w-9 h-9 rounded-xl bg-gradient-to-br from-sky-400 via-blue-500 to-indigo-600 text-white flex items-center justify-center shadow-sm shrink-0 text-base">
+                  <div class="w-7 h-7 sm:w-9 sm:h-9 rounded-lg sm:rounded-xl bg-gradient-to-br from-sky-400 via-blue-500 to-indigo-600 text-white flex items-center justify-center shadow-sm shrink-0 text-xs sm:text-base">
                     🎓
                   </div>
-                  <div>
-                    <div class="text-[11px] font-bold text-amber-300">นักเรียนปี 2569</div>
-                    <div class="text-xl sm:text-2xl font-extrabold text-white mt-0.5">
-                      ${stats.totalStudents.toLocaleString()} <span class="text-[10px] font-normal text-amber-200">คน</span>
+                  <div class="min-w-0">
+                    <div class="text-[10px] sm:text-[11px] font-bold text-amber-300 truncate">นักเรียนปี 2569</div>
+                    <div class="text-base sm:text-2xl font-extrabold text-white mt-0.5 truncate">
+                      ${stats.totalStudents.toLocaleString()} <span class="text-[9px] sm:text-[10px] font-normal text-amber-200">คน</span>
                     </div>
                   </div>
                 </div>
 
                 <div
                   onclick="window.app.navigate('personnel')"
-                  class="p-3 sm:p-3.5 rounded-2xl bg-slate-950/45 hover:bg-slate-950/65 border border-amber-400/35 transition cursor-pointer flex items-center gap-2.5"
+                  class="p-2 sm:p-3.5 rounded-xl sm:rounded-2xl bg-slate-950/45 hover:bg-slate-950/65 border border-amber-400/35 transition cursor-pointer flex items-center gap-2 sm:gap-2.5 min-w-0"
                 >
-                  <div class="w-9 h-9 rounded-xl bg-gradient-to-br from-emerald-400 via-teal-500 to-green-600 text-white flex items-center justify-center shadow-sm shrink-0 text-base">
+                  <div class="w-7 h-7 sm:w-9 sm:h-9 rounded-lg sm:rounded-xl bg-gradient-to-br from-emerald-400 via-teal-500 to-green-600 text-white flex items-center justify-center shadow-sm shrink-0 text-xs sm:text-base">
                     👩‍🏫
                   </div>
-                  <div>
-                    <div class="text-[11px] font-bold text-amber-300">ครูและบุคลากร</div>
-                    <div class="text-xl sm:text-2xl font-extrabold text-white mt-0.5">
-                      ${stats.totalPersonnel.toLocaleString()} <span class="text-[10px] font-normal text-amber-200">ท่าน</span>
+                  <div class="min-w-0">
+                    <div class="text-[10px] sm:text-[11px] font-bold text-amber-300 truncate">ครูและบุคลากร</div>
+                    <div class="text-base sm:text-2xl font-extrabold text-white mt-0.5 truncate">
+                      ${stats.totalPersonnel.toLocaleString()} <span class="text-[9px] sm:text-[10px] font-normal text-amber-200">ท่าน</span>
                     </div>
                   </div>
                 </div>
 
                 <div
                   onclick="window.app.navigate('about')"
-                  class="p-3 sm:p-3.5 rounded-2xl bg-slate-950/45 hover:bg-slate-950/65 border border-amber-400/35 transition cursor-pointer flex items-center gap-2.5"
+                  class="p-2 sm:p-3.5 rounded-xl sm:rounded-2xl bg-slate-950/45 hover:bg-slate-950/65 border border-amber-400/35 transition cursor-pointer flex items-center gap-2 sm:gap-2.5 min-w-0"
                 >
-                  <div class="w-9 h-9 rounded-xl bg-gradient-to-br from-amber-400 via-orange-500 to-red-500 text-white flex items-center justify-center shadow-sm shrink-0 text-base">
+                  <div class="w-7 h-7 sm:w-9 sm:h-9 rounded-lg sm:rounded-xl bg-gradient-to-br from-amber-400 via-orange-500 to-red-500 text-white flex items-center justify-center shadow-sm shrink-0 text-xs sm:text-base">
                     🏛️
                   </div>
-                  <div>
-                    <div class="text-[11px] font-bold text-amber-300">รหัส 10 หลัก</div>
-                    <div class="text-xs sm:text-sm font-extrabold font-mono text-white mt-0.5">
+                  <div class="min-w-0">
+                    <div class="text-[10px] sm:text-[11px] font-bold text-amber-300 truncate">รหัส 10 หลัก</div>
+                    <div class="text-xs sm:text-sm font-extrabold font-mono text-white mt-0.5 truncate">
                       ${window.authService.sanitizeHTML(profile.school_code_10 || profile.school_code || '1034710083')}
                     </div>
                   </div>
@@ -1070,35 +1070,35 @@ class PublicViews {
 
                 <div
                   onclick="window.app.navigate('news')"
-                  class="p-3 sm:p-3.5 rounded-2xl bg-slate-950/45 hover:bg-slate-950/65 border border-amber-400/35 transition cursor-pointer flex items-center gap-2.5"
+                  class="p-2 sm:p-3.5 rounded-xl sm:rounded-2xl bg-slate-950/45 hover:bg-slate-950/65 border border-amber-400/35 transition cursor-pointer flex items-center gap-2 sm:gap-2.5 min-w-0"
                 >
-                  <div class="w-9 h-9 rounded-xl bg-gradient-to-br from-pink-500 via-rose-500 to-red-600 text-white flex items-center justify-center shadow-sm shrink-0 text-base">
+                  <div class="w-7 h-7 sm:w-9 sm:h-9 rounded-lg sm:rounded-xl bg-gradient-to-br from-pink-500 via-rose-500 to-red-600 text-white flex items-center justify-center shadow-sm shrink-0 text-xs sm:text-base">
                     📢
                   </div>
-                  <div>
-                    <div class="text-[11px] font-bold text-amber-300">ข่าวสาร & สไลด์</div>
-                    <div class="text-xl sm:text-2xl font-extrabold text-white mt-0.5">
-                      ${(this.getStudentSlides().length + stats.totalNews).toLocaleString()} <span class="text-[10px] font-normal text-amber-200">รายการ</span>
+                  <div class="min-w-0">
+                    <div class="text-[10px] sm:text-[11px] font-bold text-amber-300 truncate">ข่าวสาร & สไลด์</div>
+                    <div class="text-base sm:text-2xl font-extrabold text-white mt-0.5 truncate">
+                      ${(this.getStudentSlides().length + stats.totalNews).toLocaleString()} <span class="text-[9px] sm:text-[10px] font-normal text-amber-200">รายการ</span>
                     </div>
                   </div>
                 </div>
               </div>
             </div>
 
-            <!-- Right: ภาพผู้บริหารสถานศึกษา (ขนาดย่อลงพอดีสมส่วนกับข้อความ คลิกเข้าสู่ทำเนียบบุคลากร) (4 Cols) -->
-            <div class="lg:col-span-4 flex items-center justify-center lg:justify-end lg:translate-x-3 xl:translate-x-6">
+            <!-- Right: ภาพผู้บริหารสถานศึกษา (จัดวางกึ่งกลางพอดี ไม่ดันขอบจอในมือถือ) (4 Cols) -->
+            <div class="lg:col-span-4 flex items-center justify-center lg:justify-end mt-2 lg:mt-0">
               <div
                 onclick="window.app.navigate('personnel')"
                 title="คลิกเพื่อเข้าสู่หน้าทำเนียบบุคลากร"
                 class="relative cursor-pointer group flex flex-col items-center select-none"
               >
                 <!-- แสงออร่าสีทองละมุนด้านหลังภาพผู้บริหาร -->
-                <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-64 h-64 sm:w-72 sm:h-72 lg:w-80 lg:h-80 rounded-full bg-gradient-to-tr from-amber-400/30 via-yellow-300/15 to-transparent blur-3xl pointer-events-none"></div>
+                <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-48 h-48 sm:w-72 sm:h-72 lg:w-80 lg:h-80 rounded-full bg-gradient-to-tr from-amber-400/30 via-yellow-300/15 to-transparent blur-3xl pointer-events-none"></div>
 
                 <img
                   src="${directorImg}"
                   alt="นายทองพูล สิงห์บุตร ผู้อำนวยการโรงเรียนบ้านบกหนองทันน้ำ"
-                  class="relative z-10 w-[270px] sm:w-[330px] lg:w-[370px] xl:w-[410px] max-h-[460px] lg:max-h-[500px] xl:max-h-[530px] object-contain drop-shadow-[0_20px_30px_rgba(0,0,0,0.5)] group-hover:scale-105 transition duration-500"
+                  class="relative z-10 w-[210px] sm:w-[280px] lg:w-[350px] xl:w-[390px] max-h-[310px] sm:max-h-[420px] lg:max-h-[500px] object-contain drop-shadow-[0_20px_30px_rgba(0,0,0,0.5)] group-hover:scale-105 transition duration-500"
                   onerror="this.src='assets/img/logo.png'"
                 />
               </div>
@@ -1234,12 +1234,12 @@ class PublicViews {
               </a>
             </div>
 
-            <div class="rounded-2xl overflow-hidden bg-slate-50 border border-slate-200/80 flex justify-center p-2 max-h-[520px] overflow-y-auto">
+            <div class="rounded-2xl overflow-hidden bg-slate-50 border border-slate-200/80 flex justify-center p-2 max-h-[520px] overflow-y-auto w-full">
               <iframe
                 src="https://www.facebook.com/plugins/post.php?href=https%3A%2F%2Fwww.facebook.com%2Fpermalink.php%3Fstory_fbid%3Dpfbid02owAHUJHrPDN5C4o9p8EnrD37DMes4mGHArwBSQc7PpWG8oEyD1UxfGzn2TQLcYC7l%26id%3D100066937487296&show_text=true&width=500"
-                width="500"
+                class="w-full max-w-[500px]"
                 height="721"
-                style="border:none;overflow:hidden;max-width:100%;"
+                style="border:none;overflow:hidden;max-width:100%;width:100%;"
                 scrolling="no"
                 frameborder="0"
                 allowfullscreen="true"
@@ -1748,30 +1748,51 @@ class PublicViews {
           </div>
 
           <!-- แผงสรุปจำนวนบุคลากรรวม (คำนวณสดจากยอดรายชื่อด้านล่าง) -->
-          <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 pt-2 border-t border-slate-100">
-            <div class="p-4 rounded-2xl bg-gradient-to-br from-amber-50 to-white border border-amber-300/80 flex items-center justify-between">
-              <div>
-                <div class="text-xs font-bold text-amber-900">จำนวนบุคลากรรวมทั้งหมด</div>
-                <div class="text-[11px] text-slate-500 mt-0.5">คำนวณจากรายชื่อปัจจุบัน</div>
+          <div class="grid grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-4 pt-2 border-t border-slate-100">
+            <div class="p-3 sm:p-4 rounded-xl sm:rounded-2xl bg-gradient-to-br from-amber-50 to-white border border-amber-300/80 flex items-center justify-between min-w-0">
+              <div class="min-w-0">
+                <div class="text-[11px] sm:text-xs font-bold text-amber-900 truncate">จำนวนบุคลากรรวม</div>
+                <div class="text-[10px] text-slate-500 mt-0.5 truncate">คำนวณจากรายชื่อปัจจุบัน</div>
               </div>
-              <div class="text-right">
-                <span class="text-2xl sm:text-3xl font-extrabold text-slate-900">${totalCount}</span>
-                <span class="text-xs font-bold text-slate-600 ml-1">ท่าน</span>
-              </div>
-            </div>
-
-            <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200/80 flex items-center justify-between">
-              <div>
-                <div class="text-xs font-bold text-slate-700">ผู้บริหารสถานศึกษา</div>
-                <div class="text-[11px] text-slate-400 mt-0.5">ผอ. และ รอง ผอ.</div>
-              </div>
-              <div class="text-right">
-                <span class="text-2xl font-extrabold text-amber-700">${executivesList.length}</span>
-                <span class="text-xs font-semibold text-slate-500 ml-1">ท่าน</span>
+              <div class="text-right shrink-0 ml-1">
+                <span class="text-xl sm:text-3xl font-extrabold text-slate-900">${totalCount}</span>
+                <span class="text-[10px] sm:text-xs font-bold text-slate-600 ml-0.5">ท่าน</span>
               </div>
             </div>
 
-            <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200/80 flex items-center justify-between">
+            <div class="p-3 sm:p-4 rounded-xl sm:rounded-2xl bg-slate-50 border border-slate-200/80 flex items-center justify-between min-w-0">
+              <div class="min-w-0">
+                <div class="text-[11px] sm:text-xs font-bold text-slate-700 truncate">ผู้บริหารสถานศึกษา</div>
+                <div class="text-[10px] text-slate-400 mt-0.5 truncate">ผอ. และ รอง ผอ.</div>
+              </div>
+              <div class="text-right shrink-0 ml-1">
+                <span class="text-xl sm:text-2xl font-extrabold text-amber-700">${executivesList.length}</span>
+                <span class="text-[10px] sm:text-xs font-semibold text-slate-500 ml-0.5">ท่าน</span>
+              </div>
+            </div>
+
+            <div class="p-3 sm:p-4 rounded-xl sm:rounded-2xl bg-slate-50 border border-slate-200/80 flex items-center justify-between min-w-0">
+              <div class="min-w-0">
+                <div class="text-[11px] sm:text-xs font-bold text-slate-700 truncate">ครูผู้สอน</div>
+                <div class="text-[10px] text-slate-400 mt-0.5 truncate">8 กลุ่มสาระฯ</div>
+              </div>
+              <div class="text-right shrink-0 ml-1">
+                <span class="text-xl sm:text-2xl font-extrabold text-blue-700">${teachersList.length}</span>
+                <span class="text-[10px] sm:text-xs font-semibold text-slate-500 ml-0.5">ท่าน</span>
+              </div>
+            </div>
+
+            <div class="p-3 sm:p-4 rounded-xl sm:rounded-2xl bg-slate-50 border border-slate-200/80 flex items-center justify-between min-w-0">
+              <div class="min-w-0">
+                <div class="text-[11px] sm:text-xs font-bold text-slate-700 truncate">บุคลากรสนับสนุน</div>
+                <div class="text-[10px] text-slate-400 mt-0.5 truncate">ธุรการ / ช่าง</div>
+              </div>
+              <div class="text-right shrink-0 ml-1">
+                <span class="text-xl sm:text-2xl font-extrabold text-emerald-700">${supportStaffList.length}</span>
+                <span class="text-[10px] sm:text-xs font-semibold text-slate-500 ml-0.5">ท่าน</span>
+              </div>
+            </div>
+          </div>
               <div>
                 <div class="text-xs font-bold text-slate-700">ข้าราชการครู</div>
                 <div class="text-[11px] text-slate-400 mt-0.5">สายงานการสอน</div>

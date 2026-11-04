@@ -19,6 +19,8 @@
 html {
   scroll-behavior: smooth;
   font-family: var(--bbk-font-family);
+  overflow-x: hidden;
+  max-width: 100vw;
 }
 
 body {
@@ -29,7 +31,26 @@ body {
   font-family: var(--bbk-font-family);
   line-height: 1.65;
   overflow-x: hidden;
+  max-width: 100vw;
+  width: 100%;
   -webkit-font-smoothing: antialiased;
+}
+
+/* ป้องกันรูปภาพ ไอเฟรม และคอนเทนต์ล้นจอในมือถือ */
+img, video, canvas, iframe {
+  max-width: 100%;
+  height: auto;
+}
+
+/* ปรับขนาดตัวอักษรและระยะเว้นวรรคให้เหมาะกับหน้าจอมือถือ (Fluid Mobile Adaptations) */
+@media (max-width: 640px) {
+  body {
+    font-size: 14px;
+    line-height: 1.55;
+  }
+  .bbk-soft-card {
+    border-radius: 1rem !important;
+  }
 }
 
 /* Tech Red-Gold Gradient Backgrounds */
