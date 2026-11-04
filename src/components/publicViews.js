@@ -689,31 +689,41 @@ class PublicViews {
         </div>
 
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-center">
-          <!-- ซ้าย: การ์ดสรุปตัวเลข 3 ปีย้อนหลังชัดเจน -->
+          <!-- ซ้าย: การ์ดสรุปตัวเลข 3 ปีย้อนหลัง แยกสีตามปีการศึกษาอย่างสวยงาม -->
           <div class="lg:col-span-5 space-y-3">
             ${trend3Years
-              .map((item) => {
+              .map((item, idx) => {
                 const rawVal = String(item.metric_value ?? '-').trim();
                 const isNumeric = rawVal !== '-' && rawVal !== '' && !isNaN(Number(rawVal)) && Number(rawVal) > 0;
                 const displayVal = isNumeric ? Number(rawVal).toLocaleString() : '-';
                 const pctWidth = isNumeric ? Math.min(100, Math.round((Number(rawVal) / 350) * 100)) : 0;
 
+                const colorThemes = [
+                  { border: 'border-blue-200', bg: 'bg-blue-50/50', text: 'text-blue-700', progress: 'bg-gradient-to-r from-blue-600 to-sky-400', dot: 'bg-blue-600' },
+                  { border: 'border-emerald-200', bg: 'bg-emerald-50/50', text: 'text-emerald-700', progress: 'bg-gradient-to-r from-emerald-600 to-teal-400', dot: 'bg-emerald-600' },
+                  { border: 'border-red-200', bg: 'bg-red-50/50', text: 'text-red-700', progress: 'bg-gradient-to-r from-red-600 to-amber-500', dot: 'bg-red-600' }
+                ];
+                const theme = colorThemes[idx % colorThemes.length];
+
                 return `
                   <div class="p-4 rounded-2xl border ${
-                    isNumeric ? 'bg-red-50/40 border-red-200 shadow-2xs' : 'bg-slate-50 border-slate-200/80'
+                    isNumeric ? `${theme.bg} ${theme.border} shadow-2xs` : 'bg-slate-50 border-slate-200/80'
                   } space-y-2">
                     <div class="flex items-center justify-between">
-                      <div>
-                        <span class="text-xs font-extrabold text-slate-900">ปีการศึกษา ${window.authService.sanitizeHTML(item.academic_year)}</span>
-                        <span class="block text-[11px] text-slate-500">${isNumeric ? 'ข้อมูลจำนวนนักเรียนทั้งหมด' : 'เว้นว่างไว้รอการอัปเดตข้อมูล'}</span>
+                      <div class="flex items-center gap-2">
+                        <span class="w-2.5 h-2.5 rounded-full ${isNumeric ? theme.dot : 'bg-slate-400'}"></span>
+                        <div>
+                          <span class="text-xs font-extrabold text-slate-900">ปีการศึกษา ${window.authService.sanitizeHTML(item.academic_year)}</span>
+                          <span class="block text-[11px] text-slate-500">${isNumeric ? 'ข้อมูลจำนวนนักเรียนทั้งหมด' : 'เว้นว่างไว้รอการอัปเดตข้อมูล'}</span>
+                        </div>
                       </div>
                       <div class="text-right">
-                        <span class="text-2xl font-extrabold ${isNumeric ? 'text-red-700' : 'text-slate-400'}">${displayVal}</span>
+                        <span class="text-2xl font-extrabold ${isNumeric ? theme.text : 'text-slate-400'}">${displayVal}</span>
                         <span class="text-xs font-semibold text-slate-500 ml-1">${isNumeric ? 'คน' : ''}</span>
                       </div>
                     </div>
                     <div class="w-full h-2.5 rounded-full bg-slate-200/80 overflow-hidden">
-                      <div class="h-full rounded-full ${isNumeric ? 'bg-gradient-to-r from-red-600 to-amber-500' : 'bg-slate-300'}" style="width: ${pctWidth}%"></div>
+                      <div class="h-full rounded-full ${isNumeric ? theme.progress : 'bg-slate-300'}" style="width: ${pctWidth}%"></div>
                     </div>
                   </div>
                 `;
@@ -721,11 +731,21 @@ class PublicViews {
               .join('')}
           </div>
 
-          <!-- ขวา: กราฟแท่ง Chart.js แสดงจำนวนนักเรียน 3 ปีย้อนหลัง -->
+          <!-- ขวา: กราฟแท่ง Chart.js แสดงจำนวนนักเรียน 3 ปีย้อนหลัง แยกสีตามปี -->
           <div class="lg:col-span-7 bg-slate-50/70 rounded-2xl p-4 sm:p-5 border border-slate-200/80">
-            <div class="flex items-center justify-between mb-3">
+            <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
               <span class="text-xs font-bold text-slate-700">กราฟเปรียบเทียบจำนวนนักเรียน 3 ปีย้อนหลัง (คน)</span>
-              <span class="text-[11px] font-bold text-red-800 bg-amber-100 border border-amber-300 px-2.5 py-0.5 rounded-full">ปีการศึกษา 2569: 285 คน</span>
+              <div class="flex flex-wrap items-center gap-1.5 text-[10px] sm:text-[11px] font-bold">
+                <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-blue-100 text-blue-800 border border-blue-300">
+                  <span class="w-2 h-2 rounded-full bg-blue-600"></span> ปี 2567: 295 คน
+                </span>
+                <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-800 border border-emerald-300">
+                  <span class="w-2 h-2 rounded-full bg-emerald-600"></span> ปี 2568: 281 คน
+                </span>
+                <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-red-100 text-red-800 border border-red-300">
+                  <span class="w-2 h-2 rounded-full bg-red-600"></span> ปี 2569: 285 คน
+                </span>
+              </div>
             </div>
             <div class="h-60 sm:h-64 relative">
               <canvas id="visitor-3yr-student-chart"></canvas>
@@ -755,6 +775,12 @@ class PublicViews {
       return v === '-' || v === '' || isNaN(Number(v)) ? 0 : Number(v);
     });
 
+    const barColors = [
+      { bg: '#2563EB', border: '#1D4ED8' }, // ปี 2567: สีน้ำเงิน
+      { bg: '#059669', border: '#047857' }, // ปี 2568: สีเขียวมรกต
+      { bg: '#DC2626', border: '#B91C1C' }  // ปี 2569: สีแดงเข้มเทคโนโลยี
+    ];
+
     this.visitorChartInstance = new Chart(canvas, {
       type: 'bar',
       data: {
@@ -763,8 +789,8 @@ class PublicViews {
           {
             label: 'จำนวนนักเรียนทั้งหมด (คน)',
             data: dataValues,
-            backgroundColor: dataValues.map((v) => (v > 0 ? '#DC2626' : '#E2E8F0')),
-            borderColor: dataValues.map((v) => (v > 0 ? '#F59E0B' : '#CBD5E1')),
+            backgroundColor: dataValues.map((v, i) => (v > 0 ? barColors[i % barColors.length].bg : '#E2E8F0')),
+            borderColor: dataValues.map((v, i) => (v > 0 ? barColors[i % barColors.length].border : '#CBD5E1')),
             borderWidth: 2,
             borderRadius: 12,
             maxBarThickness: 72
@@ -775,7 +801,7 @@ class PublicViews {
         responsive: true,
         maintainAspectRatio: false,
         plugins: {
-          legend: { display: true, position: 'top' },
+          legend: { display: false },
           tooltip: {
             callbacks: {
               label: (ctx) => {
