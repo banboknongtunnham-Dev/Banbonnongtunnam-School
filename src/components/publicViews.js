@@ -1451,7 +1451,7 @@ class PublicViews {
             </div>
           </div>
 
-          <div class="grid grid-cols-2 lg:grid-cols-4 gap-3.5 sm:gap-4 max-w-5xl mx-auto">
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
             ${executives.map((p, idx) => this.renderPersonnelPortraitCard(p, idx < 2)).join('')}
           </div>
         </div>
@@ -1695,7 +1695,7 @@ class PublicViews {
 
   /**
    * การ์ดแนะนำบุคลากรรูปแบบมาตรฐาน: ภาพด้านบน ชื่อและตำแหน่งด้านล่าง
-   * รองรับการเว้นว่างรูปภาพไว้รออัปเดต และมีปุ่มให้ Admin แก้ไขข้อมูล/เปลี่ยนรูปได้ทันที
+   * คืนค่าสัดส่วนภาพแบบแนวตั้ง 3:4 เต็มใบ ชัดเจน สง่างาม ไม่ถูกบีบ พร้อมจัดวางสมดุล
    */
   renderPersonnelPortraitCard(person, isExecutive = false) {
     const hasCustomPhoto = Boolean(
@@ -1714,11 +1714,11 @@ class PublicViews {
     const canManage = window.authService.isTeacherOrAbove();
 
     return `
-      <div class="group bg-white rounded-2xl overflow-hidden border ${
-        isExecutive ? 'border-amber-400 shadow-md ring-1 ring-amber-200' : 'border-slate-200/90 shadow-2xs'
-      } hover:shadow-lg hover:border-red-400 transition flex flex-col justify-between max-w-[270px] mx-auto w-full">
-        <!-- ส่วนที่ 1: ภาพถ่ายบุคลากรด้านบน (ขนาดกะทัดรัด สมส่วน ไม่เทอะทะบน PC) -->
-        <div class="relative h-44 sm:h-52 lg:h-56 w-full ${
+      <div class="group bg-white rounded-3xl overflow-hidden border ${
+        isExecutive ? 'border-amber-400 shadow-md ring-2 ring-amber-200/80' : 'border-slate-200/90 shadow-2xs'
+      } hover:shadow-xl hover:border-red-400 transition duration-300 flex flex-col justify-between w-full">
+        <!-- ส่วนที่ 1: ภาพถ่ายบุคลากรด้านบน สัดส่วน 3:4 เต็มกรอบ สมส่วน สวยงาม -->
+        <div class="relative aspect-[3/4] w-full ${
           isExecutive
             ? 'bg-gradient-to-b from-red-900 via-red-800 to-slate-950'
             : 'bg-gradient-to-b from-amber-50/50 via-slate-50 to-slate-100'
@@ -1729,7 +1729,7 @@ class PublicViews {
               <img
                 src="${resolvedPhoto}"
                 alt="${window.authService.sanitizeHTML(fullName)}"
-                class="w-full h-full ${isExecutive ? 'object-contain object-top pt-1.5 drop-shadow-md' : 'object-cover object-top'} group-hover:scale-105 transition duration-500"
+                class="w-full h-full ${isExecutive ? 'object-contain object-top pt-2 drop-shadow-xl' : 'object-cover object-top'} group-hover:scale-105 transition duration-500"
                 onerror="this.src='assets/img/logo.png'"
               />
               `
@@ -1752,7 +1752,7 @@ class PublicViews {
           ${
             isExecutive
               ? `
-              <span class="absolute top-2.5 left-2.5 px-2.5 py-0.5 rounded-full bg-slate-900/90 text-amber-300 text-[9px] sm:text-[10px] font-bold tracking-wide shadow-xs">
+              <span class="absolute top-2.5 left-2.5 px-3 py-1 rounded-full bg-slate-900/90 text-amber-300 text-[10px] font-bold tracking-wide shadow-xs backdrop-blur-xs border border-amber-400/40">
                 ผู้บริหารสถานศึกษา
               </span>
               `
@@ -1766,7 +1766,7 @@ class PublicViews {
               <button
                 onclick="window.app.handleAdminPersonnelEditClick('${person.personnel_id}')"
                 title="แก้ไขข้อมูล / อัปโหลดรูปภาพ"
-                class="absolute top-2.5 right-2.5 px-2 py-1 rounded-xl bg-white/95 hover:bg-amber-400 text-slate-800 hover:text-slate-950 border border-slate-200/80 shadow-xs text-[10px] font-bold inline-flex items-center gap-1 transition cursor-pointer"
+                class="absolute top-2.5 right-2.5 px-2.5 py-1 rounded-xl bg-white/95 hover:bg-amber-400 text-slate-800 hover:text-slate-950 border border-slate-200/80 shadow-xs text-[10px] font-bold inline-flex items-center gap-1 transition cursor-pointer"
               >
                 <i data-lucide="camera" class="w-3 h-3 text-amber-600"></i>
                 <span>เปลี่ยนรูป</span>
@@ -1776,13 +1776,13 @@ class PublicViews {
           }
         </div>
 
-        <!-- ส่วนที่ 2: ชื่อ-นามสกุล และตำแหน่งด้านล่าง (Bottom Name & Position ขนาดกระชับ) -->
-        <div class="p-3 sm:p-3.5 text-center space-y-1 bg-white flex-1 flex flex-col justify-center">
-          <h3 class="text-xs sm:text-sm lg:text-base font-bold text-slate-900 leading-snug line-clamp-1" title="${window.authService.sanitizeHTML(fullName)}">
+        <!-- ส่วนที่ 2: ชื่อ-นามสกุล และตำแหน่งด้านล่าง (ขนาดสมส่วน พอดีตา) -->
+        <div class="p-4 sm:p-5 text-center space-y-1.5 bg-white flex-1 flex flex-col justify-center">
+          <h3 class="text-sm sm:text-base font-extrabold text-slate-900 leading-snug line-clamp-1" title="${window.authService.sanitizeHTML(fullName)}">
             ${window.authService.sanitizeHTML(fullName)}
           </h3>
 
-          <div class="text-[11px] sm:text-xs font-semibold text-amber-700 truncate">
+          <div class="text-xs sm:text-sm font-bold text-amber-700 truncate">
             ตำแหน่ง ${window.authService.sanitizeHTML(posText)}
           </div>
 
@@ -1790,7 +1790,7 @@ class PublicViews {
             showStanding
               ? `
               <div class="pt-0.5">
-                <span class="inline-block px-2.5 py-0.5 rounded-full text-[10px] font-semibold truncate max-w-full ${
+                <span class="inline-block px-3 py-0.5 rounded-full text-xs font-medium truncate max-w-full ${
                   standing !== '-'
                     ? 'bg-amber-50 text-amber-900 border border-amber-200/80'
                     : 'bg-slate-100 text-slate-500'
@@ -1977,16 +1977,16 @@ class PublicViews {
           </div>
         </div>
 
-        <!-- หมวดที่ 1: คณะผู้บริหารสถานศึกษา (แสดงเด่นด้านบน) -->
+        <!-- หมวดที่ 1: คณะผู้บริหารสถานศึกษา (จัดวางตรงกลาง สง่างาม สมดุล) -->
         ${
           (this.personnelFilter === 'ALL' || this.personnelFilter === 'EXECUTIVE') && executivesList.length > 0
             ? `
-            <div class="space-y-5">
+            <div class="space-y-6">
               <div class="flex items-center gap-3">
-                <span class="w-2 h-6 rounded-full bg-amber-500"></span>
-                <h3 class="text-lg sm:text-xl font-extrabold text-slate-900">คณะผู้บริหารสถานศึกษา (${executivesList.length} ท่าน)</h3>
+                <span class="w-2.5 h-7 rounded-full bg-amber-500"></span>
+                <h3 class="text-xl sm:text-2xl font-extrabold text-slate-900">คณะผู้บริหารสถานศึกษา (${executivesList.length} ท่าน)</h3>
               </div>
-              <div class="grid grid-cols-2 sm:grid-cols-4 gap-3.5 sm:gap-4 max-w-5xl mx-auto">
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 sm:gap-8 max-w-2xl mx-auto">
                 ${executivesList.map((exec) => this.renderPersonnelPortraitCard(exec, true)).join('')}
               </div>
             </div>
@@ -1994,16 +1994,16 @@ class PublicViews {
             : ''
         }
 
-        <!-- หมวดที่ 2: คณะครูผู้สอน (แสดงผลแบบ 5 คอลัมน์บน PC สวยงามพอดี ไม่เทอะทะ) -->
+        <!-- หมวดที่ 2: คณะครูผู้สอน (จัดระเบียบ 4 คอลัมน์สมดุล สวยงาม ภาพเต็มตา) -->
         ${
           (this.personnelFilter === 'ALL' || this.personnelFilter === 'TEACHER') && teachersList.length > 0
             ? `
-            <div class="space-y-5">
+            <div class="space-y-6">
               <div class="flex items-center gap-3">
-                <span class="w-2 h-6 rounded-full bg-slate-900"></span>
-                <h3 class="text-lg sm:text-xl font-extrabold text-slate-900">ข้าราชการครูและบุคลากรทางการศึกษา (${teachersList.length} ท่าน)</h3>
+                <span class="w-2.5 h-7 rounded-full bg-red-600"></span>
+                <h3 class="text-xl sm:text-2xl font-extrabold text-slate-900">ข้าราชการครูและบุคลากรทางการศึกษา (${teachersList.length} ท่าน)</h3>
               </div>
-              <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 sm:gap-4">
+              <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 sm:gap-7">
                 ${teachersList.map((t) => this.renderPersonnelPortraitCard(t, false)).join('')}
               </div>
             </div>
@@ -2015,12 +2015,12 @@ class PublicViews {
         ${
           (this.personnelFilter === 'ALL' || this.personnelFilter === 'STAFF') && supportStaffList.length > 0
             ? `
-            <div class="space-y-5">
+            <div class="space-y-6">
               <div class="flex items-center gap-3">
-                <span class="w-2 h-6 rounded-full bg-emerald-600"></span>
-                <h3 class="text-lg sm:text-xl font-extrabold text-slate-900">บุคลากรสนับสนุนการสอนและเจ้าหน้าที่ (${supportStaffList.length} ท่าน)</h3>
+                <span class="w-2.5 h-7 rounded-full bg-emerald-600"></span>
+                <h3 class="text-xl sm:text-2xl font-extrabold text-slate-900">บุคลากรสนับสนุนการสอนและเจ้าหน้าที่ (${supportStaffList.length} ท่าน)</h3>
               </div>
-              <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 sm:gap-4">
+              <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 sm:gap-7">
                 ${supportStaffList.map((s) => this.renderPersonnelPortraitCard(s, false)).join('')}
               </div>
             </div>
