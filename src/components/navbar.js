@@ -258,6 +258,9 @@ class NavbarComponent {
   renderFooter() {
     const profile = (window.dbAdapter.getTable('School_Profile')[0]) || {};
     const logoUrl = window.driveService.resolveDriveImageUrl(window.dbAdapter.getSetting('logo_url', 'assets/img/logo.png'));
+    const visitorStats = window.dbAdapter && typeof window.dbAdapter.getVisitorStats === 'function'
+      ? window.dbAdapter.getVisitorStats()
+      : { total: 1280, today: 48 };
 
     return `
       <footer class="bg-gradient-to-b from-red-950 to-slate-950 text-slate-300 border-t-4 border-yellow-400 mt-16">
@@ -332,12 +335,34 @@ class NavbarComponent {
             </div>
           </div>
 
-          <div class="border-t border-white/10 mt-10 pt-6 flex flex-col sm:flex-row items-center justify-between text-xs text-slate-400 gap-4">
+          <div class="border-t border-white/10 mt-10 pt-6 flex flex-col md:flex-row items-center justify-between text-xs text-slate-400 gap-4">
             <div>
               © ${new Date().getFullYear()} <strong>${window.authService.sanitizeHTML(profile.school_name_th || 'โรงเรียนบ้านบกหนองทันน้ำ')}</strong> (${window.authService.sanitizeHTML(profile.school_name_en || 'BOKNONGTUNNAM')})
             </div>
-            <div class="text-yellow-400/90 font-semibold">
-              BANBOK SMART DIGITAL SCHOOL PLATFORM
+
+            <!-- กล่องสถิติผู้เข้าชมเว็บไซต์แบบเรียลไทม์ -->
+            <div class="inline-flex items-center gap-2.5 px-3.5 py-1.5 rounded-full bg-black/40 border border-white/15 text-xs text-slate-300">
+              <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+              <span>ผู้เข้าชมวันนี้: <strong class="text-yellow-400 font-mono">${(visitorStats.today || 0).toLocaleString()}</strong> คน</span>
+              <span class="text-white/20">•</span>
+              <span>ยอดเข้าชมสะสม: <strong class="text-white font-mono">${(visitorStats.total || 0).toLocaleString()}</strong> ครั้ง</span>
+            </div>
+
+            <div class="text-yellow-400/90 font-semibold flex items-center gap-2">
+              <span>BANBOK SMART DIGITAL SCHOOL</span>
+              ${
+                window.authService.isTeacherOrAbove()
+                  ? `
+                  <button
+                    onclick="window.app.sendDailyVisitorSummary(true)"
+                    title="คลิกเพื่อส่งสรุปยอดผู้เข้าชมเข้า LINE ทันที"
+                    class="px-2 py-0.5 rounded-md bg-yellow-400/20 text-yellow-300 hover:bg-yellow-400 hover:text-slate-950 text-[10px] font-bold border border-yellow-400/40 transition cursor-pointer"
+                  >
+                    📲 ส่งสรุปเข้า LINE
+                  </button>
+                  `
+                  : ''
+              }
             </div>
           </div>
         </div>

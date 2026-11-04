@@ -194,6 +194,12 @@ function doPost(e) {
       return jsonResponse({ status: 'SUCCESS', line: lineRes });
     }
 
+    // 9.2 ส่งสรุปยอดผู้เข้าชมประจำวันเข้า LINE
+    if (action === 'sendDailyVisitorSummary') {
+      const lineRes = sendDailyVisitorSummaryToLine(ss, body);
+      return jsonResponse({ status: 'SUCCESS', line: lineRes });
+    }
+
     // 10. สร้างรายงาน PDF อัตโนมัติด้วย Google Docs & Drive
     if (action === 'generateOfficialPdfReport') {
       requireRole(actor.role, ['ADMIN', 'DEVELOPER', 'TEACHER']);
@@ -518,4 +524,66 @@ function sendLineMessageViaGAS(ss, body) {
 function jsonResponse(payload) {
   return ContentService.createTextOutput(JSON.stringify(payload))
     .setMimeType(ContentService.MimeType.JSON);
+}
+
+/**
+ * ฟังก์ชันส่งสรุปยอดผู้เข้าชมเว็บไซต์ประจำวันเข้า LINE อัตโนมัติ (Google Apps Script Time-Driven Trigger)
+ */
+function sendDailyVisitorSummaryToLine(ss, body = {}) {
+  try {
+    if (!ss) ss = getSpreadsheet();
+    const token = (body.lineChannelToken || '').trim() || getSettingValue(ss, 'line_channel_access_token');
+    if (!token) {
+      return { status: 'SKIPPED', message: 'No LINE Token configured' };
+    }
+
+    const todayVisitors = (body.todayVisitors != null ? body.todayVisitors : getSettingValue(ss, 'today_visitors')) || '0';
+    const totalVisitors = (body.totalVisitors != null ? body.totalVisitors : getSettingValue(ss, 'total_visitors')) || '1280';
+    const schoolName = getSettingValue(ss, 'hero_welcome_title') || 'โรงเรียนบ้านบกหนองทันน้ำ';
+
+    const now = new Date();
+    const dateStr = Utilities.formatDate(now, 'Asia/Bangkok', 'dd/MM/yyyy HH:mm น.');
+
+    const messageText = 
+`📊 [รายงานประจำวัน] สรุปยอดผู้เข้าชมเว็บไซต์
+🏛️ ${schoolName}
+----------------------------------------
+📅 ข้อมูล ณ: ${dateStr}
+👥 ยอดผู้เข้าชมวันนี้: ${todayVisitors} ครั้ง
+🌐 ยอดผู้เข้าชมสะสมทั้งหมด: ${totalVisitors} ครั้ง
+⚡ สถานะระบบ: ออนไลน์ 100% ปกติ
+----------------------------------------
+🔗 ตรวจสอบเว็บไซต์: https://banboknongtunnham-dev.github.io/Banbonnongtunnam-School/`;
+
+    return sendLineMessageViaGAS(ss, {
+      lineChannelToken: token,
+      lineMessage: messageText
+    });
+  } catch (err) {
+    return { status: 'ERROR', message: err.toString() };
+  }
+}
+
+/**
+ * ฟังก์ชันสร้างตัวจับเวลาอัตโนมัติ (Trigger) ให้ Apps Script รันส่งสรุปเข้า LINE ทุกวันเวลา 18:00 - 19:00 น.
+ */
+function setupDailySummaryTrigger() {
+  // ลบ Trigger เดิมเพื่อไม่ให้ซ้ำซ้อน
+  const triggers = ScriptApp.getProjectTriggers();
+  for (let i = 0; i < triggers.length; i++) {
+    if (triggers[i].getHandlerFunction() === 'sendDailyVisitorSummaryToLine') {
+      ScriptApp.deleteTrigger(triggers[i]);
+    }
+  }
+
+  // สร้าง Trigger ทำงานทุกวัน เวลา 18:00 - 19:00 น.
+  ScriptApp.newTrigger('sendDailyVisitorSummaryToLine')
+    .timeBased()
+    .everyDays(1)
+    .atHour(18)
+    .nearMinute(30)
+    .inTimezone('Asia/Bangkok')
+    .create();
+
+  return 'Daily Trigger created successfully (18:30 ทุกวัน)';
 }

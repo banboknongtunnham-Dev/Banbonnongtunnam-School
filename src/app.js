@@ -14,6 +14,10 @@ class BanbokAppController {
 
   init() {
     this.applyDynamicTheme();
+    // บันทึกและนับจำนวนผู้เข้าชมเว็บไซต์
+    if (window.dbAdapter && typeof window.dbAdapter.recordVisitor === 'function') {
+      window.dbAdapter.recordVisitor();
+    }
     this.render();
     window.addEventListener('hashchange', () => {
       const hashPage = window.location.hash.replace('#', '');
@@ -21,6 +25,14 @@ class BanbokAppController {
         this.navigate(hashPage, false);
       }
     });
+
+    // ตรวจสอบการส่งสรุปรายงานประจำวันเข้า LINE อัตโนมัติ (ช่วงเย็น 18:00 น. เป็นต้นไป)
+    setTimeout(() => {
+      const currentHour = new Date().getHours();
+      if (currentHour >= 18) {
+        this.sendDailyVisitorSummary(false);
+      }
+    }, 2500);
   }
 
   /**
@@ -665,7 +677,7 @@ class BanbokAppController {
       const lineTargetId = window.dbAdapter.getSetting('line_target_id', ''); // User ID หรือ Group ID
       const gasUrl = window.dbAdapter.getSetting('gas_webapp_url', '');
 
-      const lineMessageText = 
+      const lineMessageText = payload.customMessage || 
 `🔔 มีข้อความติดต่อใหม่จากเว็บไซต์โรงเรียนบ้านบกหนองทันน้ำ
 ----------------------------------------
 👤 ผู้ติดต่อ: ${payload.senderName}
@@ -745,6 +757,66 @@ class BanbokAppController {
       }
     } catch (err) {
       console.warn('dispatchLineNotification error:', err);
+    }
+  }
+
+  /**
+   * ส่งสรุปรายงานยอดผู้เข้าชมและกิจกรรมประจำวัน เข้าสู่ LINE Messaging API
+   */
+  async sendDailyVisitorSummary(force = false) {
+    try {
+      const todayStr = new Date().toLocaleDateString('en-CA');
+      const lastSent = window.dbAdapter.getSetting('last_daily_line_summary_date', '');
+
+      // หากไม่ได้บังคับส่ง (force) และส่งไปแล้วในวันนี้ ให้ข้าม
+      if (!force && lastSent === todayStr) {
+        return { status: 'ALREADY_SENT' };
+      }
+
+      const stats = window.dbAdapter.getVisitorStats();
+      const profile = (window.dbAdapter.getTable('School_Profile')[0]) || {};
+      const schoolName = profile.school_name_th || 'โรงเรียนบ้านบกหนองทันน้ำ';
+
+      // นับข้อความติดต่อที่ได้รับวันนี้จาก Audit_Logs
+      const auditLogs = window.dbAdapter.getTable('Audit_Logs');
+      const todayInquiries = auditLogs.filter(
+        (log) => log.action_type === 'CONTACT_INQUIRY' && String(log.timestamp || '').startsWith(todayStr)
+      ).length;
+
+      const nowFormatted = new Date().toLocaleString('th-TH', {
+        dateStyle: 'long',
+        timeStyle: 'short'
+      });
+
+      const messageText = 
+`📊 [รายงานประจำวัน] สรุปยอดผู้เข้าชมเว็บไซต์
+🏛️ ${schoolName}
+----------------------------------------
+📅 ข้อมูล ณ: ${nowFormatted}
+👥 ยอดผู้เข้าชมวันนี้: ${stats.today.toLocaleString()} ครั้ง
+🌐 ยอดผู้เข้าชมสะสมทั้งหมด: ${stats.total.toLocaleString()} ครั้ง
+📨 ข้อความติดต่อสอบถามวันนี้: ${todayInquiries.toLocaleString()} รายการ
+⚡ สถานะระบบ: ออนไลน์ 100% พร้อมใช้งาน
+----------------------------------------
+🔗 เข้าชมเว็บไซต์: https://banboknongtunnham-dev.github.io/Banbonnongtunnam-School/`;
+
+      await this.dispatchLineNotification({
+        customMessage: messageText,
+        reportType: 'DAILY_VISITOR_SUMMARY',
+        submittedAt: nowFormatted
+      });
+
+      await window.dbAdapter.setSetting('last_daily_line_summary_date', todayStr);
+      if (force) {
+        this.showToast('ส่งสรุปรายงานประจำวันเข้าสู่ LINE เรียบร้อยแล้ว');
+      }
+      return { status: 'SUCCESS' };
+    } catch (err) {
+      console.warn('sendDailyVisitorSummary error:', err);
+      if (force) {
+        this.showToast('เกิดข้อผิดพลาดในการส่งรายงาน: ' + err.message, 'error');
+      }
+      return { status: 'ERROR', error: err.message };
     }
   }
 

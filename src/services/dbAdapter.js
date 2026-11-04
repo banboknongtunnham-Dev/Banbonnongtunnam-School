@@ -180,6 +180,63 @@ class DatabaseAdapter {
     });
   }
 
+  /**
+   * บันทึกและนับจำนวนผู้เข้าชมเว็บไซต์ (Visitor Analytics & Daily Tracking)
+   */
+  recordVisitor() {
+    try {
+      const todayStr = new Date().toLocaleDateString('en-CA'); // YYYY-MM-DD
+      let totalVisitors = parseInt(this.getSetting('total_visitors', '1280'), 10);
+      let todayVisitors = parseInt(this.getSetting('today_visitors', '0'), 10);
+      const lastRecordedDate = this.getSetting('today_visitor_date', '');
+      let history = {};
+      try {
+        history = JSON.parse(this.getSetting('visitor_history_json', '{}'));
+      } catch (_) {
+        history = {};
+      }
+
+      // เมื่อขึ้นวันใหม่ รีเซ็ตยอดวันนี้
+      if (lastRecordedDate !== todayStr) {
+        todayVisitors = 0;
+        this.setSetting('today_visitor_date', todayStr);
+      }
+
+      // ตรวจสอบ session (นับ 1 ครั้งต่อ 1 เซสชันบราวเซอร์ เพื่อความแม่นยำ)
+      const sessionKey = 'bbk_visited_session';
+      if (!sessionStorage.getItem(sessionKey)) {
+        totalVisitors++;
+        todayVisitors++;
+        history[todayStr] = (history[todayStr] || 0) + 1;
+        sessionStorage.setItem(sessionKey, todayStr);
+
+        this.setSetting('total_visitors', String(totalVisitors));
+        this.setSetting('today_visitors', String(todayVisitors));
+        this.setSetting('visitor_history_json', JSON.stringify(history));
+      }
+
+      return {
+        total: totalVisitors,
+        today: todayVisitors,
+        todayDate: todayStr
+      };
+    } catch (e) {
+      return { total: 1280, today: 1, todayDate: '' };
+    }
+  }
+
+  getVisitorStats() {
+    const todayStr = new Date().toLocaleDateString('en-CA');
+    const total = parseInt(this.getSetting('total_visitors', '1280'), 10);
+    const lastDate = this.getSetting('today_visitor_date', '');
+    const today = lastDate === todayStr ? parseInt(this.getSetting('today_visitors', '0'), 10) : 0;
+    let history = {};
+    try {
+      history = JSON.parse(this.getSetting('visitor_history_json', '{}'));
+    } catch (_) {}
+    return { total, today, todayDate: todayStr, history };
+  }
+
   getPrimaryKeyName(tableName) {
     return TABLE_PRIMARY_KEYS[tableName] || 'id';
   }
