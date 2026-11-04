@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0" />
+  <title>โรงเรียนบ้านบกหนองทันน้ำ | BANBOK DIGITAL SCHOOL PLATFORM</title>
+  <meta name="description" content="BANBOK DIGITAL SCHOOL PLATFORM ศูนย์กลางข้อมูล ข่าวสาร และนวัตกรรมดิจิทัลเพื่อการศึกษา โรงเรียนบ้านบกหนองทันน้ำ สำนักงานเขตพื้นที่การศึกษาประถมศึกษาอุบลราชธานี เขต 2" />
+  <link rel="icon" type="image/png" href="assets/img/logo.png" />
+
+  <!-- Google Fonts: Prompt, Sarabun, Kanit, Noto Sans Thai -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700&family=Noto+Sans+Thai:wght@300;400;500;600;700&family=Prompt:wght@300;400;500;600;700;800&family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Chart.js สำหรับระบบ Interactive Dashboard -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <!-- Custom Styles -->
+  <link rel="stylesheet" href="assets/css/custom.css" />
+</head>
+<body class="bg-white text-slate-900 antialiased selection:bg-amber-200 selection:text-slate-950">
+
+  <!-- Toast Notification Container -->
+  <div id="toast-container" class="fixed top-4 right-4 z-50 flex flex-col gap-2 max-w-sm w-full pointer-events-none"></div>
+
+  <!-- Dynamic Modal Container -->
+  <div id="modal-root"></div>
+
+  <!-- Main Application Root -->
+  <div id="app-root">
+    <!-- Loading Screen ขณะเริ่มต้นระบบ -->
+    <div class="min-h-screen flex flex-col items-center justify-center bg-white p-6 text-center">
+      <img src="assets/img/logo.png" alt="โลโก้โรงเรียนบ้านบกหนองทันน้ำ" class="w-24 h-24 object-contain animate-pulse mb-4" />
+      <h1 class="text-xl font-bold text-slate-900">โรงเรียนบ้านบกหนองทันน้ำ</h1>
+      <p class="text-xs text-amber-700 font-semibold mt-1">กำลังโหลดระบบ BANBOK DIGITAL SCHOOL PLATFORM...</p>
+    </div>
+  </div>
+
+  <!-- Core Architecture & Services (Phases 1 - 10 + Google Workspace Fast-Engine) -->
+  <script src="src/config/defaultData.js"></script>
+  <script src="src/services/googleWorkspaceClient.js"></script>
+  <script src="src/services/dbAdapter.js"></script>
+  <script src="src/services/driveService.js"></script>
+  <script src="src/services/authService.js"></script>
+
+  <!-- UI Components & Portals -->
+  <script src="src/components/navbar.js"></script>
+  <script src="src/components/publicViews.js"></script>
+  <script src="src/components/dashboardView.js"></script>
+  <script src="src/components/teacherPortalView.js"></script>
+  <script src="src/components/adminDashboardView.js"></script>
+  <script src="src/components/devConsoleView.js"></script>
+
+  <!-- Main Application Controller -->
+  <script src="src/app.js"></script>
+</body>
+</html>

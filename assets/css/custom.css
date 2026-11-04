@@ -1,0 +1,144 @@
+/* ==========================================================================
+   BANBOK DIGITAL SCHOOL PLATFORM - MODERN TECH RED & GOLD THEME
+   โทนสีเหลือง-แดง (Crimson Red & Cyber Gold) โมเดิร์น ทันสมัย สไตล์เทคโนโลยี
+   จัดวางแบบ Modular Bento Grid เป็นสัดส่วน สะอาดตา โปรเฟสชันนอล
+   ========================================================================== */
+
+:root {
+  --bbk-font-family: 'Prompt', 'Sarabun', sans-serif;
+  --bbk-primary-bg: #F8FAFC;
+  --bbk-secondary-bg: #FFFFFF;
+  --bbk-brand-red: #B91C1C;
+  --bbk-brand-red-light: #DC2626;
+  --bbk-brand-gold: #F59E0B;
+  --bbk-brand-yellow: #FACC15;
+  --bbk-accent-gold: #F59E0B;
+  --bbk-accent-navy: #991B1B;
+}
+
+html {
+  scroll-behavior: smooth;
+  font-family: var(--bbk-font-family);
+}
+
+body {
+  background-color: #F8FAFC;
+  background-image: radial-gradient(#E2E8F0 1px, transparent 1px);
+  background-size: 24px 24px;
+  color: #0F172A;
+  font-family: var(--bbk-font-family);
+  line-height: 1.65;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Tech Red-Gold Gradient Backgrounds */
+.bbk-tech-hero {
+  background: linear-gradient(135deg, #450A0A 0%, #7F1D1D 40%, #B91C1C 80%, #D97706 100%);
+  position: relative;
+}
+
+.bbk-tech-grid-overlay {
+  background-image: 
+    linear-gradient(to right, rgba(250, 204, 21, 0.07) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(250, 204, 21, 0.07) 1px, transparent 1px);
+  background-size: 32px 32px;
+}
+
+.bbk-red-gold-bar {
+  background: linear-gradient(90deg, #7F1D1D 0%, #B91C1C 50%, #D97706 100%);
+}
+
+.bbk-red-gold-badge {
+  background: linear-gradient(135deg, #DC2626 0%, #D97706 100%);
+  color: #FFFFFF;
+}
+
+/* Modular Bento Card - คมชัด เป็นสัดส่วน ไม่รก */
+.bbk-soft-card {
+  background: #FFFFFF;
+  border: 1px solid #E2E8F0;
+  box-shadow: 0 4px 20px -4px rgba(15, 23, 42, 0.05);
+  transition: transform 0.22s ease, box-shadow 0.22s ease, border-color 0.22s ease;
+}
+
+.bbk-soft-card:hover {
+  border-color: rgba(245, 158, 11, 0.55);
+  box-shadow: 0 12px 28px -6px rgba(185, 28, 28, 0.08), 0 4px 12px -2px rgba(245, 158, 11, 0.08);
+}
+
+/* แอนิเมชันเปลี่ยนหน้าและสไลด์ */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes slideProgress {
+  from {
+    width: 0%;
+  }
+  to {
+    width: 100%;
+  }
+}
+
+.bbk-slide-progress {
+  animation: slideProgress 5.5s linear infinite;
+}
+
+/* แถบข่าววิ่งแนวนอน (Smooth News Marquee) */
+@keyframes bbkMarquee {
+  0% {
+    transform: translateX(0%);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+.bbk-marquee-track {
+  display: flex;
+  width: max-content;
+  animation: bbkMarquee 36s linear infinite;
+}
+
+.bbk-marquee-track:hover {
+  animation-play-state: paused;
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+/* Custom Scrollbar โทนแดง-ทอง */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #F1F5F9;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #CBD5E1;
+  border-radius: 9999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #B91C1C;
+}
