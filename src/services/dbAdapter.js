@@ -88,11 +88,17 @@ class DatabaseAdapter {
             this.saveLocal();
           }
         }
-        // อัปเดตภาพผู้อำนวยการโรงเรียน (PER-001) อัตโนมัติหากในแคชเดิมยังว่างอยู่
+        // อัปเดตภาพถ่ายบุคลากรทั้งหมดอัตโนมัติหากในแคชเดิมยังว่างอยู่
         if (Array.isArray(this.db.Personnel)) {
-          const dirRow = this.db.Personnel.find((p) => p.personnel_id === 'PER-001');
-          if (dirRow && (!dirRow.photo_url || dirRow.photo_url === '' || dirRow.photo_url === 'assets/img/logo.png')) {
-            dirRow.photo_url = 'assets/img/director_thongpoon.png';
+          let updatedAny = false;
+          this.db.Personnel.forEach((p) => {
+            const def = (window.BANBOK_DEFAULT_DB.Personnel || []).find((dp) => dp.personnel_id === p.personnel_id);
+            if (def && def.photo_url && (!p.photo_url || p.photo_url === '' || p.photo_url === 'assets/img/logo.png')) {
+              p.photo_url = def.photo_url;
+              updatedAny = true;
+            }
+          });
+          if (updatedAny) {
             this.saveLocal();
           }
         }

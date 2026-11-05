@@ -2304,6 +2304,27 @@ class BanbokAppController {
     }
   }
 
+  async syncCurrentDatabaseToMaster() {
+    try {
+      this.showToast('กำลังส่งข้อมูลจากเครื่องนี้เข้าสู่ระบบหลัก...', 'info');
+      const res = await fetch('/api/sync-database', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ database: window.dbAdapter.db })
+      });
+      const data = await res.json();
+      if (data.success) {
+        this.showToast('✅ ซิงค์ข้อมูลเข้าสู่ระบบหลักสำเร็จแล้ว!');
+      } else {
+        throw new Error(data.error || 'ซิงค์ไม่สำเร็จ');
+      }
+    } catch (err) {
+      console.warn('Sync to local server failed, offering JSON download fallback:', err);
+      this.downloadFullBackup();
+      this.showToast('ดาวน์โหลดไฟล์ข้อมูลสำรอง (.JSON) เรียบร้อยแล้ว สามารถนำไฟล์นี้ไปอัปเดตได้ทันที', 'info');
+    }
+  }
+
   downloadFullBackup() {
     const jsonStr = window.dbAdapter.exportBackupJSON();
     const blob = new Blob([jsonStr], { type: 'application/json;charset=utf-8' });

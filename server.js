@@ -94,6 +94,40 @@ const server = http.createServer((req, res) => {
     return;
   }
 
+  // API Endpoint for Database Sync (Saves localStorage database into defaultData.js)
+  if (req.method === 'POST' && cleanUrl === '/api/sync-database') {
+    let bodyData = '';
+    req.on('data', chunk => { bodyData += chunk; });
+    req.on('end', () => {
+      try {
+        const payload = JSON.parse(bodyData || '{}');
+        const db = payload.database || payload;
+        if (!db || typeof db !== 'object') {
+          res.writeHead(400, { 'Content-Type': 'application/json' });
+          res.end(JSON.stringify({ success: false, error: 'Invalid database payload' }));
+          return;
+        }
+
+        // 1. Save JSON snapshot backup
+        const backupFile = path.join(ROOT, 'data_backup.json');
+        fs.writeFileSync(backupFile, JSON.stringify(db, null, 2), 'utf8');
+
+        // 2. Update defaultData.js
+        const defaultDataFile = path.join(ROOT, 'src', 'config', 'defaultData.js');
+        const header = `/**\n * BANBOK DIGITAL SCHOOL PLATFORM - DEFAULT MASTER DATABASE\n * Updated automatically via Local Admin Sync at ${new Date().toISOString()}\n */\n\n`;
+        const fileContent = `${header}window.BANBOK_DEFAULT_DB = ${JSON.stringify(db, null, 2)};\n`;
+        fs.writeFileSync(defaultDataFile, fileContent, 'utf8');
+
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ success: true, message: 'บันทึกฐานข้อมูลลงในระบบหลักสำเร็จแล้ว' }));
+      } catch (err) {
+        res.writeHead(500, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ success: false, error: err.message }));
+      }
+    });
+    return;
+  }
+
   // Static File Serving
   const relPath = cleanUrl === '/' ? '/index.html' : cleanUrl;
   const filePath = path.join(ROOT, relPath);
