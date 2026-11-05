@@ -1715,12 +1715,12 @@ class PublicViews {
 
     return `
       <div class="group bg-white rounded-3xl overflow-hidden border ${
-        isExecutive ? 'border-amber-400 shadow-md ring-2 ring-amber-200/80' : 'border-slate-200/90 shadow-2xs'
+        isExecutive ? 'border-2 border-amber-400 shadow-md ring-2 ring-amber-200/80' : 'border border-slate-200/90 shadow-2xs'
       } hover:shadow-xl hover:border-red-400 transition duration-300 flex flex-col justify-between w-full">
         <!-- ส่วนที่ 1: ภาพถ่ายบุคลากรด้านบน สัดส่วน 3:4 เต็มกรอบ สมส่วน สวยงาม -->
         <div class="relative aspect-[3/4] w-full ${
           isExecutive
-            ? 'bg-gradient-to-b from-red-900 via-red-800 to-slate-950'
+            ? 'bg-amber-50/20 p-1.5'
             : 'bg-gradient-to-b from-amber-50/50 via-slate-50 to-slate-100'
         } overflow-hidden flex items-center justify-center border-b border-slate-100">
           ${
@@ -1729,7 +1729,7 @@ class PublicViews {
               <img
                 src="${resolvedPhoto}"
                 alt="${window.authService.sanitizeHTML(fullName)}"
-                class="w-full h-full ${isExecutive ? 'object-contain object-top pt-2 drop-shadow-xl' : 'object-cover object-top'} group-hover:scale-105 transition duration-500"
+                class="w-full h-full ${isExecutive ? 'object-contain object-center rounded-2xl' : 'object-cover object-top'} group-hover:scale-105 transition duration-500"
                 onerror="this.src='assets/img/logo.png'"
               />
               `
@@ -1986,7 +1986,7 @@ class PublicViews {
                 <span class="w-2.5 h-7 rounded-full bg-amber-500"></span>
                 <h3 class="text-xl sm:text-2xl font-extrabold text-slate-900">คณะผู้บริหารสถานศึกษา (${executivesList.length} ท่าน)</h3>
               </div>
-              <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 sm:gap-8 max-w-2xl mx-auto">
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 sm:gap-8 max-w-xl mx-auto">
                 ${executivesList.map((exec) => this.renderPersonnelPortraitCard(exec, true)).join('')}
               </div>
             </div>
@@ -1994,7 +1994,7 @@ class PublicViews {
             : ''
         }
 
-        <!-- หมวดที่ 2: คณะครูผู้สอน (จัดระเบียบ 4 คอลัมน์สมดุล สวยงาม ภาพเต็มตา) -->
+        <!-- หมวดที่ 2: คณะครูผู้สอน (จัดระเบียบ 5 คอลัมน์สมดุล สวยงาม ภาพเต็มตา) -->
         ${
           (this.personnelFilter === 'ALL' || this.personnelFilter === 'TEACHER') && teachersList.length > 0
             ? `
@@ -2003,7 +2003,7 @@ class PublicViews {
                 <span class="w-2.5 h-7 rounded-full bg-red-600"></span>
                 <h3 class="text-xl sm:text-2xl font-extrabold text-slate-900">ข้าราชการครูและบุคลากรทางการศึกษา (${teachersList.length} ท่าน)</h3>
               </div>
-              <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 sm:gap-7">
+              <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 sm:gap-6">
                 ${teachersList.map((t) => this.renderPersonnelPortraitCard(t, false)).join('')}
               </div>
             </div>
@@ -2020,7 +2020,7 @@ class PublicViews {
                 <span class="w-2.5 h-7 rounded-full bg-emerald-600"></span>
                 <h3 class="text-xl sm:text-2xl font-extrabold text-slate-900">บุคลากรสนับสนุนการสอนและเจ้าหน้าที่ (${supportStaffList.length} ท่าน)</h3>
               </div>
-              <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 sm:gap-7">
+              <div class="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-4 lg:grid-cols-4 gap-4 sm:gap-6 max-w-5xl mx-auto">
                 ${supportStaffList.map((s) => this.renderPersonnelPortraitCard(s, false)).join('')}
               </div>
             </div>

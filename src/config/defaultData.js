@@ -111,7 +111,7 @@ window.BANBOK_DEFAULT_DB = {
       education_degree: '',
       phone: '',
       email: '',
-      photo_url: 'assets/img/personnel/per_001.png',
+      photo_url: 'assets/img/director_thongpoon.png',
       role_group: 'EXECUTIVE',
       sort_order: 1,
       status: 'ปฏิบัติราชการ',

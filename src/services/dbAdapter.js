@@ -129,6 +129,10 @@ class DatabaseAdapter {
               p.photo_url = def.photo_url;
               updatedAny = true;
             }
+            if (p.personnel_id === 'PER-001') {
+              p.photo_url = 'assets/img/director_thongpoon.png';
+              updatedAny = true;
+            }
             if (def && def.academic_standing && def.academic_standing !== '-' && (!p.academic_standing || p.academic_standing === '-')) {
               p.academic_standing = def.academic_standing;
               updatedAny = true;
