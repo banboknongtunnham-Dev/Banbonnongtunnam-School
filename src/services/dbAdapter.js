@@ -138,6 +138,42 @@ class DatabaseAdapter {
             this.saveLocal();
           }
         }
+
+        // ตรวจสอบและอัปเดตสถิติ School_Statistics (กราฟ 3 ปีย้อนหลัง และผลสอบระดับชาติ O-NET, RT, NT)
+        if (Array.isArray(this.db.School_Statistics)) {
+          let updatedStats = false;
+          // อัปเดตสถิตินักเรียน 3 ปีย้อนหลังให้ตรงความจริง: 295 (ปี 67), 281 (ปี 68), 285 (ปี 69)
+          const s67 = this.db.School_Statistics.find((s) => s.metric_group === 'STUDENT_TREND' && String(s.academic_year) === '2567');
+          if (s67 && (s67.metric_value === '-' || !s67.metric_value || s67.metric_value === 0)) {
+            s67.metric_value = 295;
+            updatedStats = true;
+          }
+          const s68 = this.db.School_Statistics.find((s) => s.metric_group === 'STUDENT_TREND' && String(s.academic_year) === '2568');
+          if (s68 && (s68.metric_value === '-' || !s68.metric_value || s68.metric_value === 0)) {
+            s68.metric_value = 281;
+            updatedStats = true;
+          }
+          const s69 = this.db.School_Statistics.find((s) => s.metric_group === 'STUDENT_TREND' && String(s.academic_year) === '2569');
+          if (s69 && (s69.metric_value === '-' || !s69.metric_value || s69.metric_value === 0)) {
+            s69.metric_value = 285;
+            updatedStats = true;
+          }
+
+          // เติมผลสอบระดับชาติ O-NET, RT, NT หากในเครื่องยังไม่มี
+          (window.BANBOK_DEFAULT_DB.School_Statistics || []).forEach((defS) => {
+            if (String(defS.metric_group || '').startsWith('EXAM_')) {
+              const exists = this.db.School_Statistics.some((s) => s.kpi_id === defS.kpi_id);
+              if (!exists) {
+                this.db.School_Statistics.push(JSON.parse(JSON.stringify(defS)));
+                updatedStats = true;
+              }
+            }
+          });
+
+          if (updatedStats) {
+            this.saveLocal();
+          }
+        }
       } else {
         this.db = JSON.parse(JSON.stringify(window.BANBOK_DEFAULT_DB));
         this.saveLocal();
