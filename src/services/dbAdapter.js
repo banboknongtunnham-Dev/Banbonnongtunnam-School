@@ -91,10 +91,22 @@ class DatabaseAdapter {
         // อัปเดตภาพถ่ายบุคลากรทั้งหมดอัตโนมัติหากในแคชเดิมยังว่างอยู่
         if (Array.isArray(this.db.Personnel)) {
           let updatedAny = false;
+          // ตรวจสอบและเติมบุคลากรใหม่จากค่าเริ่มต้น (เช่น PER-019, PER-020)
+          (window.BANBOK_DEFAULT_DB.Personnel || []).forEach((defP) => {
+            const exists = this.db.Personnel.some((p) => p.personnel_id === defP.personnel_id);
+            if (!exists) {
+              this.db.Personnel.push(JSON.parse(JSON.stringify(defP)));
+              updatedAny = true;
+            }
+          });
           this.db.Personnel.forEach((p) => {
             const def = (window.BANBOK_DEFAULT_DB.Personnel || []).find((dp) => dp.personnel_id === p.personnel_id);
             if (def && def.photo_url && (!p.photo_url || p.photo_url === '' || p.photo_url === 'assets/img/logo.png')) {
               p.photo_url = def.photo_url;
+              updatedAny = true;
+            }
+            if (def && def.academic_standing && def.academic_standing !== '-' && (!p.academic_standing || p.academic_standing === '-')) {
+              p.academic_standing = def.academic_standing;
               updatedAny = true;
             }
           });
