@@ -18,6 +18,14 @@ class BanbokAppController {
     if (window.dbAdapter && typeof window.dbAdapter.recordVisitor === 'function') {
       window.dbAdapter.recordVisitor();
     }
+
+    // ระบบ Reactive Subscription: เมื่อมีการแก้ไขข้อมูลใดๆ ในระบบ ให้เรนเดอร์หน้าจอและกราฟใหม่ทันทีแบบ Real-Time
+    if (window.dbAdapter && typeof window.dbAdapter.subscribe === 'function') {
+      window.dbAdapter.subscribe(() => {
+        this.render();
+      });
+    }
+
     this.render();
     window.addEventListener('hashchange', () => {
       const hashPage = window.location.hash.replace('#', '');

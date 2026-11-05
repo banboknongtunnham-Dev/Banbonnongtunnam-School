@@ -33,6 +33,7 @@ class DatabaseAdapter {
   constructor() {
     this.db = null;
     this.listeners = [];
+    this._syncTimeout = null;
     this.lastSyncStatus = {
       mode: 'HYBRID_READY',
       connectedToCloud: false,
@@ -41,6 +42,29 @@ class DatabaseAdapter {
       errorCount: 0
     };
     this.init();
+    this.initStorageListener();
+    this.startAutoRevalidation();
+  }
+
+  initStorageListener() {
+    if (typeof window !== 'undefined' && window.addEventListener) {
+      window.addEventListener('storage', (event) => {
+        if (event.key === STORAGE_KEY && event.newValue) {
+          try {
+            this.db = JSON.parse(event.newValue);
+            this.notifyListeners();
+          } catch (e) { /* ignore */ }
+        }
+      });
+    }
+  }
+
+  startAutoRevalidation() {
+    if (typeof window === 'undefined') return;
+    // ตรวจสอบและดึงข้อมูลอัปเดตจาก Cloud / Google Workspace ทุก 30 วินาทีแบบ Real-Time Polling
+    setInterval(() => {
+      this.backgroundRevalidateFromGoogleWorkspace();
+    }, 30000);
   }
 
   init() {
@@ -183,9 +207,25 @@ class DatabaseAdapter {
     try {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(this.db));
       this.notifyListeners();
+      this.autoSyncToLocalServer();
     } catch (err) {
       this.recordError('DB_SAVE_LOCAL_ERROR', err.message);
     }
+  }
+
+  autoSyncToLocalServer() {
+    if (this._syncTimeout) clearTimeout(this._syncTimeout);
+    this._syncTimeout = setTimeout(async () => {
+      try {
+        if (typeof window !== 'undefined' && window.location && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')) {
+          await fetch('/api/sync-database', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ database: this.db })
+          });
+        }
+      } catch (_) { /* silent fallback */ }
+    }, 600);
   }
 
   subscribe(callback) {
