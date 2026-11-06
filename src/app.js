@@ -584,7 +584,8 @@ class BanbokAppController {
             <div class="p-4 rounded-2xl bg-blue-50/70 border border-blue-200 space-y-3">
               <div class="flex flex-wrap items-center justify-between gap-2">
                 <span class="text-xs font-extrabold text-[#1877F2] inline-flex items-center gap-1.5">
-                  <img src="assets/img/facebook_logo.png" alt="Facebook" class="w-4 h-4 object-contain shrink-0 inline-block" /> โพสต์จาก Facebook โรงเรียนบ้านบกหนองทันน้ำ
+                  <svg class="w-4 h-4 fill-[#1877F2] shrink-0" viewBox="0 0 24 24"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+                  <span>โพสต์จาก Facebook โรงเรียนบ้านบกหนองทันน้ำ</span>
                 </span>
                 <a href="${window.authService.sanitizeHTML(fbUrl)}" target="_blank" rel="noopener" class="px-3 py-1.5 rounded-xl bg-[#1877F2] text-white text-xs font-bold hover:bg-blue-700 transition inline-flex items-center gap-1">
                   <span>เปิดบน Facebook</span>
@@ -2511,7 +2512,7 @@ class BanbokAppController {
               <span>Google Drive คลังไฟล์</span>
             </a>
             <a href="https://www.facebook.com/profile.php?id=100014526581847" target="_blank" rel="noopener" class="p-3 rounded-xl bg-white border border-slate-200 hover:border-blue-500 flex flex-col items-center text-center gap-1.5 font-semibold text-slate-800 transition">
-              <img src="assets/img/facebook_logo.png" alt="FB" class="w-5 h-5 object-contain" />
+              <svg class="w-5 h-5 fill-[#1877F2] shrink-0" viewBox="0 0 24 24"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
               <span>Facebook โรงเรียน</span>
             </a>
             <button type="button" onclick="window.app.handleAdminFacebookNewsClick()" class="p-3 rounded-xl bg-white border border-slate-200 hover:border-indigo-500 flex flex-col items-center text-center gap-1.5 font-semibold text-slate-800 transition cursor-pointer">

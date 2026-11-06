@@ -79,21 +79,21 @@ img, video, canvas, iframe {
   color: #FFFFFF;
 }
 
-/* Bento Stat Card บนพื้นหลังแดง (กระจกหรูหรา คมชัด สบายตา) */
+/* Bento Stat Card บนพื้นหลังแดง (กระจกแก้วหรูหรา คมชัด สว่าง สบายตา) */
 .bbk-glass-on-red {
-  background: rgba(15, 23, 42, 0.45);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border: 1px solid rgba(251, 191, 36, 0.3);
-  box-shadow: 0 8px 24px -4px rgba(0, 0, 0, 0.35);
-  transition: all 0.22s ease;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.14) 0%, rgba(255, 255, 255, 0.06) 100%);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.3), inset 0 1px 1px 0 rgba(255, 255, 255, 0.35);
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .bbk-glass-on-red:hover {
-  background: rgba(15, 23, 42, 0.65);
-  border-color: rgba(251, 191, 36, 0.55);
-  transform: translateY(-2px);
-  box-shadow: 0 12px 28px -4px rgba(0, 0, 0, 0.45);
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.20) 0%, rgba(255, 255, 255, 0.09) 100%);
+  border-color: rgba(250, 204, 21, 0.65);
+  transform: translateY(-3px);
+  box-shadow: 0 14px 36px -4px rgba(0, 0, 0, 0.4), 0 0 20px -4px rgba(245, 158, 11, 0.35), inset 0 1px 1px 0 rgba(255, 255, 255, 0.5);
 }
 
 /* Executive Portrait Frame บนพื้นหลังสีแดง */

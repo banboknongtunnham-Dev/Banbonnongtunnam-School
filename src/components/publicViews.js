@@ -428,9 +428,9 @@ class PublicViews {
                 href="${window.authService.sanitizeHTML(fbUrl)}"
                 target="_blank"
                 rel="noopener"
-                class="px-3.5 py-2 rounded-xl bg-white/15 hover:bg-white/25 text-white border border-white/25 text-xs font-bold backdrop-blur-xs inline-flex items-center gap-1.5 transition"
+                class="px-3.5 py-2 rounded-xl bg-[#1877F2] hover:bg-[#166fe5] text-white text-xs font-bold shadow-xs inline-flex items-center gap-1.5 transition"
               >
-                <img src="assets/img/facebook_logo.png" alt="FB" class="w-3.5 h-3.5 object-contain inline-block shrink-0" />
+                <svg class="w-3.5 h-3.5 fill-white shrink-0 inline-block" viewBox="0 0 24 24"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
                 <span>Facebook</span>
               </a>
             </div>
@@ -616,9 +616,9 @@ class PublicViews {
             href="https://www.facebook.com/profile.php?id=100014526581847"
             target="_blank"
             rel="noopener"
-            class="font-bold text-slate-700 hover:text-blue-600 inline-flex items-center gap-1.5"
+            class="font-bold text-slate-700 hover:text-[#1877F2] inline-flex items-center gap-1.5 transition"
           >
-            <img src="assets/img/facebook_logo.png" alt="Facebook" class="w-4 h-4 object-contain shrink-0 inline-block" />
+            <svg class="w-4 h-4 fill-[#1877F2] shrink-0" viewBox="0 0 24 24"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
             <span>Facebook โรงเรียน</span>
           </a>
           ${
@@ -1124,24 +1124,27 @@ class PublicViews {
             <!-- Left: ข้อมูลโรงเรียน สะอาดตา โปรขึ้น เรียบหรู ชัดเจน บนธีมแดงเอกลักษณ์ (7 Cols) -->
             <div class="lg:col-span-7 space-y-5">
               
-              <!-- Badges: สังกัด สพป., รหัสสถานศึกษา และ เพจ Facebook ทางการ -->
+              <!-- Badges: สังกัด สพป., รหัสสถานศึกษา และ เพจ Facebook ทางการ (ไอคอนคมชัด เป็นระเบียบ) -->
               <div class="flex flex-wrap items-center gap-2">
-                <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/15 border border-white/25 text-white text-xs font-semibold backdrop-blur-md shadow-2xs">
-                  <img src="assets/img/obec_logo.png" alt="โลโก้ สพป.อุบลราชธานี เขต 2" class="w-4 h-4 object-contain shrink-0" />
+                <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/15 border border-white/25 text-white text-xs font-semibold backdrop-blur-md shadow-2xs">
+                  <span class="w-4 h-4 rounded-full bg-white/90 p-0.5 flex items-center justify-center shrink-0">
+                    <img src="assets/img/obec_logo.png" alt="โลโก้ สพป.อุบลราชธานี เขต 2" class="w-full h-full object-contain" />
+                  </span>
                   <span class="truncate">${window.authService.sanitizeHTML(heroBadge)}</span>
                 </div>
                 <div class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-amber-400/20 border border-amber-400/40 text-amber-200 text-xs font-bold font-mono shadow-2xs backdrop-blur-md">
+                  <i data-lucide="shield-check" class="w-3.5 h-3.5 text-amber-300"></i>
                   <span>ID: ${window.authService.sanitizeHTML(profile.school_code_10 || profile.school_code || '1034710083')}</span>
                 </div>
                 <a
                   href="${window.authService.sanitizeHTML(fbSchoolUrl)}"
                   target="_blank"
                   rel="noopener"
-                  class="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-[#1877F2] hover:bg-blue-600 text-white text-xs font-bold shadow-2xs transition backdrop-blur-md"
+                  class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#1877F2] hover:bg-[#166fe5] text-white text-xs font-bold shadow-md transition backdrop-blur-md border border-blue-300/40 group cursor-pointer"
                 >
-                  <img src="assets/img/facebook_logo.png" alt="Facebook" class="w-3.5 h-3.5 object-contain shrink-0" />
+                  <svg class="w-3.5 h-3.5 fill-white shrink-0 group-hover:scale-110 transition" viewBox="0 0 24 24"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
                   <span>Facebook โรงเรียน</span>
-                  <i data-lucide="external-link" class="w-3 h-3 text-blue-100"></i>
+                  <i data-lucide="external-link" class="w-3 h-3 text-blue-200"></i>
                 </a>
               </div>
 
@@ -1155,63 +1158,91 @@ class PublicViews {
                 <h1 class="text-2xl sm:text-4xl lg:text-5xl font-extrabold text-white tracking-tight leading-tight drop-shadow-md">
                   ${window.authService.sanitizeHTML(heroTitle)}
                 </h1>
-                <p class="text-xs sm:text-sm text-rose-100/90 leading-relaxed font-normal">
-                  📍 ${window.authService.sanitizeHTML(profile.address || 'หมู่ที่ 2 บ้านบก ตำบลหนองทันน้ำ อำเภอกุดข้าวปุ้น จังหวัดอุบลราชธานี 34270')} • จัดการศึกษา <strong class="text-amber-200 font-semibold">${window.authService.sanitizeHTML(profile.education_level || 'อนุบาล-มัธยมศึกษาตอนต้น')}</strong>
-                </p>
+                <div class="flex flex-wrap items-center gap-2 text-xs sm:text-sm text-rose-100/95 leading-relaxed font-normal">
+                  <span class="inline-flex items-center gap-1.5">
+                    <i data-lucide="map-pin" class="w-3.5 h-3.5 text-amber-300 shrink-0"></i>
+                    <span>${window.authService.sanitizeHTML(profile.address || 'หมู่ที่ 2 บ้านบก ตำบลหนองทันน้ำ อำเภอกุดข้าวปุ้น จังหวัดอุบลราชธานี 34270')}</span>
+                  </span>
+                  <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-white/15 text-amber-200 font-bold border border-white/25 text-xs whitespace-nowrap shrink-0 shadow-2xs backdrop-blur-md">
+                    <i data-lucide="book-open" class="w-3 h-3 text-amber-300"></i>
+                    <span>จัดการศึกษา ${window.authService.sanitizeHTML(profile.education_level || 'อนุบาล-มัธยมศึกษาตอนต้น')}</span>
+                  </span>
+                </div>
               </div>
 
               <!-- คำขวัญโรงเรียนในกรอบทองกระจกหรูหราสง่างาม -->
               <div class="p-4 sm:p-5 rounded-2xl bg-black/25 backdrop-blur-md border border-amber-400/40 border-l-4 border-l-amber-400 shadow-sm">
                 <div class="text-[11px] font-extrabold uppercase tracking-wider text-amber-300 flex items-center gap-1.5">
-                  <span>✨ คำขวัญประจำสถานศึกษา</span>
+                  <i data-lucide="sparkles" class="w-3.5 h-3.5 text-amber-300"></i>
+                  <span>คำขวัญประจำสถานศึกษา</span>
                 </div>
                 <p class="text-sm sm:text-base font-bold text-white mt-1 italic leading-relaxed">
                   “${window.authService.sanitizeHTML(profile.motto || 'เรียนรู้สู่ความเป็นเลิศ เชิดชูคุณธรรม นำพาชุมชน')}”
                 </p>
               </div>
 
-              <!-- 4 Clean Bento KPI Metric Cards (Glass on Red Theme - เรียบร้อย ชัดเจน สมส่วน) -->
+              <!-- 4 Clean Bento KPI Metric Cards (Glass on Red Theme - ชัดเจน สว่าง สมส่วน) -->
               <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-1">
-                <div onclick="window.app.navigate('dashboard')" class="bbk-glass-on-red p-3 sm:p-4 rounded-2xl cursor-pointer hover:bg-white/15 transition shadow-sm">
-                  <div class="flex items-center justify-between text-rose-200 mb-1">
+                <div onclick="window.app.navigate('dashboard')" class="bbk-glass-on-red p-3.5 sm:p-4 rounded-2xl cursor-pointer transition flex flex-col justify-between">
+                  <div class="flex items-center justify-between mb-2">
                     <span class="text-[10px] font-bold uppercase tracking-wider text-rose-100">นักเรียนปี 2569</span>
-                    <i data-lucide="graduation-cap" class="w-4 h-4 text-amber-300"></i>
+                    <span class="w-7 h-7 rounded-lg bg-amber-400/25 border border-amber-300/40 text-amber-300 flex items-center justify-center shadow-2xs">
+                      <i data-lucide="graduation-cap" class="w-4 h-4"></i>
+                    </span>
                   </div>
-                  <div class="text-xl sm:text-2xl font-extrabold text-white font-mono">
-                    ${stats.totalStudents.toLocaleString()}
-                    <span class="text-xs font-normal text-rose-200">คน</span>
+                  <div>
+                    <div class="text-2xl sm:text-3xl font-extrabold text-white font-mono tracking-tight leading-none">
+                      ${stats.totalStudents.toLocaleString()}
+                      <span class="text-xs font-normal text-amber-200 ml-0.5">คน</span>
+                    </div>
+                    <p class="text-[10px] text-rose-200/80 mt-1">อนุบาล - ม.3</p>
                   </div>
                 </div>
 
-                <div onclick="window.app.navigate('personnel')" class="bbk-glass-on-red p-3 sm:p-4 rounded-2xl cursor-pointer hover:bg-white/15 transition shadow-sm">
-                  <div class="flex items-center justify-between text-rose-200 mb-1">
+                <div onclick="window.app.navigate('personnel')" class="bbk-glass-on-red p-3.5 sm:p-4 rounded-2xl cursor-pointer transition flex flex-col justify-between">
+                  <div class="flex items-center justify-between mb-2">
                     <span class="text-[10px] font-bold uppercase tracking-wider text-rose-100">บุคลากร</span>
-                    <i data-lucide="user-check" class="w-4 h-4 text-emerald-300"></i>
+                    <span class="w-7 h-7 rounded-lg bg-emerald-400/25 border border-emerald-300/40 text-emerald-300 flex items-center justify-center shadow-2xs">
+                      <i data-lucide="users" class="w-4 h-4"></i>
+                    </span>
                   </div>
-                  <div class="text-xl sm:text-2xl font-extrabold text-white font-mono">
-                    ${stats.totalPersonnel.toLocaleString()}
-                    <span class="text-xs font-normal text-rose-200">ท่าน</span>
+                  <div>
+                    <div class="text-2xl sm:text-3xl font-extrabold text-white font-mono tracking-tight leading-none">
+                      ${stats.totalPersonnel.toLocaleString()}
+                      <span class="text-xs font-normal text-emerald-200 ml-0.5">ท่าน</span>
+                    </div>
+                    <p class="text-[10px] text-rose-200/80 mt-1">ผู้บริหาร & ครู</p>
                   </div>
                 </div>
 
-                <div onclick="window.app.navigate('about')" class="bbk-glass-on-red p-3 sm:p-4 rounded-2xl cursor-pointer hover:bg-white/15 transition shadow-sm">
-                  <div class="flex items-center justify-between text-rose-200 mb-1">
+                <div onclick="window.app.navigate('about')" class="bbk-glass-on-red p-3.5 sm:p-4 rounded-2xl cursor-pointer transition flex flex-col justify-between">
+                  <div class="flex items-center justify-between mb-2">
                     <span class="text-[10px] font-bold uppercase tracking-wider text-rose-100">รหัสสถานศึกษา</span>
-                    <i data-lucide="award" class="w-4 h-4 text-amber-300"></i>
+                    <span class="w-7 h-7 rounded-lg bg-sky-400/25 border border-sky-300/40 text-sky-300 flex items-center justify-center shadow-2xs">
+                      <i data-lucide="shield-check" class="w-4 h-4"></i>
+                    </span>
                   </div>
-                  <div class="text-sm sm:text-base font-extrabold text-white font-mono">
-                    ${window.authService.sanitizeHTML(profile.school_code_10 || '1034710083')}
+                  <div>
+                    <div class="text-base sm:text-lg font-extrabold text-white font-mono tracking-tight leading-snug">
+                      ${window.authService.sanitizeHTML(profile.school_code_10 || '1034710083')}
+                    </div>
+                    <p class="text-[10px] text-rose-200/80 mt-0.5">SMIS: ${window.authService.sanitizeHTML(profile.smis_code_8 || '34020157')}</p>
                   </div>
                 </div>
 
-                <div onclick="window.app.navigate('news')" class="bbk-glass-on-red p-3 sm:p-4 rounded-2xl cursor-pointer hover:bg-white/15 transition shadow-sm">
-                  <div class="flex items-center justify-between text-rose-200 mb-1">
+                <div onclick="window.app.navigate('news')" class="bbk-glass-on-red p-3.5 sm:p-4 rounded-2xl cursor-pointer transition flex flex-col justify-between">
+                  <div class="flex items-center justify-between mb-2">
                     <span class="text-[10px] font-bold uppercase tracking-wider text-rose-100">ข่าวสาร & ผลงาน</span>
-                    <i data-lucide="newspaper" class="w-4 h-4 text-amber-300"></i>
+                    <span class="w-7 h-7 rounded-lg bg-rose-400/25 border border-rose-300/40 text-rose-300 flex items-center justify-center shadow-2xs">
+                      <i data-lucide="newspaper" class="w-4 h-4"></i>
+                    </span>
                   </div>
-                  <div class="text-xl sm:text-2xl font-extrabold text-white font-mono">
-                    ${(this.getStudentSlides().length + stats.totalNews).toLocaleString()}
-                    <span class="text-xs font-normal text-rose-200">รายการ</span>
+                  <div>
+                    <div class="text-2xl sm:text-3xl font-extrabold text-white font-mono tracking-tight leading-none">
+                      ${(this.getStudentSlides().length + stats.totalNews).toLocaleString()}
+                      <span class="text-xs font-normal text-rose-200 ml-0.5">รายการ</span>
+                    </div>
+                    <p class="text-[10px] text-rose-200/80 mt-1">อัปเดตต่อเนื่อง</p>
                   </div>
                 </div>
               </div>
@@ -1233,25 +1264,23 @@ class PublicViews {
                   <img
                     src="${directorImg}"
                     alt="นายทองพูล สิงห์บุตร ผู้อำนวยการโรงเรียนบ้านบกหนองทันน้ำ"
-                    class="w-[240px] sm:w-[310px] lg:w-[360px] max-h-[380px] sm:max-h-[460px] object-contain drop-shadow-[0_20px_35px_rgba(0,0,0,0.45)] group-hover:scale-102 transition duration-500"
+                    class="w-[240px] sm:w-[310px] lg:w-[350px] max-h-[360px] sm:max-h-[420px] object-contain drop-shadow-[0_20px_35px_rgba(0,0,0,0.45)] group-hover:scale-102 transition duration-500"
                     onerror="this.src='assets/img/logo.png'"
                   />
                 </div>
 
-                <!-- ป้ายชื่อตำแหน่งผู้บริหารหรูหรากระจกทองบนพื้นแดง -->
-                <div class="relative z-20 -mt-6 w-11/12 bg-slate-950/85 backdrop-blur-md rounded-2xl p-3.5 sm:p-4 border border-amber-400/40 shadow-xl text-center space-y-0.5">
-                  <span class="inline-block px-2.5 py-0.5 rounded-full bg-amber-400/20 border border-amber-400/40 text-amber-300 text-[10px] font-bold uppercase tracking-wider mb-0.5">
-                    EXECUTIVE LEADERSHIP
-                  </span>
-                  <h3 class="text-sm sm:text-base font-extrabold text-white">
+                <!-- ป้ายชื่อตำแหน่งผู้บริหารหรูหรากระจกทองบนพื้นแดง (จัดวางลงตัว ไม่ทับริบบิ้นภาพ) -->
+                <div class="relative z-20 mt-2 w-full max-w-xs bg-slate-950/85 backdrop-blur-md rounded-2xl py-2 px-4 border border-amber-400/40 shadow-xl text-center space-y-1">
+                  <div class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-amber-400/20 border border-amber-400/40 text-amber-300 text-[10px] font-bold uppercase tracking-wider">
+                    <span class="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse"></span>
+                    <span>EXECUTIVE LEADERSHIP</span>
+                  </div>
+                  <h3 class="text-sm sm:text-base font-extrabold text-white leading-tight">
                     นายทองพูล สิงห์บุตร
                   </h3>
-                  <p class="text-xs font-semibold text-rose-200">
-                    ผู้อำนวยการโรงเรียนบ้านบกหนองทันน้ำ
-                  </p>
-                  <p class="text-[11px] text-amber-300 font-medium">
-                    วิทยฐานะ ชำนาญการพิเศษ
-                  </p>
+                  <div class="text-[11px] font-semibold text-rose-200/90 leading-tight">
+                    ผู้อำนวยการโรงเรียนบ้านบกหนองทันน้ำ • ชำนาญการพิเศษ
+                  </div>
                 </div>
               </div>
             </div>
@@ -1381,7 +1410,7 @@ class PublicViews {
                   onclick="window.app.handleAdminFacebookNewsClick()"
                   class="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-blue-50 text-[#1877F2] hover:bg-blue-100 border border-blue-200 text-xs font-bold shadow-2xs transition cursor-pointer"
                 >
-                  <img src="assets/img/facebook_logo.png" alt="Facebook" class="w-3.5 h-3.5 object-contain shrink-0 inline-block" />
+                  <svg class="w-3.5 h-3.5 fill-[#1877F2] shrink-0" viewBox="0 0 24 24"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
                   <span>+ ดึงโพสต์ Facebook</span>
                 </button>
               </div>
@@ -1458,7 +1487,7 @@ class PublicViews {
             <div class="flex items-center justify-between gap-2 border-b border-slate-100 pb-4">
               <div class="flex items-center gap-3">
                 <div class="w-10 h-10 rounded-xl bg-blue-50 border border-blue-200 flex items-center justify-center shrink-0">
-                  <img src="assets/img/facebook_logo.png" alt="Facebook" class="w-6 h-6 object-contain shrink-0 inline-block" />
+                  <svg class="w-6 h-6 fill-[#1877F2] shrink-0" viewBox="0 0 24 24"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
                 </div>
                 <div>
                   <span class="text-[10px] font-extrabold uppercase tracking-widest text-[#1877F2]">OFFICIAL FACEBOOK COMMUNITY</span>
@@ -1651,7 +1680,8 @@ class PublicViews {
                     rel="noopener"
                     class="text-[11px] font-bold text-blue-600 hover:underline inline-flex items-center gap-1"
                   >
-                    <img src="assets/img/facebook_logo.png" alt="Facebook" class="w-3.5 h-3.5 object-contain shrink-0 inline-block" /> ดูโพสต์ FB
+                    <svg class="w-3.5 h-3.5 fill-[#1877F2] shrink-0 inline-block" viewBox="0 0 24 24"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+                    <span>ดูโพสต์ FB</span>
                   </a>
                   `
                   : ''
@@ -2528,7 +2558,7 @@ class PublicViews {
                     onclick="window.app.handleAdminFacebookNewsClick()"
                     class="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-blue-600 text-white hover:bg-blue-500 text-xs font-bold shadow-2xs transition cursor-pointer"
                   >
-                    <img src="assets/img/facebook_logo.png" alt="Facebook" class="w-4 h-4 object-contain shrink-0 inline-block" />
+                    <svg class="w-4 h-4 fill-white shrink-0" viewBox="0 0 24 24"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
                     <span>+ ฝังข่าวจากลิงก์ Facebook</span>
                   </button>
                 </div>
@@ -2559,7 +2589,8 @@ class PublicViews {
                 rel="noopener"
                 class="px-3.5 py-2 rounded-xl bg-blue-600 text-white hover:bg-blue-500 text-xs font-bold inline-flex items-center gap-1.5"
               >
-                <img src="assets/img/facebook_logo.png" alt="Facebook" class="w-3.5 h-3.5 object-contain shrink-0 inline-block" /> เพจ Facebook โรงเรียน
+                <svg class="w-3.5 h-3.5 fill-white shrink-0" viewBox="0 0 24 24"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+                <span>เพจ Facebook โรงเรียน</span>
               </a>
               <div class="relative w-full sm:w-64">
                 <input
@@ -2853,8 +2884,8 @@ class PublicViews {
                   </div>
                 </div>
                 <div class="flex items-start gap-3 p-3 rounded-2xl bg-slate-50 border border-slate-200/70">
-                  <div class="w-9 h-9 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center shrink-0">
-                    <img src="assets/img/facebook_logo.png" alt="Facebook" class="w-4 h-4 object-contain shrink-0 inline-block" />
+                  <div class="w-9 h-9 rounded-xl bg-blue-50 text-[#1877F2] flex items-center justify-center shrink-0">
+                    <svg class="w-4 h-4 fill-[#1877F2] shrink-0" viewBox="0 0 24 24"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
                   </div>
                   <div class="min-w-0">
                     <div class="text-xs font-bold text-slate-400">Facebook โรงเรียน</div>
