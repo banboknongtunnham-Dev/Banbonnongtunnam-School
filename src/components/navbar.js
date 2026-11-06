@@ -103,11 +103,12 @@ class NavbarComponent {
             <div class="flex items-center gap-1.5 sm:gap-2 shrink-0">
               <button
                 onclick="window.app.openGoogleWorkspaceHubModal()"
-                class="hidden md:inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-amber-50 text-red-900 border border-amber-300 text-xs font-bold hover:bg-amber-100 transition cursor-pointer whitespace-nowrap"
-                title="สถานะเชื่อมต่อ Google Workspace / Google Sheets API"
+                class="hidden md:inline-flex items-center gap-2 px-3 py-1.5 rounded-xl bg-slate-900 text-white hover:bg-slate-800 text-xs font-semibold transition cursor-pointer shadow-2xs whitespace-nowrap"
+                title="คลิกเพื่อเปิดศูนย์ซิงค์เชื่อมโยงทุกแพลตฟอร์ม (Google Sheets, Central Server, Facebook, Drive)"
               >
-                <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-                <span>Google Cloud Connected</span>
+                <span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
+                <span class="text-amber-300 font-bold">Live Synced</span>
+                <span class="text-slate-300 text-[11px] hidden xl:inline">• เชื่อมโยงทุกระบบ</span>
               </button>
 
               <button

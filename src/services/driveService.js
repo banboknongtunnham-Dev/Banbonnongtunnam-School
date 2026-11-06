@@ -8,17 +8,26 @@
 
 class DriveService {
   /**
-   * แปลงลิงก์แชร์ของ Google Drive ให้เป็น Direct Image URL ที่แสดงผลบนหน้าเว็บได้ทันที
+   * แปลงลิงก์แชร์ของ Google Drive และคลาวด์ ให้เป็น Direct Image URL ที่แสดงผลบนหน้าเว็บได้ทันที 100%
    */
   resolveDriveImageUrl(url) {
     if (!url) return 'assets/img/logo.png';
     const trimmed = String(url).trim();
     if (!trimmed) return 'assets/img/logo.png';
 
-    // กรณีเป็นลิงก์ Google Drive รูปแบบ /file/d/FILE_ID/view หรือ id=FILE_ID
-    const fileIdMatch = trimmed.match(/\/file\/d\/([a-zA-Z0-9_-]+)/) || trimmed.match(/[?&]id=([a-zA-Z0-9_-]+)/);
-    if (fileIdMatch && fileIdMatch[1] && trimmed.includes('drive.google.com')) {
-      return `https://drive.google.com/thumbnail?id=${fileIdMatch[1]}&sz=w1200`;
+    // กรณีเป็น Base64 Data URL หรือ path ใน assets อยู่แล้ว
+    if (trimmed.startsWith('data:image') || trimmed.startsWith('assets/')) {
+      return trimmed;
+    }
+
+    // กรณีเป็นลิงก์ Google Drive ทุกรูปแบบ
+    if (trimmed.includes('drive.google.com') || trimmed.includes('docs.google.com')) {
+      const fileIdMatch = trimmed.match(/\/file\/d\/([a-zA-Z0-9_-]+)/) ||
+                          trimmed.match(/[?&]id=([a-zA-Z0-9_-]+)/) ||
+                          trimmed.match(/\/d\/([a-zA-Z0-9_-]+)/);
+      if (fileIdMatch && fileIdMatch[1]) {
+        return `https://drive.google.com/thumbnail?id=${fileIdMatch[1]}&sz=w1600`;
+      }
     }
     return trimmed;
   }

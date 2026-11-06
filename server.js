@@ -95,7 +95,7 @@ const server = http.createServer((req, res) => {
   }
 
   // API Endpoint for Database Sync (Saves localStorage database into defaultData.js)
-  if (req.method === 'POST' && cleanUrl === '/api/sync-database') {
+  if (req.method === 'POST' && (cleanUrl === '/api/sync-database' || cleanUrl === '/api/database')) {
     let bodyData = '';
     req.on('data', chunk => { bodyData += chunk; });
     req.on('end', () => {
@@ -108,23 +108,64 @@ const server = http.createServer((req, res) => {
           return;
         }
 
+        const now = new Date().toISOString();
+
         // 1. Save JSON snapshot backup
         const backupFile = path.join(ROOT, 'data_backup.json');
         fs.writeFileSync(backupFile, JSON.stringify(db, null, 2), 'utf8');
 
         // 2. Update defaultData.js
         const defaultDataFile = path.join(ROOT, 'src', 'config', 'defaultData.js');
-        const header = `/**\n * BANBOK DIGITAL SCHOOL PLATFORM - DEFAULT MASTER DATABASE\n * Updated automatically via Local Admin Sync at ${new Date().toISOString()}\n */\n\n`;
+        const header = `/**\n * BANBOK DIGITAL SCHOOL PLATFORM - DEFAULT MASTER DATABASE\n * Updated automatically via Multi-Platform Sync at ${now}\n */\n\n`;
         const fileContent = `${header}window.BANBOK_DEFAULT_DB = ${JSON.stringify(db, null, 2)};\n`;
         fs.writeFileSync(defaultDataFile, fileContent, 'utf8');
 
         res.writeHead(200, { 'Content-Type': 'application/json' });
-        res.end(JSON.stringify({ success: true, message: 'บันทึกฐานข้อมูลลงในระบบหลักสำเร็จแล้ว' }));
+        res.end(JSON.stringify({
+          success: true,
+          message: 'บันทึกฐานข้อมูลลงในระบบหลักและเชื่อมโยงทุกแพลตฟอร์มสำเร็จแล้ว',
+          updated_at: now
+        }));
       } catch (err) {
         res.writeHead(500, { 'Content-Type': 'application/json' });
         res.end(JSON.stringify({ success: false, error: err.message }));
       }
     });
+    return;
+  }
+
+  // API Endpoint to Get Live Master Database
+  if (req.method === 'GET' && cleanUrl === '/api/database') {
+    try {
+      const backupFile = path.join(ROOT, 'data_backup.json');
+      if (fs.existsSync(backupFile)) {
+        const data = fs.readFileSync(backupFile, 'utf8');
+        res.writeHead(200, {
+          'Content-Type': 'application/json; charset=utf-8',
+          'Cache-Control': 'no-cache'
+        });
+        res.end(data);
+        return;
+      }
+      res.writeHead(200, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ success: true, message: 'Using default database' }));
+    } catch (e) {
+      res.writeHead(500, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ success: false, error: e.message }));
+    }
+    return;
+  }
+
+  // API Endpoint for Multi-Platform Health & Sync Status
+  if (req.method === 'GET' && cleanUrl === '/api/sync-status') {
+    res.writeHead(200, { 'Content-Type': 'application/json' });
+    res.end(JSON.stringify({
+      status: 'ONLINE',
+      platform: 'BANBOK_DIGITAL_SCHOOL_PLATFORM',
+      sync_mode: 'MULTI_PLATFORM_HYBRID',
+      server_time: new Date().toISOString(),
+      backup_exists: fs.existsSync(path.join(ROOT, 'data_backup.json'))
+    }));
     return;
   }
 

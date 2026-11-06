@@ -271,16 +271,16 @@ class PublicViews {
     const isNewsSlide = current.slide_type === 'NEWS_SLIDE';
 
     return `
-      <div class="bbk-soft-card rounded-3xl overflow-hidden bg-white flex flex-col h-full">
-        <!-- แถบเลือกโหมดสไลด์ด้านบน โทนเหลือง-แดง โมเดิร์น -->
+      <div class="bbk-soft-card rounded-3xl overflow-hidden bg-white flex flex-col h-full border border-slate-200/90 shadow-2xs">
+        <!-- แถบเลือกโหมดสไลด์ด้านบน เรียบหรู สะอาดตา -->
         <div class="px-5 py-3.5 bg-white border-b border-slate-100 flex flex-wrap items-center justify-between gap-2">
           <div class="flex flex-wrap items-center gap-1.5">
             <button
               onclick="window.publicViews.setSliderMode('ALL')"
               class="px-3.5 py-1.5 rounded-xl text-xs font-bold transition cursor-pointer ${
                 this.sliderMode === 'ALL'
-                  ? 'bg-gradient-to-r from-red-700 to-red-600 text-white shadow-xs'
-                  : 'bg-slate-50 text-slate-600 hover:bg-red-50 hover:text-red-700'
+                  ? 'bg-slate-900 text-white shadow-2xs'
+                  : 'bg-slate-50 text-slate-600 hover:bg-slate-100'
               }"
             >
               สไลด์ทั้งหมด
@@ -289,7 +289,7 @@ class PublicViews {
               onclick="window.publicViews.setSliderMode('STUDENT')"
               class="px-3.5 py-1.5 rounded-xl text-xs font-bold transition cursor-pointer ${
                 this.sliderMode === 'STUDENT'
-                  ? 'bg-amber-400 text-red-950 shadow-xs'
+                  ? 'bg-amber-600 text-white shadow-2xs'
                   : 'bg-slate-50 text-slate-600 hover:bg-amber-50 hover:text-amber-800'
               }"
             >
@@ -299,8 +299,8 @@ class PublicViews {
               onclick="window.publicViews.setSliderMode('NEWS')"
               class="px-3.5 py-1.5 rounded-xl text-xs font-bold transition cursor-pointer ${
                 this.sliderMode === 'NEWS'
-                  ? 'bg-red-700 text-yellow-300 shadow-xs'
-                  : 'bg-slate-50 text-slate-600 hover:bg-red-50 hover:text-red-700'
+                  ? 'bg-blue-600 text-white shadow-2xs'
+                  : 'bg-slate-50 text-slate-600 hover:bg-blue-50 hover:text-blue-700'
               }"
             >
               ข่าวประชาสัมพันธ์
@@ -310,18 +310,18 @@ class PublicViews {
           <div class="flex items-center gap-2">
             <button
               onclick="window.publicViews.toggleSliderPause()"
-              class="px-2.5 py-1 rounded-lg bg-slate-50 border border-slate-200 text-slate-600 hover:text-red-700 text-[11px] font-bold inline-flex items-center gap-1 cursor-pointer"
+              class="px-2.5 py-1 rounded-lg bg-slate-50 border border-slate-200 text-slate-600 hover:text-slate-900 text-[11px] font-bold inline-flex items-center gap-1 cursor-pointer"
             >
-              <i data-lucide="${this.isSliderPaused ? 'play' : 'pause'}" class="w-3 h-3 text-red-600"></i>
+              <i data-lucide="${this.isSliderPaused ? 'play' : 'pause'}" class="w-3 h-3 text-slate-700"></i>
               <span>${this.isSliderPaused ? 'เล่นต่อ' : 'อัตโนมัติ'}</span>
             </button>
-            <span class="px-2.5 py-0.5 rounded-md bg-red-50 text-red-800 text-xs font-extrabold">${this.currentSlideIndex + 1}/${slides.length}</span>
+            <span class="px-2.5 py-0.5 rounded-md bg-slate-100 text-slate-800 text-xs font-mono font-bold">${this.currentSlideIndex + 1}/${slides.length}</span>
           </div>
         </div>
 
-        <!-- เส้น Progress Bar โทนแดง-ทอง -->
+        <!-- เส้น Progress Bar โทนทองแชมเปญเรียบหรู -->
         <div class="w-full h-1 bg-slate-100 overflow-hidden">
-          <div class="h-full bg-gradient-to-r from-red-600 via-amber-500 to-yellow-400 ${this.isSliderPaused ? 'w-1/2' : 'bbk-slide-progress'}"></div>
+          <div class="h-full bg-gradient-to-r from-amber-500 to-amber-400 ${this.isSliderPaused ? 'w-1/2' : 'bbk-slide-progress'}"></div>
         </div>
 
         <!-- พื้นที่แสดงภาพสไลด์หลัก -->
@@ -344,12 +344,12 @@ class PublicViews {
             onerror="this.src='assets/img/logo.png'"
           />
 
-          <div class="absolute inset-0 z-20 bg-gradient-to-t from-slate-950/90 via-slate-950/20 to-transparent pointer-events-none"></div>
+          <div class="absolute inset-0 z-20 bg-gradient-to-t from-slate-950/90 via-slate-950/25 to-transparent pointer-events-none"></div>
 
           <!-- ป้ายกำกับด้านบนซ้าย & ปุ่มแก้ไขด่วนสำหรับครู/แอดมิน/ผู้พัฒนาเท่านั้น -->
           <div class="absolute top-4 left-4 right-4 z-30 flex items-center justify-between gap-2">
-            <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-gradient-to-r from-red-600 to-amber-500 text-white text-xs font-extrabold shadow-sm">
-              <i data-lucide="${isNewsSlide ? 'newspaper' : 'award'}" class="w-3.5 h-3.5 text-yellow-200"></i>
+            <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-slate-900/80 backdrop-blur-md text-amber-300 text-xs font-bold border border-white/20 shadow-xs">
+              <i data-lucide="${isNewsSlide ? 'newspaper' : 'award'}" class="w-3.5 h-3.5 text-amber-300"></i>
               <span>${window.authService.sanitizeHTML(current.tag)}</span>
             </span>
 
@@ -362,9 +362,9 @@ class PublicViews {
                       ? `window.app.openNewsEditorModal('${current.id}')`
                       : `window.app.handleAdminSlideEditClick('${current.id}')`
                   }"
-                  class="px-3 py-1.5 rounded-xl bg-white/95 hover:bg-yellow-400 text-slate-900 text-xs font-bold shadow-md inline-flex items-center gap-1.5 transition cursor-pointer"
+                  class="px-3 py-1.5 rounded-xl bg-white/95 hover:bg-white text-slate-900 text-xs font-bold shadow-md inline-flex items-center gap-1.5 transition cursor-pointer"
                 >
-                  <i data-lucide="edit-3" class="w-3.5 h-3.5 text-red-600"></i>
+                  <i data-lucide="edit-3" class="w-3.5 h-3.5 text-amber-700"></i>
                   <span>แก้ไขสไลด์</span>
                 </button>
                 `
@@ -376,14 +376,14 @@ class PublicViews {
           <button
             onclick="window.publicViews.prevSlide()"
             aria-label="สไลด์ก่อนหน้า"
-            class="absolute left-3 top-1/2 -translate-y-1/2 z-30 w-10 h-10 rounded-full bg-black/50 hover:bg-yellow-400 text-white hover:text-red-950 border border-white/20 flex items-center justify-center backdrop-blur-xs transition cursor-pointer"
+            class="absolute left-3 top-1/2 -translate-y-1/2 z-30 w-10 h-10 rounded-full bg-black/40 hover:bg-white hover:text-slate-950 text-white border border-white/20 flex items-center justify-center backdrop-blur-xs transition cursor-pointer"
           >
             <i data-lucide="chevron-left" class="w-5 h-5"></i>
           </button>
           <button
             onclick="window.publicViews.nextSlide()"
             aria-label="สไลด์ถัดไป"
-            class="absolute right-3 top-1/2 -translate-y-1/2 z-30 w-10 h-10 rounded-full bg-black/50 hover:bg-yellow-400 text-white hover:text-red-950 border border-white/20 flex items-center justify-center backdrop-blur-xs transition cursor-pointer"
+            class="absolute right-3 top-1/2 -translate-y-1/2 z-30 w-10 h-10 rounded-full bg-black/40 hover:bg-white hover:text-slate-950 text-white border border-white/20 flex items-center justify-center backdrop-blur-xs transition cursor-pointer"
           >
             <i data-lucide="chevron-right" class="w-5 h-5"></i>
           </button>
@@ -391,7 +391,7 @@ class PublicViews {
           <!-- คำบรรยายสไลด์ด้านล่าง กระชับ ชัดเจน -->
           <div class="absolute bottom-0 inset-x-0 z-30 p-5 sm:p-6 flex flex-col sm:flex-row sm:items-end justify-between gap-4">
             <div class="space-y-1 max-w-2xl">
-              <div class="text-xs font-bold text-yellow-400">
+              <div class="text-xs font-bold text-amber-300">
                 📅 ${window.authService.sanitizeHTML(current.date)}
               </div>
               <h3 class="text-lg sm:text-2xl font-extrabold text-white leading-snug">
@@ -409,7 +409,7 @@ class PublicViews {
                     ? `window.app.openNewsModal('${current.id}')`
                     : `window.app.openImageLightbox('${imgUrl}', '${window.authService.sanitizeHTML(current.title)}', '${window.authService.sanitizeHTML(current.subtitle)}')`
                 }"
-                class="px-4 py-2 rounded-xl bg-yellow-400 hover:bg-yellow-300 text-red-950 text-xs font-extrabold shadow-xs inline-flex items-center gap-1.5 transition cursor-pointer"
+                class="px-4 py-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 text-xs font-extrabold shadow-xs inline-flex items-center gap-1.5 transition cursor-pointer"
               >
                 <span>${isNewsSlide ? 'อ่านรายละเอียด' : 'ดูภาพขยาย'}</span>
               </button>
@@ -419,7 +419,7 @@ class PublicViews {
                 rel="noopener"
                 class="px-3.5 py-2 rounded-xl bg-white/15 hover:bg-white/25 text-white border border-white/25 text-xs font-bold backdrop-blur-xs inline-flex items-center gap-1.5 transition"
               >
-                <img src="assets/img/facebook_logo.png" alt="Facebook" class="w-3.5 h-3.5 object-contain shrink-0 inline-block" />
+                <img src="assets/img/facebook_logo.png" alt="FB" class="w-3.5 h-3.5 object-contain inline-block shrink-0" />
                 <span>Facebook</span>
               </a>
             </div>
@@ -469,6 +469,9 @@ class PublicViews {
   /**
    * เรนเดอร์บอร์ดข่าวสารและประกาศเคลื่อนไหวอัตโนมัติ (Live Moving Digital Bulletin Board - โทนเหลือง-แดง เทคโนโลยี)
    */
+  /**
+   * เรนเดอร์บอร์ดข่าวสารและประกาศสำคัญทางการ (Executive Official Bulletin - ดีไซน์สะอาดตา เรียบหรู)
+   */
   renderLiveBulletinBoardInner() {
     const items = this.getBulletinBoardItems();
     if (this.activeBulletinIndex >= items.length) {
@@ -484,35 +487,35 @@ class PublicViews {
     ];
 
     return `
-      <div class="bbk-soft-card rounded-3xl bg-white overflow-hidden flex flex-col h-full">
-        <!-- ส่วนหัวบอร์ดโทนแดงเข้ม-ทอง เทคโนโลยี -->
-        <div class="px-5 py-3.5 bbk-red-gold-bar text-white flex items-center justify-between gap-2">
+      <div class="bbk-soft-card rounded-3xl bg-white overflow-hidden flex flex-col h-full border border-slate-200/90 shadow-2xs">
+        <!-- ส่วนหัวบอร์ดโทนกรมท่า-ทอง เรียบหรู สะอาดตา -->
+        <div class="px-5 py-4 bg-slate-900 text-white flex items-center justify-between gap-2 border-b border-amber-500/30">
           <div class="flex items-center gap-2.5">
-            <span class="w-2.5 h-2.5 rounded-full bg-yellow-300 animate-ping"></span>
+            <span class="w-2 h-2 rounded-full bg-amber-400"></span>
             <div>
-              <h4 class="text-sm sm:text-base font-extrabold text-white leading-tight">SMART PR BOARD • บอร์ดเคลื่อนไหว</h4>
+              <h4 class="text-sm sm:text-base font-bold text-white tracking-wide">OFFICIAL NOTICES • ประกาศทางการ</h4>
             </div>
           </div>
 
-          <div class="flex items-center gap-1">
+          <div class="flex items-center gap-1.5">
             <button
               onclick="window.publicViews.prevBulletinItem()"
               title="รายการก่อนหน้า"
-              class="w-7 h-7 rounded-lg bg-black/20 hover:bg-yellow-400 hover:text-red-950 flex items-center justify-center transition cursor-pointer"
+              class="w-7 h-7 rounded-lg bg-white/10 hover:bg-white/20 text-white flex items-center justify-center transition cursor-pointer"
             >
               <i data-lucide="chevron-up" class="w-4 h-4"></i>
             </button>
             <button
               onclick="window.publicViews.toggleBulletinPause()"
               title="${this.isBulletinPaused ? 'เล่นต่อ' : 'หยุดชั่วคราว'}"
-              class="w-7 h-7 rounded-lg bg-black/20 hover:bg-yellow-400 hover:text-red-950 flex items-center justify-center transition cursor-pointer"
+              class="w-7 h-7 rounded-lg bg-white/10 hover:bg-white/20 text-white flex items-center justify-center transition cursor-pointer"
             >
               <i data-lucide="${this.isBulletinPaused ? 'play' : 'pause'}" class="w-3.5 h-3.5"></i>
             </button>
             <button
               onclick="window.publicViews.nextBulletinItem()"
               title="รายการถัดไป"
-              class="w-7 h-7 rounded-lg bg-black/20 hover:bg-yellow-400 hover:text-red-950 flex items-center justify-center transition cursor-pointer"
+              class="w-7 h-7 rounded-lg bg-white/10 hover:bg-white/20 text-white flex items-center justify-center transition cursor-pointer"
             >
               <i data-lucide="chevron-down" class="w-4 h-4"></i>
             </button>
@@ -529,7 +532,7 @@ class PublicViews {
                   onclick="window.publicViews.setBulletinFilter('${b.id}')"
                   class="px-3 py-1 rounded-lg text-xs font-bold transition cursor-pointer ${
                     this.bulletinFilter === b.id
-                      ? 'bg-red-700 text-white shadow-2xs'
+                      ? 'bg-slate-900 text-white shadow-2xs'
                       : 'text-slate-600 hover:bg-white'
                   }"
                 >
@@ -539,7 +542,7 @@ class PublicViews {
               )
               .join('')}
           </div>
-          <span class="text-[11px] font-bold text-red-700">${this.activeBulletinIndex + 1}/${items.length}</span>
+          <span class="text-[11px] font-mono font-bold text-slate-500">${this.activeBulletinIndex + 1}/${items.length}</span>
         </div>
 
         <!-- กล่องไฮไลต์ข่าวที่กำลังแสดงผลบนบอร์ด -->
@@ -548,15 +551,15 @@ class PublicViews {
             ? `
             <div
               onclick="${activeItem.onClick}"
-              class="mx-4 mt-4 p-4 rounded-2xl bg-gradient-to-br from-red-50/70 via-white to-amber-50/60 border-l-4 border-l-red-600 border border-amber-200/80 shadow-2xs cursor-pointer transition animate-fade-in"
+              class="mx-4 mt-4 p-4 rounded-2xl bg-slate-50/80 border-l-4 border-l-amber-600 border border-slate-200/80 shadow-2xs cursor-pointer transition animate-fade-in hover:bg-white"
             >
-              <div class="flex items-center justify-between gap-2 mb-1">
-                <span class="px-2.5 py-0.5 rounded bg-red-700 text-yellow-300 text-[10px] font-extrabold">
+              <div class="flex items-center justify-between gap-2 mb-1.5">
+                <span class="px-2.5 py-0.5 rounded-full bg-slate-900 text-amber-300 text-[10px] font-bold">
                   ${window.authService.sanitizeHTML(activeItem.badge)}
                 </span>
                 <span class="text-[11px] font-semibold text-slate-500">📅 ${window.authService.sanitizeHTML(activeItem.date)}</span>
               </div>
-              <h5 class="text-sm sm:text-base font-extrabold text-slate-900 leading-snug mt-1">
+              <h5 class="text-sm font-bold text-slate-900 leading-snug">
                 ${window.authService.sanitizeHTML(activeItem.title)}
               </h5>
               <p class="text-xs text-slate-600 mt-1 line-clamp-2">
@@ -578,18 +581,18 @@ class PublicViews {
                   onmouseenter="window.publicViews.selectBulletinItem(${idx})"
                   class="p-3 rounded-xl border transition cursor-pointer flex items-center justify-between gap-3 ${
                     isCurrent
-                      ? 'bg-amber-50/80 border-amber-400 font-bold'
-                      : 'bg-slate-50/60 hover:bg-white border-slate-200/70'
+                      ? 'bg-amber-50/80 border-amber-300 font-bold'
+                      : 'bg-slate-50/50 hover:bg-white border-slate-200/60'
                   }"
                 >
                   <div class="flex items-center gap-2.5 min-w-0">
-                    <span class="w-2 h-2 rounded-full shrink-0 ${isCurrent ? 'bg-red-600 ring-4 ring-red-200' : 'bg-amber-400'}"></span>
+                    <span class="w-2 h-2 rounded-full shrink-0 ${isCurrent ? 'bg-amber-600 ring-4 ring-amber-100' : 'bg-slate-300'}"></span>
                     <div class="min-w-0">
-                      <div class="text-xs sm:text-sm font-bold text-slate-800 truncate">${window.authService.sanitizeHTML(item.title)}</div>
-                      <div class="text-[11px] text-slate-400">${window.authService.sanitizeHTML(item.badge)} • ${window.authService.sanitizeHTML(item.date)}</div>
+                      <div class="text-xs sm:text-sm font-semibold text-slate-800 truncate">${window.authService.sanitizeHTML(item.title)}</div>
+                      <div class="text-[10px] text-slate-400">${window.authService.sanitizeHTML(item.badge)} • ${window.authService.sanitizeHTML(item.date)}</div>
                     </div>
                   </div>
-                  <i data-lucide="chevron-right" class="w-4 h-4 text-red-600 shrink-0"></i>
+                  <i data-lucide="chevron-right" class="w-4 h-4 text-slate-400 shrink-0"></i>
                 </div>
               `;
             })
@@ -602,22 +605,22 @@ class PublicViews {
             href="https://www.facebook.com/profile.php?id=100014526581847"
             target="_blank"
             rel="noopener"
-            class="font-bold text-red-700 hover:underline inline-flex items-center gap-1.5"
+            class="font-bold text-slate-700 hover:text-blue-600 inline-flex items-center gap-1.5"
           >
             <img src="assets/img/facebook_logo.png" alt="Facebook" class="w-4 h-4 object-contain shrink-0 inline-block" />
-            <span>เพจ Facebook โรงเรียน</span>
+            <span>Facebook โรงเรียน</span>
           </a>
           ${
             window.authService.isTeacherOrAbove()
               ? `
               <button
                 onclick="window.app.handleAdminFacebookNewsClick()"
-                class="px-3 py-1 rounded-lg bg-amber-400 hover:bg-amber-300 text-red-950 font-extrabold transition cursor-pointer"
+                class="px-3 py-1 rounded-lg bg-slate-900 text-white hover:bg-slate-800 text-xs font-bold transition cursor-pointer"
               >
-                + เพิ่มข่าวจาก FB
+                + ดึงข่าว FB
               </button>
               `
-              : `<span class="text-[11px] text-slate-400 font-semibold">อัปเดตข่าวสารล่าสุด</span>`
+              : `<span class="text-[11px] text-slate-400 font-semibold">อัปเดตแบบเรียลไทม์</span>`
           }
         </div>
       </div>
@@ -1054,7 +1057,7 @@ class PublicViews {
   }
 
   /**
-   * 1. หน้าแรก (HOME LANDING PAGE) — ธีมเหลือง-แดง โมเดิร์น เทคโนโลยี เป็นสัดส่วน ไม่รก
+   * 1. หน้าแรก (HOME LANDING PAGE) — ดีไซน์สะอาดตา โปรขึ้น เรียบหรูขึ้น (Clean & Luxury Prestige Theme)
    */
   renderHome() {
     const profile = (window.dbAdapter.getTable('School_Profile')[0]) || {};
@@ -1086,171 +1089,195 @@ class PublicViews {
     const fbSchoolUrl = profile.facebook_url || 'https://www.facebook.com/profile.php?id=100014526581847';
 
     return `
-      <!-- ZONE 1: MODERN TECH RED & GOLD HERO + EXECUTIVE PORTRAIT SHOWCASE -->
-      <section class="relative overflow-hidden bbk-tech-hero text-white border-b-4 border-amber-400">
-        <!-- Tech Grid Overlay & Glows -->
-        <div class="absolute inset-0 bbk-tech-grid-overlay pointer-events-none"></div>
-        <div class="absolute -top-28 -right-24 w-96 h-96 rounded-full bg-amber-400/25 blur-3xl pointer-events-none"></div>
-        <div class="absolute -bottom-28 -left-24 w-80 h-80 rounded-full bg-red-500/25 blur-3xl pointer-events-none"></div>
+      <!-- แถบขลิบสีทอง-แดงเกียรติยศด้านบนสุด -->
+      <div class="h-1.5 bbk-luxury-ribbon w-full"></div>
 
-        <div class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 pt-5 pb-6 sm:py-8 lg:py-10 relative z-10">
-          <div class="grid grid-cols-1 lg:grid-cols-12 gap-5 sm:gap-6 lg:gap-8 items-center">
-            <!-- Left: ข้อมูลโรงเรียนขนาดพอดี สบายตา สมส่วน (8 Cols) -->
-            <div class="lg:col-span-8 space-y-3.5 sm:space-y-5">
-              <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 border border-amber-400/40 text-amber-300 text-[11px] sm:text-xs font-bold backdrop-blur-md max-w-full">
-                <img src="assets/img/obec_logo.png" alt="โลโก้ สพป.อุบลราชธานี เขต 2" class="w-5 h-5 sm:w-6 sm:h-6 object-contain shrink-0" />
-                <span class="truncate">${window.authService.sanitizeHTML(heroBadge)}</span>
+      <!-- ZONE 1: CLEAN LUXURY EXECUTIVE HERO + PORTRAIT SHOWCASE -->
+      <section class="bbk-luxury-hero border-b border-slate-200/80 relative overflow-hidden">
+        <!-- Subtle Ambient Lighting -->
+        <div class="absolute top-0 right-1/4 w-96 h-96 rounded-full bg-amber-400/10 blur-3xl pointer-events-none"></div>
+        <div class="absolute bottom-0 left-10 w-80 h-80 rounded-full bg-slate-900/5 blur-3xl pointer-events-none"></div>
+
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12 lg:py-14 relative z-10">
+          <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
+            
+            <!-- Left: ข้อมูลโรงเรียน สะอาดตา โปรขึ้น เรียบหรู ชัดเจน (7 Cols) -->
+            <div class="lg:col-span-7 space-y-5">
+              
+              <!-- Badges: สังกัด สพป. และ รหัสสถานศึกษา -->
+              <div class="flex flex-wrap items-center gap-2">
+                <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-slate-900/5 border border-slate-300 text-slate-800 text-xs font-semibold backdrop-blur-xs shadow-2xs">
+                  <img src="assets/img/obec_logo.png" alt="โลโก้ สพป.อุบลราชธานี เขต 2" class="w-4 h-4 object-contain shrink-0" />
+                  <span class="truncate">${window.authService.sanitizeHTML(heroBadge)}</span>
+                </div>
+                <div class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-amber-50 border border-amber-300/80 text-amber-900 text-xs font-bold font-mono shadow-2xs">
+                  <span>ID: ${window.authService.sanitizeHTML(profile.school_code_10 || profile.school_code || '1034710083')}</span>
+                </div>
               </div>
 
-              <div class="space-y-1.5 sm:space-y-2">
-                <div class="flex flex-wrap items-center gap-1.5 sm:gap-2 text-[11px] sm:text-sm font-extrabold tracking-wider uppercase text-amber-300">
+              <!-- หัวข้อชื่อโรงเรียน สไตล์สถาบันการศึกษาชั้นนำ -->
+              <div class="space-y-2">
+                <div class="text-xs sm:text-sm font-extrabold tracking-widest uppercase text-amber-700 flex items-center gap-2">
                   <span>BANBOKNONGTUNNAM SCHOOL</span>
-                  <span class="text-white/40">•</span>
-                  <span class="px-2 py-0.5 rounded-lg bg-amber-400/20 border border-amber-400/40 text-amber-200 font-mono text-[10px] sm:text-xs">
-                    ID: ${window.authService.sanitizeHTML(profile.school_code_10 || profile.school_code || '1034710083')}
-                  </span>
+                  <span class="w-1.5 h-1.5 rounded-full bg-amber-600"></span>
+                  <span class="text-slate-500 font-semibold lowercase">ubon ratchathani primary education</span>
                 </div>
-                <h2 class="text-2xl sm:text-4xl lg:text-5xl font-extrabold text-white tracking-tight leading-tight">
+                <h1 class="text-2xl sm:text-4xl lg:text-5xl font-extrabold text-slate-900 tracking-tight leading-tight">
                   ${window.authService.sanitizeHTML(heroTitle)}
-                </h2>
-                <p class="text-xs sm:text-base lg:text-lg font-bold text-amber-300">
+                </h1>
+                <p class="text-xs sm:text-sm text-slate-600 leading-relaxed font-normal">
+                  📍 ${window.authService.sanitizeHTML(profile.address || 'หมู่ที่ 2 บ้านบก ตำบลหนองทันน้ำ อำเภอกุดข้าวปุ้น จังหวัดอุบลราชธานี 34270')} • จัดการศึกษา <strong class="text-slate-900 font-semibold">${window.authService.sanitizeHTML(profile.education_level || 'อนุบาล-มัธยมศึกษาตอนต้น')}</strong>
+                </p>
+              </div>
+
+              <!-- คำขวัญโรงเรียนในกรอบทองแชมเปญเรียบหรู -->
+              <div class="p-4 sm:p-5 rounded-2xl bg-amber-50/60 border border-amber-200/90 border-l-4 border-l-amber-600 shadow-2xs">
+                <div class="text-[11px] font-extrabold uppercase tracking-wider text-amber-800 flex items-center gap-1.5">
+                  <span>✨ คำขวัญประจำสถานศึกษา</span>
+                </div>
+                <p class="text-sm sm:text-base font-bold text-slate-900 mt-1 italic leading-relaxed">
                   “${window.authService.sanitizeHTML(profile.motto || 'เรียนรู้สู่ความเป็นเลิศ เชิดชูคุณธรรม นำพาชุมชน')}”
                 </p>
               </div>
 
-              <p class="text-[11px] sm:text-sm text-red-100/90 leading-relaxed max-w-3xl">
-                📍 ${window.authService.sanitizeHTML(profile.address || 'หมู่ที่ 2 บ้านบก ตำบลหนองทันน้ำ อำเภอกุดข้าวปุ้น จังหวัดอุบลราชธานี 34270')} • เปิดสอนระดับชั้น <strong class="text-amber-300">${window.authService.sanitizeHTML(profile.education_level || 'อนุบาล-มัธยมศึกษาตอนต้น')}</strong>
-              </p>
-
-              <!-- Primary Action Bar (ขนาดกระชับ สมดุลทั้งมือถือและคอมพิวเตอร์) -->
-              <div class="grid grid-cols-1 sm:flex sm:flex-wrap items-stretch sm:items-center gap-2 sm:gap-3 pt-1">
+              <!-- Primary Action Bar (สะอาดตา โปร เรียบหรู) -->
+              <div class="flex flex-wrap items-center gap-3 pt-1">
                 <button
                   onclick="window.app.navigate('about')"
-                  class="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-gradient-to-r from-amber-400 to-yellow-300 text-slate-950 text-xs sm:text-sm font-extrabold hover:from-amber-300 hover:to-yellow-200 shadow-md transition cursor-pointer w-full sm:w-auto"
+                  class="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs sm:text-sm font-bold shadow-sm hover:shadow transition cursor-pointer"
                 >
-                  <span class="w-6 h-6 rounded-lg bg-gradient-to-br from-blue-500 to-indigo-600 text-white flex items-center justify-center shadow-xs text-xs shrink-0">🏫</span>
+                  <i data-lucide="building-2" class="w-4 h-4 text-amber-400"></i>
                   <span>ข้อมูลพื้นฐานโรงเรียน</span>
                 </button>
                 <button
                   onclick="window.app.navigate('personnel')"
-                  class="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-white/10 hover:bg-white/20 text-white border border-white/25 text-xs sm:text-sm font-bold backdrop-blur-xs transition cursor-pointer w-full sm:w-auto"
+                  class="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl bg-white hover:bg-slate-50 text-slate-800 border border-slate-300 text-xs sm:text-sm font-bold shadow-2xs transition cursor-pointer"
                 >
-                  <span class="w-6 h-6 rounded-lg bg-gradient-to-br from-emerald-400 to-teal-600 text-white flex items-center justify-center shadow-xs text-xs shrink-0">👨‍🏫</span>
+                  <i data-lucide="users" class="w-4 h-4 text-slate-600"></i>
                   <span>ทำเนียบบุคลากร (${stats.totalPersonnel})</span>
+                </button>
+                <button
+                  onclick="window.app.navigate('teacher-portal')"
+                  class="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-amber-50 hover:bg-amber-100 text-amber-900 border border-amber-300 text-xs sm:text-sm font-bold shadow-2xs transition cursor-pointer"
+                >
+                  <i data-lucide="laptop" class="w-4 h-4 text-amber-700"></i>
+                  <span>ระบบบริการดิจิทัลครู</span>
                 </button>
                 <a
                   href="${window.authService.sanitizeHTML(fbSchoolUrl)}"
                   target="_blank"
                   rel="noopener"
-                  class="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-gradient-to-r from-[#1877F2] to-blue-600 hover:from-blue-500 hover:to-blue-600 text-white text-xs sm:text-sm font-bold shadow-md transition w-full sm:w-auto"
+                  class="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-blue-50 hover:bg-blue-100 text-[#1877F2] border border-blue-200 text-xs sm:text-sm font-bold shadow-2xs transition"
                 >
-                  <span class="w-6 h-6 rounded-full bg-white flex items-center justify-center shadow-xs overflow-hidden shrink-0">
-                    <img src="assets/img/facebook_logo.png" alt="Facebook" class="w-6 h-6 object-contain shrink-0 inline-block" />
-                  </span>
+                  <img src="assets/img/facebook_logo.png" alt="Facebook" class="w-4 h-4 object-contain shrink-0" />
                   <span>Facebook โรงเรียน</span>
                 </a>
               </div>
 
-              <!-- 4 Tech KPI Cards (จัดวางสวยงาม ไม่ล้นจอในมือถือ) -->
-              <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-3 pt-1">
-                <div
-                  onclick="window.app.navigate('dashboard')"
-                  class="p-2 sm:p-3.5 rounded-xl sm:rounded-2xl bg-slate-950/45 hover:bg-slate-950/65 border border-amber-400/35 transition cursor-pointer flex items-center gap-2 sm:gap-2.5 min-w-0"
-                >
-                  <div class="w-7 h-7 sm:w-9 sm:h-9 rounded-lg sm:rounded-xl bg-gradient-to-br from-sky-400 via-blue-500 to-indigo-600 text-white flex items-center justify-center shadow-sm shrink-0 text-xs sm:text-base">
-                    🎓
+              <!-- 4 Clean Bento KPI Metric Cards -->
+              <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-2">
+                <div onclick="window.app.navigate('dashboard')" class="bbk-clean-stat-card p-3 sm:p-4 cursor-pointer">
+                  <div class="flex items-center justify-between text-slate-400 mb-1">
+                    <span class="text-[10px] font-bold uppercase tracking-wider text-slate-500">นักเรียนปี 2569</span>
+                    <i data-lucide="graduation-cap" class="w-4 h-4 text-amber-600"></i>
                   </div>
-                  <div class="min-w-0">
-                    <div class="text-[10px] sm:text-[11px] font-bold text-amber-300 truncate">นักเรียนปี 2569</div>
-                    <div class="text-base sm:text-2xl font-extrabold text-white mt-0.5 truncate">
-                      ${stats.totalStudents.toLocaleString()} <span class="text-[9px] sm:text-[10px] font-normal text-amber-200">คน</span>
-                    </div>
+                  <div class="text-xl sm:text-2xl font-extrabold text-slate-900 font-mono">
+                    ${stats.totalStudents.toLocaleString()}
+                    <span class="text-xs font-normal text-slate-500">คน</span>
                   </div>
                 </div>
 
-                <div
-                  onclick="window.app.navigate('personnel')"
-                  class="p-2 sm:p-3.5 rounded-xl sm:rounded-2xl bg-slate-950/45 hover:bg-slate-950/65 border border-amber-400/35 transition cursor-pointer flex items-center gap-2 sm:gap-2.5 min-w-0"
-                >
-                  <div class="w-7 h-7 sm:w-9 sm:h-9 rounded-lg sm:rounded-xl bg-gradient-to-br from-emerald-400 via-teal-500 to-green-600 text-white flex items-center justify-center shadow-sm shrink-0 text-xs sm:text-base">
-                    👩‍🏫
+                <div onclick="window.app.navigate('personnel')" class="bbk-clean-stat-card p-3 sm:p-4 cursor-pointer">
+                  <div class="flex items-center justify-between text-slate-400 mb-1">
+                    <span class="text-[10px] font-bold uppercase tracking-wider text-slate-500">บุคลากร</span>
+                    <i data-lucide="user-check" class="w-4 h-4 text-emerald-600"></i>
                   </div>
-                  <div class="min-w-0">
-                    <div class="text-[10px] sm:text-[11px] font-bold text-amber-300 truncate">ครูและบุคลากร</div>
-                    <div class="text-base sm:text-2xl font-extrabold text-white mt-0.5 truncate">
-                      ${stats.totalPersonnel.toLocaleString()} <span class="text-[9px] sm:text-[10px] font-normal text-amber-200">ท่าน</span>
-                    </div>
+                  <div class="text-xl sm:text-2xl font-extrabold text-slate-900 font-mono">
+                    ${stats.totalPersonnel.toLocaleString()}
+                    <span class="text-xs font-normal text-slate-500">ท่าน</span>
                   </div>
                 </div>
 
-                <div
-                  onclick="window.app.navigate('about')"
-                  class="p-2 sm:p-3.5 rounded-xl sm:rounded-2xl bg-slate-950/45 hover:bg-slate-950/65 border border-amber-400/35 transition cursor-pointer flex items-center gap-2 sm:gap-2.5 min-w-0"
-                >
-                  <div class="w-7 h-7 sm:w-9 sm:h-9 rounded-lg sm:rounded-xl bg-gradient-to-br from-amber-400 via-orange-500 to-red-500 text-white flex items-center justify-center shadow-sm shrink-0 text-xs sm:text-base">
-                    🏛️
+                <div onclick="window.app.navigate('about')" class="bbk-clean-stat-card p-3 sm:p-4 cursor-pointer">
+                  <div class="flex items-center justify-between text-slate-400 mb-1">
+                    <span class="text-[10px] font-bold uppercase tracking-wider text-slate-500">รหัสสถานศึกษา</span>
+                    <i data-lucide="award" class="w-4 h-4 text-blue-600"></i>
                   </div>
-                  <div class="min-w-0">
-                    <div class="text-[10px] sm:text-[11px] font-bold text-amber-300 truncate">รหัส 10 หลัก</div>
-                    <div class="text-xs sm:text-sm font-extrabold font-mono text-white mt-0.5 truncate">
-                      ${window.authService.sanitizeHTML(profile.school_code_10 || profile.school_code || '1034710083')}
-                    </div>
+                  <div class="text-sm sm:text-base font-extrabold text-slate-900 font-mono">
+                    ${window.authService.sanitizeHTML(profile.school_code_10 || '1034710083')}
                   </div>
                 </div>
 
-                <div
-                  onclick="window.app.navigate('news')"
-                  class="p-2 sm:p-3.5 rounded-xl sm:rounded-2xl bg-slate-950/45 hover:bg-slate-950/65 border border-amber-400/35 transition cursor-pointer flex items-center gap-2 sm:gap-2.5 min-w-0"
-                >
-                  <div class="w-7 h-7 sm:w-9 sm:h-9 rounded-lg sm:rounded-xl bg-gradient-to-br from-pink-500 via-rose-500 to-red-600 text-white flex items-center justify-center shadow-sm shrink-0 text-xs sm:text-base">
-                    📢
+                <div onclick="window.app.navigate('news')" class="bbk-clean-stat-card p-3 sm:p-4 cursor-pointer">
+                  <div class="flex items-center justify-between text-slate-400 mb-1">
+                    <span class="text-[10px] font-bold uppercase tracking-wider text-slate-500">ข่าวสาร & ผลงาน</span>
+                    <i data-lucide="newspaper" class="w-4 h-4 text-rose-600"></i>
                   </div>
-                  <div class="min-w-0">
-                    <div class="text-[10px] sm:text-[11px] font-bold text-amber-300 truncate">ข่าวสาร & สไลด์</div>
-                    <div class="text-base sm:text-2xl font-extrabold text-white mt-0.5 truncate">
-                      ${(this.getStudentSlides().length + stats.totalNews).toLocaleString()} <span class="text-[9px] sm:text-[10px] font-normal text-amber-200">รายการ</span>
-                    </div>
+                  <div class="text-xl sm:text-2xl font-extrabold text-slate-900 font-mono">
+                    ${(this.getStudentSlides().length + stats.totalNews).toLocaleString()}
+                    <span class="text-xs font-normal text-slate-500">รายการ</span>
                   </div>
                 </div>
               </div>
+
             </div>
 
-            <!-- Right: ภาพผู้บริหารสถานศึกษา (จัดวางกึ่งกลางพอดี ไม่ดันขอบจอในมือถือ) (4 Cols) -->
-            <div class="lg:col-span-4 flex items-center justify-center lg:justify-end mt-2 lg:mt-0">
+            <!-- Right: ภาพผู้บริหารสถานศึกษาในกรอบ Executive Prestige สวยสง่างาม (5 Cols) -->
+            <div class="lg:col-span-5 flex flex-col items-center justify-center">
               <div
                 onclick="window.app.navigate('personnel')"
-                title="คลิกเพื่อเข้าสู่หน้าทำเนียบบุคลากร"
-                class="relative cursor-pointer group flex flex-col items-center select-none"
+                title="คลิกเพื่อดูทำเนียบบุคลากรทั้งหมด"
+                class="relative cursor-pointer group flex flex-col items-center select-none w-full max-w-sm sm:max-w-md"
               >
-                <!-- แสงออร่าสีทองละมุนด้านหลังภาพผู้บริหาร -->
-                <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-48 h-48 sm:w-72 sm:h-72 lg:w-80 lg:h-80 rounded-full bg-gradient-to-tr from-amber-400/30 via-yellow-300/15 to-transparent blur-3xl pointer-events-none"></div>
+                <!-- แสงเรืองทองอ่อนละมุนด้านหลังภาพ -->
+                <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-64 h-64 sm:w-80 sm:h-80 rounded-full bg-gradient-to-tr from-amber-200/40 via-yellow-100/20 to-transparent blur-3xl pointer-events-none"></div>
 
-                <img
-                  src="${directorImg}"
-                  alt="นายทองพูล สิงห์บุตร ผู้อำนวยการโรงเรียนบ้านบกหนองทันน้ำ"
-                  class="relative z-10 w-[210px] sm:w-[280px] lg:w-[350px] xl:w-[390px] max-h-[310px] sm:max-h-[420px] lg:max-h-[500px] object-contain drop-shadow-[0_20px_30px_rgba(0,0,0,0.5)] group-hover:scale-105 transition duration-500"
-                  onerror="this.src='assets/img/logo.png'"
-                />
+                <!-- กรอบรูปภาพผู้บริหาร -->
+                <div class="relative z-10 w-full flex justify-center">
+                  <img
+                    src="${directorImg}"
+                    alt="นายทองพูล สิงห์บุตร ผู้อำนวยการโรงเรียนบ้านบกหนองทันน้ำ"
+                    class="w-[240px] sm:w-[310px] lg:w-[360px] max-h-[380px] sm:max-h-[460px] object-contain drop-shadow-[0_15px_25px_rgba(15,23,42,0.18)] group-hover:scale-102 transition duration-500"
+                    onerror="this.src='assets/img/logo.png'"
+                  />
+                </div>
+
+                <!-- ป้ายชื่อตำแหน่งผู้บริหารหรูหราสะอาดตา -->
+                <div class="relative z-20 -mt-6 w-11/12 bg-white/95 backdrop-blur-md rounded-2xl p-3.5 sm:p-4 border border-slate-200/90 shadow-md text-center space-y-0.5">
+                  <span class="inline-block px-2.5 py-0.5 rounded-full bg-amber-50 border border-amber-200 text-amber-800 text-[10px] font-bold uppercase tracking-wider mb-0.5">
+                    EXECUTIVE LEADERSHIP
+                  </span>
+                  <h3 class="text-sm sm:text-base font-extrabold text-slate-900">
+                    นายทองพูล สิงห์บุตร
+                  </h3>
+                  <p class="text-xs font-semibold text-slate-600">
+                    ผู้อำนวยการโรงเรียนบ้านบกหนองทันน้ำ
+                  </p>
+                  <p class="text-[11px] text-amber-700 font-medium">
+                    วิทยฐานะ ชำนาญการพิเศษ
+                  </p>
+                </div>
               </div>
             </div>
+
           </div>
         </div>
       </section>
 
-      <!-- ZONE 2: BENTO SHOWCASE SLIDER (7 COLS) + SMART MOVING BULLETIN BOARD (5 COLS) -->
+      <!-- ZONE 2: CAMPUS SPOTLIGHT SLIDER (7 COLS) + OFFICIAL NOTICES BULLETIN (5 COLS) -->
       <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 pb-6">
-        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-5">
-          <div class="flex items-center gap-3.5">
-            <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-rose-500 via-red-600 to-amber-500 text-white flex items-center justify-center shadow-md shrink-0 text-2xl">
-              🎬
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-6">
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-xl bg-slate-900 text-amber-400 flex items-center justify-center shadow-xs shrink-0 text-xl font-bold">
+              <i data-lucide="sparkles" class="w-5 h-5"></i>
             </div>
             <div>
-              <span class="text-[11px] font-extrabold uppercase tracking-wider text-red-700">
-                SMART DIGITAL PR & INTERACTIVE BOARD
+              <span class="text-[11px] font-extrabold uppercase tracking-widest text-amber-700">
+                CAMPUS SPOTLIGHT & OFFICIAL NOTICES
               </span>
-              <h3 class="text-xl sm:text-2xl font-extrabold text-slate-900">
-                สไลด์โอกาสสำคัญนักเรียน & บอร์ดประชาสัมพันธ์เคลื่อนไหว
-              </h3>
+              <h2 class="text-xl sm:text-2xl font-extrabold text-slate-900">
+                ผลงานและโอกาสสำคัญนักเรียน & ประกาศทางการ
+              </h2>
             </div>
           </div>
 
@@ -1260,17 +1287,17 @@ class PublicViews {
               <div class="flex flex-wrap items-center gap-2">
                 <button
                   onclick="window.app.handleAdminSlideAddClick()"
-                  class="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-gradient-to-r from-red-700 to-red-600 text-white hover:from-red-600 hover:to-red-500 text-xs font-bold shadow-2xs transition cursor-pointer"
+                  class="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-slate-900 text-white hover:bg-slate-800 text-xs font-bold shadow-2xs transition cursor-pointer"
                 >
-                  <i data-lucide="image-plus" class="w-3.5 h-3.5 text-amber-300"></i>
+                  <i data-lucide="image-plus" class="w-3.5 h-3.5 text-amber-400"></i>
                   <span>+ เพิ่มสไลด์ภาพ</span>
                 </button>
                 <button
                   onclick="window.app.handleAdminFacebookNewsClick()"
-                  class="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-amber-400 text-slate-950 hover:bg-amber-300 text-xs font-extrabold shadow-2xs transition cursor-pointer"
+                  class="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-blue-50 text-[#1877F2] hover:bg-blue-100 border border-blue-200 text-xs font-bold shadow-2xs transition cursor-pointer"
                 >
                   <img src="assets/img/facebook_logo.png" alt="Facebook" class="w-3.5 h-3.5 object-contain shrink-0 inline-block" />
-                  <span>+ ฝังโพสต์ Facebook</span>
+                  <span>+ ดึงโพสต์ Facebook</span>
                 </button>
               </div>
               `
@@ -1288,18 +1315,18 @@ class PublicViews {
         </div>
       </section>
 
-      <!-- ZONE 3: HORIZONTAL NEWS & FACEBOOK CAROUSEL + LIVE EMBEDDED FACEBOOK POST -->
-      <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-5 space-y-6">
+      <!-- ZONE 3: EDITORIAL NEWS CAROUSEL + OFFICIAL FACEBOOK COMMUNITY HUB -->
+      <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
-          <!-- ซ้าย (7 คอลัมน์): สไลด์การ์ดข่าวสารประชาสัมพันธ์ -->
-          <div class="lg:col-span-7 bg-white rounded-3xl p-6 sm:p-7 border border-slate-200/90 shadow-xs space-y-5">
+          <!-- ซ้าย (7 คอลัมน์): สไลด์การ์ดข่าวสารประชาสัมพันธ์ สะอาดตา เรียบหรู -->
+          <div class="lg:col-span-7 bg-white rounded-3xl p-6 sm:p-7 border border-slate-200/90 shadow-2xs space-y-5">
             <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-100 pb-4">
-              <div class="flex items-center gap-3.5">
-                <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-pink-500 via-rose-500 to-orange-500 text-white flex items-center justify-center shadow-md shrink-0 text-2xl">
-                  📢
+              <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl bg-slate-100 text-slate-800 flex items-center justify-center shadow-xs shrink-0">
+                  <i data-lucide="newspaper" class="w-5 h-5 text-slate-700"></i>
                 </div>
                 <div>
-                  <span class="text-[11px] font-extrabold uppercase tracking-wider text-red-700">NEWS & SCHOOL PR</span>
+                  <span class="text-[10px] font-extrabold uppercase tracking-widest text-slate-500">SCHOOL PR & ACTIVITIES</span>
                   <h3 class="text-lg sm:text-xl font-extrabold text-slate-900">ข่าวสารประชาสัมพันธ์และกิจกรรมโรงเรียน</h3>
                 </div>
               </div>
@@ -1307,23 +1334,23 @@ class PublicViews {
                 <button
                   onclick="window.publicViews.scrollNewsCarousel(-1)"
                   title="เลื่อนไปทางซ้าย"
-                  class="w-9 h-9 rounded-xl bg-slate-100 hover:bg-red-600 text-slate-700 hover:text-white flex items-center justify-center transition cursor-pointer"
+                  class="w-9 h-9 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 flex items-center justify-center transition cursor-pointer"
                 >
                   <i data-lucide="chevron-left" class="w-4 h-4"></i>
                 </button>
                 <button
                   onclick="window.publicViews.scrollNewsCarousel(1)"
                   title="เลื่อนไปทางขวา"
-                  class="w-9 h-9 rounded-xl bg-slate-100 hover:bg-red-600 text-slate-700 hover:text-white flex items-center justify-center transition cursor-pointer"
+                  class="w-9 h-9 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 flex items-center justify-center transition cursor-pointer"
                 >
                   <i data-lucide="chevron-right" class="w-4 h-4"></i>
                 </button>
                 <button
                   onclick="window.app.navigate('news')"
-                  class="px-3.5 py-2 rounded-xl bg-slate-900 text-amber-300 hover:bg-red-700 hover:text-white text-xs font-bold inline-flex items-center gap-1.5 transition cursor-pointer"
+                  class="px-3.5 py-2 rounded-xl bg-slate-900 text-white hover:bg-slate-800 text-xs font-bold inline-flex items-center gap-1.5 transition cursor-pointer"
                 >
                   <span>ดูทั้งหมด (${allNews.length})</span>
-                  <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i>
+                  <i data-lucide="arrow-right" class="w-3.5 h-3.5 text-amber-400"></i>
                 </button>
               </div>
             </div>
@@ -1341,112 +1368,131 @@ class PublicViews {
             </div>
           </div>
 
-          <!-- ขวา (5 คอลัมน์): กรอบฝังโพสต์ Facebook สด (Facebook Embedded Post) -->
-          <div class="lg:col-span-5 bg-white rounded-3xl p-5 sm:p-6 border border-slate-200/90 shadow-xs space-y-4">
-            <div class="flex items-center justify-between gap-2 border-b border-slate-100 pb-3.5">
+          <!-- ขวา (5 คอลัมน์): กล่องทางการเชื่อมต่อ Facebook โรงเรียน สวยงาม เสถียร ไม่หน่วง -->
+          <div class="lg:col-span-5 bg-white rounded-3xl p-6 sm:p-7 border border-slate-200/90 shadow-2xs space-y-5">
+            <div class="flex items-center justify-between gap-2 border-b border-slate-100 pb-4">
               <div class="flex items-center gap-3">
-                <div class="w-11 h-11 flex items-center justify-center shrink-0">
-                  <img src="assets/img/facebook_logo.png" alt="Facebook" class="w-11 h-11 object-contain shrink-0 inline-block drop-shadow-sm" />
+                <div class="w-10 h-10 rounded-xl bg-blue-50 border border-blue-200 flex items-center justify-center shrink-0">
+                  <img src="assets/img/facebook_logo.png" alt="Facebook" class="w-6 h-6 object-contain shrink-0 inline-block" />
                 </div>
                 <div>
-                  <span class="text-[10px] font-extrabold uppercase tracking-wider text-[#1877F2]">FACEBOOK LIVE EMBED</span>
-                  <h4 class="text-sm sm:text-base font-extrabold text-slate-900 leading-tight">โพสต์ประชาสัมพันธ์จาก Facebook</h4>
+                  <span class="text-[10px] font-extrabold uppercase tracking-widest text-[#1877F2]">OFFICIAL FACEBOOK COMMUNITY</span>
+                  <h3 class="text-sm sm:text-base font-extrabold text-slate-900 leading-tight">เฟซบุ๊กโรงเรียนบ้านบกหนองทันน้ำ</h3>
                 </div>
               </div>
               <a
-                href="https://www.facebook.com/permalink.php?story_fbid=pfbid02owAHUJHrPDN5C4o9p8EnrD37DMes4mGHArwBSQc7PpWG8oEyD1UxfGzn2TQLcYC7l&id=100066937487296"
+                href="${window.authService.sanitizeHTML(fbSchoolUrl)}"
                 target="_blank"
                 rel="noopener"
-                class="px-3 py-1.5 rounded-xl bg-blue-50 text-[#1877F2] hover:bg-blue-100 text-xs font-bold inline-flex items-center gap-1 transition shrink-0"
+                class="px-3 py-1.5 rounded-xl bg-[#1877F2] text-white hover:bg-blue-700 text-xs font-bold inline-flex items-center gap-1 transition shadow-2xs shrink-0"
               >
                 <span>เปิดดูบน FB</span>
                 <i data-lucide="external-link" class="w-3.5 h-3.5"></i>
               </a>
             </div>
 
-            <div class="rounded-2xl overflow-hidden bg-slate-50 border border-slate-200/80 flex justify-center p-2 max-h-[520px] overflow-y-auto w-full">
-              <iframe
-                src="https://www.facebook.com/plugins/post.php?href=https%3A%2F%2Fwww.facebook.com%2Fpermalink.php%3Fstory_fbid%3Dpfbid02owAHUJHrPDN5C4o9p8EnrD37DMes4mGHArwBSQc7PpWG8oEyD1UxfGzn2TQLcYC7l%26id%3D100066937487296&show_text=true&width=500"
-                class="w-full max-w-[500px]"
-                height="721"
-                style="border:none;overflow:hidden;max-width:100%;width:100%;"
-                scrolling="no"
-                frameborder="0"
-                allowfullscreen="true"
-                allow="autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share"
-              ></iframe>
+            <!-- กล่องแนะนำเพจโรงเรียนอย่างเป็นทางการและไฮไลต์โพสต์ -->
+            <div class="rounded-2xl p-5 bg-gradient-to-br from-blue-50/50 via-white to-slate-50 border border-blue-100 space-y-4">
+              <div class="flex items-center gap-3">
+                <img src="${logoUrl}" alt="โลโก้" class="w-12 h-12 rounded-xl object-contain bg-white p-1 border border-slate-200 shadow-2xs" />
+                <div>
+                  <h4 class="text-sm font-bold text-slate-900">โรงเรียนบ้านบกหนองทันน้ำ</h4>
+                  <p class="text-xs text-slate-500">สำนักงานเขตพื้นที่การศึกษาประถมศึกษาอุบลราชธานี เขต 2</p>
+                </div>
+              </div>
+              <p class="text-xs text-slate-600 leading-relaxed">
+                ติดตามข่าวสาร กิจกรรมสด ภาพถ่ายการเรียนการสอน และประกาศด่วนจากทางโรงเรียนผ่านเพจ Facebook ทางการ
+              </p>
+              <div class="pt-2 flex flex-wrap gap-2">
+                <a
+                  href="${window.authService.sanitizeHTML(fbSchoolUrl)}"
+                  target="_blank"
+                  rel="noopener"
+                  class="flex-1 text-center py-2 px-3 rounded-xl bg-slate-900 text-white hover:bg-slate-800 text-xs font-bold shadow-2xs transition"
+                >
+                  👍 เยี่ยมชม & ติดตามเพจ
+                </a>
+                <button
+                  onclick="window.app.handleAdminFacebookNewsClick()"
+                  class="py-2 px-3 rounded-xl bg-white text-slate-700 hover:bg-slate-100 border border-slate-200 text-xs font-bold transition"
+                  title="เพิ่มโพสต์ล่าสุดลงเว็บ"
+                >
+                  🔗 ซิงค์โพสต์
+                </button>
+              </div>
             </div>
           </div>
         </div>
       </section>
 
-      <!-- ZONE 4: 3-YEAR STUDENT ANALYTICS + SCHOOL IDENTITY & PERSONNEL PREVIEW -->
+      <!-- ZONE 4: 3-YEAR STUDENT ANALYTICS + ACADEMIC EXCELLENCE -->
       <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-5">
         ${this.renderThreeYearStudentGraphSection()}
       </section>
 
-      <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-4 pb-12 space-y-6">
-        <!-- แถบสรุปอัตลักษณ์ เอกลักษณ์ คำขวัญ แบบไอคอน 3D สีสันสดใสสไตล์ Facebook -->
+      <!-- ZONE 5: SCHOOL PHILOSOPHY & PERSONNEL DIRECTORY PREVIEW -->
+      <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-4 pb-14 space-y-6">
+        <!-- 3 กล่องอัตลักษณ์ เอกลักษณ์ คำขวัญ เรียบหรู สะอาดตา -->
         <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <!-- 1. คำขวัญของโรงเรียน -->
-          <div class="bg-white p-5 rounded-2xl border border-slate-200/90 border-l-4 border-l-red-600 shadow-xs hover:shadow-md transition flex items-center gap-4">
-            <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-amber-400 via-orange-500 to-red-600 text-white flex items-center justify-center shrink-0 shadow-md ring-4 ring-orange-100 text-2xl select-none">
+          <!-- 1. คำขวัญ -->
+          <div class="bg-white p-5 rounded-2xl border border-slate-200/90 border-l-4 border-l-amber-600 shadow-2xs hover:shadow-xs transition flex items-center gap-4">
+            <div class="w-12 h-12 rounded-xl bg-amber-50 text-amber-700 border border-amber-200 flex items-center justify-center shrink-0 text-xl font-bold">
               🏆
             </div>
             <div>
-              <div class="text-xs font-extrabold uppercase tracking-wider text-red-700">คำขวัญของโรงเรียน</div>
-              <div class="text-sm sm:text-base font-extrabold text-slate-900 mt-0.5">${window.authService.sanitizeHTML(profile.motto || 'เรียนรู้สู่ความเป็นเลิศ เชิดชูคุณธรรม นำพาชุมชน')}</div>
+              <div class="text-[11px] font-extrabold uppercase tracking-wider text-amber-800">คำขวัญของโรงเรียน</div>
+              <div class="text-sm font-extrabold text-slate-900 mt-0.5">${window.authService.sanitizeHTML(profile.motto || 'เรียนรู้สู่ความเป็นเลิศ เชิดชูคุณธรรม นำพาชุมชน')}</div>
             </div>
           </div>
 
-          <!-- 2. อัตลักษณ์สถานศึกษา -->
-          <div class="bg-white p-5 rounded-2xl border border-slate-200/90 border-l-4 border-l-amber-500 shadow-xs hover:shadow-md transition flex items-center gap-4">
-            <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-sky-400 via-blue-500 to-indigo-600 text-white flex items-center justify-center shrink-0 shadow-md ring-4 ring-blue-100 text-2xl select-none">
+          <!-- 2. อัตลักษณ์ -->
+          <div class="bg-white p-5 rounded-2xl border border-slate-200/90 border-l-4 border-l-blue-600 shadow-2xs hover:shadow-xs transition flex items-center gap-4">
+            <div class="w-12 h-12 rounded-xl bg-blue-50 text-blue-700 border border-blue-200 flex items-center justify-center shrink-0 text-xl font-bold">
               🌟
             </div>
             <div>
-              <div class="text-xs font-extrabold uppercase tracking-wider text-amber-700">อัตลักษณ์สถานศึกษา</div>
-              <div class="text-sm sm:text-base font-extrabold text-slate-900 mt-0.5">${window.authService.sanitizeHTML(profile.identity || 'มีวินัย ใส่ใจจิตอาสา')}</div>
+              <div class="text-[11px] font-extrabold uppercase tracking-wider text-blue-800">อัตลักษณ์สถานศึกษา</div>
+              <div class="text-sm font-extrabold text-slate-900 mt-0.5">${window.authService.sanitizeHTML(profile.identity || 'มีวินัย ใส่ใจจิตอาสา')}</div>
             </div>
           </div>
 
-          <!-- 3. เอกลักษณ์สถานศึกษา -->
-          <div class="bg-white p-5 rounded-2xl border border-slate-200/90 border-l-4 border-l-emerald-600 shadow-xs hover:shadow-md transition flex items-center gap-4">
-            <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-emerald-400 via-green-500 to-teal-600 text-white flex items-center justify-center shrink-0 shadow-md ring-4 ring-emerald-100 text-2xl select-none">
+          <!-- 3. เอกลักษณ์ -->
+          <div class="bg-white p-5 rounded-2xl border border-slate-200/90 border-l-4 border-l-emerald-600 shadow-2xs hover:shadow-xs transition flex items-center gap-4">
+            <div class="w-12 h-12 rounded-xl bg-emerald-50 text-emerald-700 border border-emerald-200 flex items-center justify-center shrink-0 text-xl font-bold">
               🌳
             </div>
             <div>
-              <div class="text-xs font-extrabold uppercase tracking-wider text-emerald-700">เอกลักษณ์สถานศึกษา</div>
-              <div class="text-sm sm:text-base font-extrabold text-slate-900 mt-0.5">${window.authService.sanitizeHTML(profile.uniqueness || 'โรงเรียนสะอาด บรรยากาศร่มรื่น')}</div>
+              <div class="text-[11px] font-extrabold uppercase tracking-wider text-emerald-800">เอกลักษณ์สถานศึกษา</div>
+              <div class="text-sm font-extrabold text-slate-900 mt-0.5">${window.authService.sanitizeHTML(profile.uniqueness || 'โรงเรียนสะอาด บรรยากาศร่มรื่น')}</div>
             </div>
           </div>
         </div>
 
-        <!-- ทำเนียบผู้บริหารและบุคลากร (Preview 4 ท่านแรก เรียงลำดับ 1, 2, 3, 4) -->
-        <div class="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200/90 shadow-xs space-y-5">
-          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-100 pb-4">
+        <!-- ทำเนียบผู้บริหารและบุคลากร (Preview 4 ท่านแรก ในกรอบคลีนเรียบหรู) -->
+        <div class="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200/90 shadow-2xs space-y-6">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-100 pb-5">
             <div class="flex items-center gap-3.5">
-              <div class="w-12 h-12 rounded-2xl bg-white border border-amber-200/90 p-1 flex items-center justify-center shadow-xs shrink-0 overflow-hidden">
+              <div class="w-11 h-11 rounded-2xl bg-white border border-slate-200 p-1 flex items-center justify-center shadow-2xs shrink-0 overflow-hidden">
                 <img src="${logoUrl}" alt="โลโก้โรงเรียนบ้านบกหนองทันน้ำ" class="w-full h-full object-contain" onerror="this.src='assets/img/logo.png'" />
               </div>
               <div>
-                <span class="text-[11px] font-extrabold uppercase tracking-wider text-red-700">EXECUTIVE & PERSONNEL DIRECTORY</span>
+                <span class="text-[10px] font-extrabold uppercase tracking-widest text-slate-500">FACULTY & STAFF DIRECTORY</span>
                 <h3 class="text-lg sm:text-xl font-extrabold text-slate-900">ทำเนียบผู้บริหารและบุคลากร (ทั้งหมด ${stats.totalPersonnel} ท่าน)</h3>
               </div>
             </div>
             <div class="flex flex-wrap gap-2">
               <button
                 onclick="window.app.navigate('about')"
-                class="px-3.5 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-xs font-bold text-slate-700 transition cursor-pointer"
+                class="px-4 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-xs font-bold text-slate-700 transition cursor-pointer"
               >
-                ข้อมูลพื้นฐานโรงเรียน
+                ข้อมูลโรงเรียน
               </button>
               <button
                 onclick="window.app.navigate('personnel')"
-                class="px-4 py-2 rounded-xl bg-gradient-to-r from-red-700 to-red-600 text-white hover:from-red-600 hover:to-red-500 text-xs font-bold shadow-2xs inline-flex items-center gap-1.5 transition cursor-pointer"
+                class="px-4 py-2 rounded-xl bg-slate-900 text-white hover:bg-slate-800 text-xs font-bold shadow-2xs inline-flex items-center gap-1.5 transition cursor-pointer"
               >
                 <span>ดูบุคลากรทั้งหมด ${stats.totalPersonnel} ท่าน</span>
-                <i data-lucide="arrow-right" class="w-3.5 h-3.5 text-amber-300"></i>
+                <i data-lucide="arrow-right" class="w-3.5 h-3.5 text-amber-400"></i>
               </button>
             </div>
           </div>

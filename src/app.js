@@ -2124,7 +2124,7 @@ class BanbokAppController {
   }
 
   /**
-   * หน้าต่างศูนย์ควบคุมและเชื่อมต่อ Google Workspace ด่วน (Google Workspace Fast-Engine Hub)
+   * หน้าต่างศูนย์ควบคุมและเชื่อมต่อทุกแพลตฟอร์ม (Universal Multi-Platform Sync Hub)
    */
   openGoogleWorkspaceHubModal() {
     const s = window.dbAdapter.getSettingsMap();
@@ -2140,48 +2140,86 @@ class BanbokAppController {
       : 'https://drive.google.com';
 
     this.openModal(
-      'ศูนย์เชื่อมต่อ Google Workspace ความเร็วสูง (Google Ecosystem Hub)',
+      'ศูนย์เชื่อมโยงและซิงค์ข้อมูลทุกแพลตฟอร์ม (Universal Multi-Platform Hub)',
       `
       <div class="space-y-5">
-        <!-- สถานะความเร็วและเสถียรภาพ -->
-        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+        <!-- แถบปุ่มซิงค์ด่วนทุกแพลตฟอร์มในคลิกเดียว -->
+        <div class="p-4 rounded-2xl bg-gradient-to-r from-slate-900 to-slate-800 text-white flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-sm">
+          <div class="flex items-center gap-3">
+            <span class="w-3 h-3 rounded-full bg-emerald-400 animate-ping shrink-0"></span>
+            <div>
+              <div class="text-xs font-bold text-amber-300 uppercase tracking-wider">UNIVERSAL PLATFORM SYNC</div>
+              <h4 class="text-sm sm:text-base font-extrabold text-white">ระบบเชื่อมโยงและอัปเดตข้อมูลเป็นปัจจุบัน</h4>
+            </div>
+          </div>
+          <button
+            type="button"
+            onclick="window.app.syncAllPlatformsNow()"
+            class="px-4 py-2.5 rounded-xl bg-gradient-to-r from-amber-400 to-yellow-300 text-slate-950 hover:from-amber-300 hover:to-yellow-200 text-xs font-extrabold shadow-sm transition cursor-pointer shrink-0 flex items-center justify-center gap-2"
+          >
+            <span>⚡ ซิงค์ทุกแพลตฟอร์มเดี๋ยวนี้</span>
+          </button>
+        </div>
+
+        <!-- สถานะความเร็วและเสถียรภาพ 4 แพลตฟอร์ม -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
           <div class="p-3.5 rounded-2xl bg-emerald-50 border border-emerald-200">
-            <div class="text-[11px] font-bold text-emerald-700 uppercase">สถาปัตยกรรมความเร็วสูง</div>
-            <div class="text-sm font-extrabold text-slate-900 mt-0.5">SWR + Edge Cache</div>
-            <div class="text-[11px] text-emerald-800 mt-0.5">Latency: ${syncStatus.latencyMs || 12} ms (0ms UI Render)</div>
+            <div class="flex items-center justify-between">
+              <span class="text-[10px] font-bold text-emerald-800 uppercase">1. Google Sheets</span>
+              <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+            </div>
+            <div class="text-sm font-extrabold text-slate-900 mt-1">17 ตารางมาตรฐาน</div>
+            <div class="text-[10px] text-emerald-700 mt-0.5">Edge CDN + GAS Sync</div>
           </div>
+
+          <div class="p-3.5 rounded-2xl bg-blue-50 border border-blue-200">
+            <div class="flex items-center justify-between">
+              <span class="text-[10px] font-bold text-blue-800 uppercase">2. Web Central Server</span>
+              <span class="w-2 h-2 rounded-full bg-blue-500"></span>
+            </div>
+            <div class="text-sm font-extrabold text-slate-900 mt-1">Master DB Backup</div>
+            <div class="text-[10px] text-blue-700 mt-0.5">REST API / Live Sync</div>
+          </div>
+
+          <div class="p-3.5 rounded-2xl bg-indigo-50 border border-indigo-200">
+            <div class="flex items-center justify-between">
+              <span class="text-[10px] font-bold text-indigo-800 uppercase">3. Facebook School</span>
+              <span class="w-2 h-2 rounded-full bg-indigo-500"></span>
+            </div>
+            <div class="text-sm font-extrabold text-slate-900 mt-1">เพจทางการโรงเรียน</div>
+            <div class="text-[10px] text-indigo-700 mt-0.5">ดึงโพสต์ข่าวใน 1 คลิก</div>
+          </div>
+
           <div class="p-3.5 rounded-2xl bg-amber-50 border border-amber-200">
-            <div class="text-[11px] font-bold text-amber-800 uppercase">ฐานข้อมูล Google Sheets</div>
-            <div class="text-sm font-extrabold text-slate-900 mt-0.5">ครบ 17 ตารางมาตรฐาน</div>
-            <div class="text-[11px] text-amber-900 mt-0.5">คิวรอซิงค์อัตโนมัติ: ${queueLen} รายการ</div>
-          </div>
-          <div class="p-3.5 rounded-2xl bg-slate-50 border border-slate-200">
-            <div class="text-[11px] font-bold text-slate-500 uppercase">โหมดการเชื่อมต่อปัจจุบัน</div>
-            <div class="text-sm font-extrabold text-slate-900 mt-0.5">${s.gas_webapp_url ? 'Google Apps Script Cloud' : (s.google_spreadsheet_id ? 'Google Sheets Edge CDN' : 'Hybrid Persistent Ready')}</div>
-            <div class="text-[11px] text-slate-500 mt-0.5">Auto-Retry Exponential Backoff</div>
+            <div class="flex items-center justify-between">
+              <span class="text-[10px] font-bold text-amber-800 uppercase">4. Google Drive CDN</span>
+              <span class="w-2 h-2 rounded-full bg-amber-500"></span>
+            </div>
+            <div class="text-sm font-extrabold text-slate-900 mt-1">คลังรูปภาพ & เอกสาร</div>
+            <div class="text-[10px] text-amber-700 mt-0.5">Direct Image Resolver</div>
           </div>
         </div>
 
-        <!-- ทางลัดเปิดบริการ Google Workspace ของโรงเรียน -->
+        <!-- ทางลัดเปิดบริการแพลตฟอร์มต่างๆ ของโรงเรียน -->
         <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200 space-y-3">
-          <div class="text-xs font-bold text-slate-800">ทางลัดเข้าถึงบริการ Google Workspace ของโรงเรียนบ้านบกหนองทันน้ำ</div>
+          <div class="text-xs font-bold text-slate-800">ทางลัดเปิดจัดการแพลตฟอร์มภายนอกโดยตรง</div>
           <div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5 text-xs">
             <a href="${sheetUrl}" target="_blank" rel="noopener" class="p-3 rounded-xl bg-white border border-slate-200 hover:border-emerald-500 flex flex-col items-center text-center gap-1.5 font-semibold text-slate-800 transition">
               <i data-lucide="table" class="w-5 h-5 text-emerald-600"></i>
-              <span>Google Sheets DB</span>
+              <span>เปิด Google Sheets</span>
             </a>
             <a href="${driveUrl}" target="_blank" rel="noopener" class="p-3 rounded-xl bg-white border border-slate-200 hover:border-amber-500 flex flex-col items-center text-center gap-1.5 font-semibold text-slate-800 transition">
               <i data-lucide="hard-drive" class="w-5 h-5 text-amber-600"></i>
               <span>Google Drive คลังไฟล์</span>
             </a>
-            <a href="https://calendar.google.com" target="_blank" rel="noopener" class="p-3 rounded-xl bg-white border border-slate-200 hover:border-sky-500 flex flex-col items-center text-center gap-1.5 font-semibold text-slate-800 transition">
-              <i data-lucide="calendar" class="w-5 h-5 text-sky-600"></i>
-              <span>Google Calendar</span>
+            <a href="https://www.facebook.com/profile.php?id=100014526581847" target="_blank" rel="noopener" class="p-3 rounded-xl bg-white border border-slate-200 hover:border-blue-500 flex flex-col items-center text-center gap-1.5 font-semibold text-slate-800 transition">
+              <img src="assets/img/facebook_logo.png" alt="FB" class="w-5 h-5 object-contain" />
+              <span>Facebook โรงเรียน</span>
             </a>
-            <a href="https://lookerstudio.google.com" target="_blank" rel="noopener" class="p-3 rounded-xl bg-white border border-slate-200 hover:border-indigo-500 flex flex-col items-center text-center gap-1.5 font-semibold text-slate-800 transition">
-              <i data-lucide="bar-chart-big" class="w-5 h-5 text-indigo-600"></i>
-              <span>Looker Studio</span>
-            </a>
+            <button type="button" onclick="window.app.handleAdminFacebookNewsClick()" class="p-3 rounded-xl bg-white border border-slate-200 hover:border-indigo-500 flex flex-col items-center text-center gap-1.5 font-semibold text-slate-800 transition cursor-pointer">
+              <i data-lucide="link" class="w-5 h-5 text-indigo-600"></i>
+              <span>ดึงโพสต์ FB เป็นข่าว</span>
+            </button>
           </div>
         </div>
 
@@ -2207,13 +2245,13 @@ class BanbokAppController {
               </div>
               <div class="flex flex-wrap items-center gap-2 pt-2">
                 <button type="submit" class="px-4 py-2 rounded-xl bg-slate-900 text-amber-300 hover:bg-amber-500 hover:text-slate-950 text-xs font-bold transition cursor-pointer">
-                  บันทึกและเชื่อมต่อทันที
+                  บันทึกการตั้งค่า
                 </button>
                 <button type="button" onclick="window.app.syncLocalToCloudNow()" class="px-3.5 py-2 rounded-xl bg-emerald-600 text-white hover:bg-emerald-700 text-xs font-bold transition cursor-pointer">
-                  ส่งข้อมูลทั้ง 17 ตารางขึ้น Google Sheets
+                  ส่งข้อมูลขึ้น Google Sheets
                 </button>
                 <button type="button" onclick="window.app.pullCloudToLocalNow()" class="px-3.5 py-2 rounded-xl bg-white border border-slate-300 text-slate-700 hover:bg-slate-100 text-xs font-bold transition cursor-pointer">
-                  ดึงข้อมูลล่าสุดจาก Google Sheets
+                  ดึงข้อมูลจาก Google Sheets
                 </button>
               </div>
             </form>
@@ -2287,6 +2325,18 @@ class BanbokAppController {
       this.showToast(`เชื่อมต่อคลาวด์สำเร็จ! Latency: ${data.latencyMs || 15} ms`);
     } catch (err) {
       this.showToast(`ไม่สามารถติดต่อ GAS URL ได้: ${err.message}`, 'error');
+    }
+  }
+
+  async syncAllPlatformsNow() {
+    try {
+      this.showToast('กำลังตรวจสอบและซิงค์เชื่อมโยงทุกแพลตฟอร์ม...', 'info');
+      await window.dbAdapter.syncAllPlatforms(true);
+      this.showToast('✅ ซิงค์เชื่อมโยงทุกแพลตฟอร์มเป็นปัจจุบันแล้ว!', 'success');
+      this.render();
+      this.openGoogleWorkspaceHubModal();
+    } catch (err) {
+      this.showToast(`เกิดข้อผิดพลาดในการซิงค์: ${err.message}`, 'error');
     }
   }
 

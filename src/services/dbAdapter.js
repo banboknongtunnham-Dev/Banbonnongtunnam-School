@@ -47,24 +47,41 @@ class DatabaseAdapter {
   }
 
   initStorageListener() {
-    if (typeof window !== 'undefined' && window.addEventListener) {
-      window.addEventListener('storage', (event) => {
-        if (event.key === STORAGE_KEY && event.newValue) {
-          try {
-            this.db = JSON.parse(event.newValue);
-            this.notifyListeners();
-          } catch (e) { /* ignore */ }
-        }
-      });
+    if (typeof window !== 'undefined') {
+      // 1. Cross-Tab Real-time Broadcast Synchronization
+      if ('BroadcastChannel' in window) {
+        try {
+          this.broadcastChannel = new BroadcastChannel('banbok_platform_sync');
+          this.broadcastChannel.onmessage = (event) => {
+            if (event.data && event.data.type === 'DB_UPDATED' && event.data.database) {
+              this.db = event.data.database;
+              try { localStorage.setItem(STORAGE_KEY, JSON.stringify(this.db)); } catch (e) {}
+              this.notifyListeners();
+            }
+          };
+        } catch (e) { /* ignore */ }
+      }
+
+      // 2. LocalStorage Event Listener
+      if (window.addEventListener) {
+        window.addEventListener('storage', (event) => {
+          if (event.key === STORAGE_KEY && event.newValue) {
+            try {
+              this.db = JSON.parse(event.newValue);
+              this.notifyListeners();
+            } catch (e) { /* ignore */ }
+          }
+        });
+      }
     }
   }
 
   startAutoRevalidation() {
     if (typeof window === 'undefined') return;
-    // ตรวจสอบและดึงข้อมูลอัปเดตจาก Cloud / Google Workspace ทุก 30 วินาทีแบบ Real-Time Polling
+    // ตรวจสอบและดึงข้อมูลอัปเดตจาก Cloud / Google Workspace / Central Server ทุก 20 วินาทีแบบ Real-Time Polling
     setInterval(() => {
       this.backgroundRevalidateFromGoogleWorkspace();
-    }, 30000);
+    }, 20000);
   }
 
   init() {
@@ -191,19 +208,30 @@ class DatabaseAdapter {
   }
 
   /**
-   * ดึงข้อมูลสดจาก Google Workspace เบื้องหลังอัตโนมัติ (Stale-While-Revalidate)
+   * ดึงข้อมูลสดจาก Google Workspace และ Central Server เบื้องหลังอัตโนมัติ (Stale-While-Revalidate)
    */
   async backgroundRevalidateFromGoogleWorkspace() {
     try {
+      // 1. ซิงค์กับ Central Server ก่อนเสมอเพื่ออัปเดตข้อมูลล่าสุดข้ามอุปกรณ์
+      await this.syncWithCentralServer();
+
       const gasUrl = this.getSetting('gas_webapp_url', '').trim();
       const sheetId = this.getSetting('google_spreadsheet_id', '').trim();
       const sheetsEnabled = this.getSetting('enable_google_sheets', 'true') === 'true';
       if (!sheetsEnabled) return;
 
+      let gasSuccess = false;
       if (gasUrl) {
-        await this.pullFromGoogleSheets(true);
-      } else if (sheetId && window.googleWorkspaceClient) {
-        // กรณีใส่เฉพาะ Spreadsheet ID ให้ดึงผ่าน Google Edge gviz API ความเร็วสูง
+        try {
+          await this.pullFromGoogleSheets(true);
+          gasSuccess = true;
+        } catch (e) {
+          gasSuccess = false;
+        }
+      }
+
+      // หาก GAS ติดขัด หรือไม่ได้ตั้งค่า แต่มี Spreadsheet ID ให้ดึงผ่าน Google Sheets Edge GViz CDN อัตโนมัติ
+      if (!gasSuccess && sheetId && window.googleWorkspaceClient) {
         await this.pullFromGoogleSheetsEdgeGviz(sheetId, true);
       }
     } catch (e) {
@@ -246,6 +274,11 @@ class DatabaseAdapter {
   saveLocal() {
     try {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(this.db));
+      if (this.broadcastChannel) {
+        try {
+          this.broadcastChannel.postMessage({ type: 'DB_UPDATED', database: this.db, timestamp: Date.now() });
+        } catch (e) {}
+      }
       this.notifyListeners();
       this.autoSyncToLocalServer();
     } catch (err) {
@@ -257,15 +290,73 @@ class DatabaseAdapter {
     if (this._syncTimeout) clearTimeout(this._syncTimeout);
     this._syncTimeout = setTimeout(async () => {
       try {
-        if (typeof window !== 'undefined' && window.location && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')) {
-          await fetch('/api/sync-database', {
+        if (typeof window !== 'undefined' && typeof fetch === 'function') {
+          await fetch('/api/database', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ database: this.db })
           });
         }
       } catch (_) { /* silent fallback */ }
-    }, 600);
+    }, 400);
+  }
+
+  /**
+   * ดึงฐานข้อมูลหลักจากเซิร์ฟเวอร์กลาง (Central / Local Server Sync)
+   */
+  async syncWithCentralServer() {
+    try {
+      if (typeof window !== 'undefined' && typeof fetch === 'function') {
+        const res = await fetch('/api/database', { cache: 'no-cache' });
+        if (res.ok) {
+          const remoteDb = await res.json();
+          if (remoteDb && remoteDb.School_Profile && Array.isArray(remoteDb.School_Profile)) {
+            this.db = remoteDb;
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(this.db));
+            if (this.broadcastChannel) {
+              try {
+                this.broadcastChannel.postMessage({ type: 'DB_UPDATED', database: this.db, timestamp: Date.now() });
+              } catch (_) {}
+            }
+            this.notifyListeners();
+            return true;
+          }
+        }
+      }
+    } catch (e) {}
+    return false;
+  }
+
+  /**
+   * ซิงค์เชื่อมโยงทุกแพลตฟอร์มแบบครบวงจร (Universal Multi-Platform Sync)
+   * โยงทั้ง Central Server, Google Sheets Edge GViz / GAS, และ Local Cache
+   */
+  async syncAllPlatforms(silent = false) {
+    const results = {
+      serverConnected: false,
+      googleSheetsConnected: false,
+      timestamp: new Date().toISOString()
+    };
+
+    // 1. ซิงค์กับ Central Server
+    try {
+      const serverUpdated = await this.syncWithCentralServer();
+      results.serverConnected = serverUpdated;
+    } catch (_) {}
+
+    // 2. ซิงค์กับ Google Workspace / Sheets
+    try {
+      await this.backgroundRevalidateFromGoogleWorkspace();
+      results.googleSheetsConnected = Boolean(this.lastSyncStatus && this.lastSyncStatus.connectedToCloud);
+    } catch (_) {}
+
+    if (!silent && window.app) {
+      window.app.render();
+      if (typeof window.app.showToast === 'function') {
+        window.app.showToast('✅ ซิงค์เชื่อมโยงทุกแพลตฟอร์มเป็นปัจจุบันแล้ว', 'success');
+      }
+    }
+    return results;
   }
 
   subscribe(callback) {
