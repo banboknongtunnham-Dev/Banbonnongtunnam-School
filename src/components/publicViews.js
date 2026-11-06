@@ -1284,6 +1284,65 @@ class PublicViews {
         </div>
       </section>
 
+      <!-- ZONE 1.5: FLOATING DIGITAL SERVICES & ACADEMIC PORTALS -->
+      <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 -mt-7 sm:-mt-9 relative z-20">
+        <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 sm:gap-4">
+          <!-- 1. ครู/พอร์ทัล -->
+          <div onclick="window.app.navigate('teacher-portal')" class="bg-white/95 backdrop-blur-md p-4 rounded-2xl border border-slate-200/90 shadow-md cursor-pointer bbk-card-interactive group text-center flex flex-col items-center justify-center">
+            <div class="w-12 h-12 rounded-2xl bg-gradient-to-tr from-amber-500 to-amber-400 text-slate-950 flex items-center justify-center shadow-xs group-hover:scale-110 transition duration-300 mb-2">
+              <i data-lucide="laptop" class="w-6 h-6"></i>
+            </div>
+            <h4 class="text-xs sm:text-sm font-extrabold text-slate-900 group-hover:text-red-700 transition">พอร์ทัลครู</h4>
+            <p class="text-[10px] sm:text-[11px] text-slate-500 line-clamp-1 mt-0.5">บริการดิจิทัล 8 ฝ่าย</p>
+          </div>
+
+          <!-- 2. บุคลากร -->
+          <div onclick="window.app.navigate('personnel')" class="bg-white/95 backdrop-blur-md p-4 rounded-2xl border border-slate-200/90 shadow-md cursor-pointer bbk-card-interactive group text-center flex flex-col items-center justify-center">
+            <div class="w-12 h-12 rounded-2xl bg-gradient-to-tr from-blue-600 to-sky-400 text-white flex items-center justify-center shadow-xs group-hover:scale-110 transition duration-300 mb-2">
+              <i data-lucide="users" class="w-6 h-6"></i>
+            </div>
+            <h4 class="text-xs sm:text-sm font-extrabold text-slate-900 group-hover:text-red-700 transition">ทำเนียบบุคลากร</h4>
+            <p class="text-[10px] sm:text-[11px] text-slate-500 line-clamp-1 mt-0.5">${stats.totalPersonnel} ท่านครบถ้วน</p>
+          </div>
+
+          <!-- 3. วิชาการ & ผลสอบ -->
+          <div onclick="window.app.navigate('academic')" class="bg-white/95 backdrop-blur-md p-4 rounded-2xl border border-slate-200/90 shadow-md cursor-pointer bbk-card-interactive group text-center flex flex-col items-center justify-center">
+            <div class="w-12 h-12 rounded-2xl bg-gradient-to-tr from-emerald-600 to-teal-400 text-white flex items-center justify-center shadow-xs group-hover:scale-110 transition duration-300 mb-2">
+              <i data-lucide="graduation-cap" class="w-6 h-6"></i>
+            </div>
+            <h4 class="text-xs sm:text-sm font-extrabold text-slate-900 group-hover:text-red-700 transition">วิชาการ & สอบ</h4>
+            <p class="text-[10px] sm:text-[11px] text-slate-500 line-clamp-1 mt-0.5">O-NET / RT / NT</p>
+          </div>
+
+          <!-- 4. สถิติสารสนเทศ -->
+          <div onclick="window.app.navigate('dashboard')" class="bg-white/95 backdrop-blur-md p-4 rounded-2xl border border-slate-200/90 shadow-md cursor-pointer bbk-card-interactive group text-center flex flex-col items-center justify-center">
+            <div class="w-12 h-12 rounded-2xl bg-gradient-to-tr from-red-600 to-rose-400 text-white flex items-center justify-center shadow-xs group-hover:scale-110 transition duration-300 mb-2">
+              <i data-lucide="bar-chart-3" class="w-6 h-6"></i>
+            </div>
+            <h4 class="text-xs sm:text-sm font-extrabold text-slate-900 group-hover:text-red-700 transition">สถิติสารสนเทศ</h4>
+            <p class="text-[10px] sm:text-[11px] text-slate-500 line-clamp-1 mt-0.5">กราฟวิเคราะห์ 4 แบบ</p>
+          </div>
+
+          <!-- 5. เอกสารเผยแพร่ -->
+          <div onclick="window.app.navigate('documents')" class="bg-white/95 backdrop-blur-md p-4 rounded-2xl border border-slate-200/90 shadow-md cursor-pointer bbk-card-interactive group text-center flex flex-col items-center justify-center">
+            <div class="w-12 h-12 rounded-2xl bg-gradient-to-tr from-purple-600 to-violet-400 text-white flex items-center justify-center shadow-xs group-hover:scale-110 transition duration-300 mb-2">
+              <i data-lucide="folder-open" class="w-6 h-6"></i>
+            </div>
+            <h4 class="text-xs sm:text-sm font-extrabold text-slate-900 group-hover:text-red-700 transition">เอกสารเผยแพร่</h4>
+            <p class="text-[10px] sm:text-[11px] text-slate-500 line-clamp-1 mt-0.5">ITA / แบบฟอร์ม</p>
+          </div>
+
+          <!-- 6. ข้อมูลพื้นฐานโรงเรียน -->
+          <div onclick="window.app.navigate('about')" class="bg-white/95 backdrop-blur-md p-4 rounded-2xl border border-slate-200/90 shadow-md cursor-pointer bbk-card-interactive group text-center flex flex-col items-center justify-center">
+            <div class="w-12 h-12 rounded-2xl bg-gradient-to-tr from-slate-900 to-slate-700 text-amber-300 flex items-center justify-center shadow-xs group-hover:scale-110 transition duration-300 mb-2">
+              <i data-lucide="building-2" class="w-6 h-6"></i>
+            </div>
+            <h4 class="text-xs sm:text-sm font-extrabold text-slate-900 group-hover:text-red-700 transition">ข้อมูลโรงเรียน</h4>
+            <p class="text-[10px] sm:text-[11px] text-slate-500 line-clamp-1 mt-0.5">23 รายการสถานศึกษา</p>
+          </div>
+        </div>
+      </section>
+
       <!-- ZONE 2: CAMPUS SPOTLIGHT SLIDER (7 COLS) + OFFICIAL NOTICES BULLETIN (5 COLS) -->
       <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 pb-6">
         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-6">
@@ -1632,7 +1691,7 @@ class PublicViews {
               <span class="px-3 py-1 rounded-lg bg-slate-100">รหัส 10 หลัก: <strong>${window.authService.sanitizeHTML(profile.school_code_10 || profile.school_code || '1034710083')}</strong></span>
               <span class="px-3 py-1 rounded-lg bg-slate-100">SMIS 8 หลัก: <strong>${window.authService.sanitizeHTML(profile.smis_code_8 || '34020157')}</strong></span>
               <span class="px-3 py-1 rounded-lg bg-slate-100">OBEC 6 หลัก: <strong>${window.authService.sanitizeHTML(profile.obec_code_6 || '710083')}</strong></span>
-              <span class="px-3 py-1 rounded-lg bg-slate-100">ก่อตั้งเมื่อ: <strong>${window.authService.sanitizeHTML(profile.established_date || '12052512')}</strong></span>
+              <span class="px-3 py-1 rounded-lg bg-slate-100">ก่อตั้งเมื่อ: <strong>12 พฤษภาคม พ.ศ. 2512</strong></span>
               <span class="px-3 py-1 rounded-lg bg-amber-50 text-amber-900 font-semibold">${window.authService.sanitizeHTML(profile.education_level || 'อนุบาล-มัธยมศึกษาตอนต้น')}</span>
             </div>
           </div>
@@ -1780,9 +1839,13 @@ class PublicViews {
     const canManage = window.authService.isTeacherOrAbove();
 
     return `
-      <div class="group bg-white rounded-3xl overflow-hidden border ${
-        isExecutive ? 'border-2 border-amber-400 shadow-md ring-2 ring-amber-200/80' : 'border border-slate-200/90 shadow-2xs'
-      } hover:shadow-xl hover:border-red-400 transition duration-300 flex flex-col justify-between w-full">
+      <div
+        onclick="window.app.openPersonnelDetailModal('${person.personnel_id}')"
+        title="คลิกเพื่อดูประวัติและข้อมูลบุคลากร"
+        class="group bg-white rounded-3xl overflow-hidden border ${
+          isExecutive ? 'border-2 border-amber-400 shadow-md ring-2 ring-amber-200/80' : 'border border-slate-200/90 shadow-2xs'
+        } hover:shadow-xl hover:border-red-400 transition duration-300 flex flex-col justify-between w-full cursor-pointer select-none"
+      >
         <!-- ส่วนที่ 1: ภาพถ่ายบุคลากรด้านบน สัดส่วน 3:4 เต็มกรอบ สมส่วน สวยงาม -->
         <div class="relative aspect-[3/4] w-full ${
           isExecutive
@@ -1830,9 +1893,9 @@ class PublicViews {
               ? `
               <!-- ปุ่มลัดบนภาพสำหรับ ครู/แอดมิน/ผู้พัฒนา เพื่อเปลี่ยนรูปหรือแก้ไขข้อมูล -->
               <button
-                onclick="window.app.handleAdminPersonnelEditClick('${person.personnel_id}')"
+                onclick="event.stopPropagation(); window.app.handleAdminPersonnelEditClick('${person.personnel_id}');"
                 title="แก้ไขข้อมูล / อัปโหลดรูปภาพ"
-                class="absolute top-2.5 right-2.5 px-2.5 py-1 rounded-xl bg-white/95 hover:bg-amber-400 text-slate-800 hover:text-slate-950 border border-slate-200/80 shadow-xs text-[10px] font-bold inline-flex items-center gap-1 transition cursor-pointer"
+                class="absolute top-2.5 right-2.5 px-2.5 py-1 rounded-xl bg-white/95 hover:bg-amber-400 text-slate-800 hover:text-slate-950 border border-slate-200/80 shadow-xs text-[10px] font-bold inline-flex items-center gap-1 transition cursor-pointer z-10"
               >
                 <i data-lucide="camera" class="w-3 h-3 text-amber-600"></i>
                 <span>เปลี่ยนรูป</span>

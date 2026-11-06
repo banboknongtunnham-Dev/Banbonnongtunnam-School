@@ -34,6 +34,26 @@ class BanbokAppController {
       }
     });
 
+    // ปุ่มลอยเลื่อนกลับขึ้นบนสุด (Floating Back-to-Top Button Listener)
+    window.addEventListener('scroll', () => {
+      const btn = document.getElementById('back-to-top-btn');
+      if (btn) {
+        if (window.scrollY > 280) {
+          btn.classList.add('visible');
+        } else {
+          btn.classList.remove('visible');
+        }
+      }
+    });
+
+    // คีย์ลัดค้นหาด่วนทั่วทั้งเว็บไซต์ (Global Quick Search: Ctrl+K / Cmd+K)
+    window.addEventListener('keydown', (e) => {
+      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') {
+        e.preventDefault();
+        this.openQuickSearchModal();
+      }
+    });
+
     // ตรวจสอบการส่งสรุปรายงานประจำวันเข้า LINE อัตโนมัติ (ช่วงเย็น 18:00 น. เป็นต้นไป)
     setTimeout(() => {
       const currentHour = new Date().getHours();
@@ -639,6 +659,279 @@ class BanbokAppController {
       `,
       'max-w-4xl'
     );
+  }
+
+  openPersonnelDetailModal(personnelId) {
+    const person = window.dbAdapter.getTable('Personnel').find((p) => p.personnel_id === personnelId);
+    if (!person) return;
+
+    const hasCustomPhoto = Boolean(
+      person.photo_url &&
+      String(person.photo_url).trim() !== '' &&
+      String(person.photo_url).trim() !== 'assets/img/logo.png'
+    );
+    const resolvedPhoto = hasCustomPhoto
+      ? window.driveService.resolveDriveImageUrl(person.photo_url)
+      : 'assets/img/logo.png';
+
+    const fullName = `${person.prefix || ''}${person.first_name || ''} ${person.last_name || ''}`.trim();
+    const posText = person.position || 'บุคลากรทางการศึกษา';
+    const standing = person.academic_standing ? String(person.academic_standing).trim() : '-';
+    const canManage = window.authService.isTeacherOrAbove();
+    const isExecutive = person.role_group === 'EXECUTIVE' || String(person.position).includes('ผู้อำนวยการ');
+
+    this.openModal(
+      `ข้อมูลบุคลากรทางการศึกษา`,
+      `
+      <div class="space-y-6">
+        <div class="flex flex-col sm:flex-row items-center sm:items-start gap-6 bg-gradient-to-br from-amber-50/50 via-white to-red-50/30 p-6 rounded-3xl border border-amber-200/80">
+          <div class="relative w-36 h-48 sm:w-44 sm:h-56 rounded-2xl overflow-hidden bg-white shadow-md border-2 border-amber-300 shrink-0">
+            <img src="${resolvedPhoto}" alt="${window.authService.sanitizeHTML(fullName)}" class="w-full h-full object-cover object-top" onerror="this.src='assets/img/logo.png'" />
+            ${isExecutive ? '<span class="absolute bottom-2 inset-x-2 text-center py-0.5 rounded-full bg-slate-900/90 text-amber-300 text-[10px] font-bold border border-amber-400/40">ผู้บริหารสถานศึกษา</span>' : ''}
+          </div>
+          <div class="flex-1 text-center sm:text-left space-y-3">
+            <div>
+              <span class="inline-block px-3 py-1 rounded-full ${isExecutive ? 'bg-amber-100 text-amber-900 border border-amber-300' : 'bg-slate-100 text-slate-700'} text-xs font-bold mb-1.5">
+                ${window.authService.sanitizeHTML(person.department || 'โรงเรียนบ้านบกหนองทันน้ำ')}
+              </span>
+              <h3 class="text-xl sm:text-2xl font-extrabold text-slate-900 leading-tight">
+                ${window.authService.sanitizeHTML(fullName)}
+              </h3>
+              <p class="text-sm sm:text-base font-bold text-amber-800 mt-0.5">
+                ตำแหน่ง ${window.authService.sanitizeHTML(posText)}
+              </p>
+              ${standing && standing !== '-' ? `<p class="text-xs font-semibold text-slate-600 mt-0.5">วิทยฐานะ ${window.authService.sanitizeHTML(standing)}</p>` : ''}
+            </div>
+
+            <div class="grid grid-cols-1 gap-2 pt-2 border-t border-slate-200/80 text-xs">
+              <div class="flex items-center gap-2 text-slate-700 justify-center sm:justify-start">
+                <i data-lucide="book-open" class="w-4 h-4 text-amber-600 shrink-0"></i>
+                <span>กลุ่มสาระ: <strong>${window.authService.sanitizeHTML(person.subject_group || 'ทั่วไป / กิจกรรมพัฒนาผู้เรียน')}</strong></span>
+              </div>
+              <div class="flex items-center gap-2 text-slate-700 justify-center sm:justify-start">
+                <i data-lucide="award" class="w-4 h-4 text-emerald-600 shrink-0"></i>
+                <span>วุฒิการศึกษา: <strong>${window.authService.sanitizeHTML(person.education_degree || 'ปริญญาตรี')}</strong></span>
+              </div>
+              <div class="flex items-center gap-2 text-slate-700 justify-center sm:justify-start">
+                <i data-lucide="mail" class="w-4 h-4 text-blue-600 shrink-0"></i>
+                <span>อีเมล: <strong>${window.authService.sanitizeHTML(person.email || 'banboknongtannham@gmail.com')}</strong></span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="flex flex-wrap items-center justify-between gap-3 pt-2">
+          ${canManage ? `
+            <button
+              onclick="window.app.closeModal(); window.app.handleAdminPersonnelEditClick('${person.personnel_id}');"
+              class="px-4 py-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 text-xs font-bold inline-flex items-center gap-1.5 cursor-pointer shadow-xs transition"
+            >
+              <i data-lucide="edit-3" class="w-3.5 h-3.5"></i>
+              <span>แก้ไขข้อมูล / อัปโหลดรูปภาพ</span>
+            </button>
+          ` : '<div></div>'}
+          <button onclick="window.app.closeModal()" class="px-5 py-2 rounded-xl bg-slate-900 text-white text-xs font-bold hover:bg-slate-800 cursor-pointer">
+            ปิดหน้าต่าง
+          </button>
+        </div>
+      </div>
+      `,
+      'max-w-2xl'
+    );
+  }
+
+  openQuickSearchModal(initialQuery = '') {
+    this.openModal(
+      '🔍 ค้นหาข้อมูลใน BANBOK DIGITAL PLATFORM',
+      `
+      <div class="space-y-4">
+        <div class="relative">
+          <i data-lucide="search" class="w-5 h-5 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none"></i>
+          <input
+            id="quick-search-input"
+            type="text"
+            value="${window.authService.sanitizeHTML(initialQuery)}"
+            placeholder="พิมพ์คำค้นหา เช่น ชื่อครู, ข่าว, ทุนการศึกษา, O-NET, ปพ., ระเบียบ..."
+            oninput="window.app.handleQuickSearchInput(this.value)"
+            class="w-full pl-11 pr-10 py-3 rounded-2xl bg-slate-50 border-2 border-slate-200 focus:border-red-600 focus:bg-white text-sm font-semibold outline-none transition"
+            autofocus
+          />
+          <button
+            onclick="document.getElementById('quick-search-input').value = ''; window.app.handleQuickSearchInput('');"
+            class="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 text-xs font-bold"
+            title="ล้างข้อความ"
+          >
+            ✕
+          </button>
+        </div>
+
+        <div class="flex items-center gap-2 text-[11px] text-slate-500 overflow-x-auto no-scrollbar pb-1">
+          <span class="font-bold text-slate-700 shrink-0">ค้นหาด่วน:</span>
+          <button onclick="document.getElementById('quick-search-input').value = 'ผอ.'; window.app.handleQuickSearchInput('ผอ.');" class="px-2.5 py-0.5 rounded-full bg-slate-100 hover:bg-amber-100 text-slate-700 text-xs">ผอ. ทองพูล</button>
+          <button onclick="document.getElementById('quick-search-input').value = 'O-NET'; window.app.handleQuickSearchInput('O-NET');" class="px-2.5 py-0.5 rounded-full bg-slate-100 hover:bg-amber-100 text-slate-700 text-xs">ผลสอบ O-NET</button>
+          <button onclick="document.getElementById('quick-search-input').value = 'นักเรียน'; window.app.handleQuickSearchInput('นักเรียน');" class="px-2.5 py-0.5 rounded-full bg-slate-100 hover:bg-amber-100 text-slate-700 text-xs">สถิตินักเรียน</button>
+          <button onclick="document.getElementById('quick-search-input').value = 'เอกสาร'; window.app.handleQuickSearchInput('เอกสาร');" class="px-2.5 py-0.5 rounded-full bg-slate-100 hover:bg-amber-100 text-slate-700 text-xs">เอกสาร/คำสั่ง</button>
+        </div>
+
+        <div id="quick-search-results-box" class="max-h-[60vh] overflow-y-auto space-y-3 pt-2 border-t border-slate-100">
+          ${this.getQuickSearchResultsHtml(initialQuery)}
+        </div>
+      </div>
+      `,
+      'max-w-2xl'
+    );
+
+    setTimeout(() => {
+      const inp = document.getElementById('quick-search-input');
+      if (inp) {
+        inp.focus();
+        if (inp.value) inp.select();
+      }
+    }, 100);
+  }
+
+  handleQuickSearchInput(query) {
+    const box = document.getElementById('quick-search-results-box');
+    if (box) {
+      box.innerHTML = this.getQuickSearchResultsHtml(query);
+      if (typeof lucide !== 'undefined') lucide.createIcons();
+    }
+  }
+
+  getQuickSearchResultsHtml(query) {
+    const q = String(query || '').trim().toLowerCase();
+    if (!q) {
+      return `
+        <div class="py-8 text-center text-slate-400 space-y-1">
+          <i data-lucide="search" class="w-8 h-8 mx-auto text-slate-300 mb-2"></i>
+          <p class="text-xs sm:text-sm font-semibold">พิมพ์คำค้นหาเพื่อค้นหาข้อมูลทั่วทั้งเว็บไซต์</p>
+          <p class="text-[11px] text-slate-400">ค้นหาได้ทั้ง ข่าวสาร, รายชื่อครู, เอกสาร, ผลสอบ, และข้อมูลโรงเรียน</p>
+        </div>
+      `;
+    }
+
+    const personnel = (window.dbAdapter.getTable('Personnel') || []).filter((p) => {
+      const str = `${p.prefix || ''} ${p.first_name || ''} ${p.last_name || ''} ${p.position || ''} ${p.academic_standing || ''} ${p.department || ''} ${p.subject_group || ''}`.toLowerCase();
+      return str.includes(q);
+    });
+
+    const news = (window.dbAdapter.getTable('News') || []).filter((n) => {
+      const str = `${n.title || ''} ${n.summary || ''} ${n.category || ''} ${n.content || ''}`.toLowerCase();
+      return str.includes(q);
+    });
+
+    const docs = (window.dbAdapter.getTable('Documents') || []).filter((d) => {
+      const str = `${d.title || ''} ${d.category || ''} ${d.doc_number || ''} ${d.description || ''}`.toLowerCase();
+      return str.includes(q);
+    });
+
+    const curriculums = (window.dbAdapter.getTable('Curriculum') || []).filter((c) => {
+      const str = `${c.title || ''} ${c.course_name || ''} ${c.level || ''} ${c.description || ''}`.toLowerCase();
+      return str.includes(q);
+    });
+
+    const totalResults = personnel.length + news.length + docs.length + curriculums.length;
+
+    if (totalResults === 0) {
+      return `
+        <div class="py-10 text-center text-slate-500 space-y-2">
+          <div class="w-12 h-12 rounded-full bg-slate-100 flex items-center justify-center mx-auto text-xl">🔍</div>
+          <p class="text-sm font-bold text-slate-700">ไม่พบข้อมูลที่ตรงกับ "${window.authService.sanitizeHTML(query)}"</p>
+          <p class="text-xs text-slate-400">ลองใช้คำค้นหาอื่น เช่น "ผอ.", "ครู", "ประถมศึกษา", "ปพ.", "ทุน"</p>
+        </div>
+      `;
+    }
+
+    let html = `<div class="text-[11px] font-bold text-slate-500 mb-2">พบผลการค้นหา ${totalResults} รายการ</div>`;
+
+    if (personnel.length > 0) {
+      html += `
+        <div class="space-y-1.5">
+          <div class="text-xs font-extrabold text-amber-800 uppercase flex items-center gap-1.5">
+            <i data-lucide="users" class="w-3.5 h-3.5 text-amber-600"></i>
+            <span>ครูและบุคลากร (${personnel.length})</span>
+          </div>
+          ${personnel.slice(0, 4).map((p) => {
+            const name = `${p.prefix || ''}${p.first_name || ''} ${p.last_name || ''}`;
+            const photo = p.photo_url && p.photo_url !== 'assets/img/logo.png' ? window.driveService.resolveDriveImageUrl(p.photo_url) : 'assets/img/logo.png';
+            return `
+              <div onclick="window.app.closeModal(); window.app.openPersonnelDetailModal('${p.personnel_id}');" class="p-2.5 rounded-xl bg-white hover:bg-amber-50 border border-slate-200 hover:border-amber-300 transition cursor-pointer flex items-center justify-between gap-3 shadow-2xs">
+                <div class="flex items-center gap-3 min-w-0">
+                  <img src="${photo}" class="w-10 h-10 rounded-full object-cover shrink-0 border border-slate-200" onerror="this.src='assets/img/logo.png'" />
+                  <div class="min-w-0">
+                    <div class="text-xs sm:text-sm font-bold text-slate-900 truncate">${window.authService.sanitizeHTML(name)}</div>
+                    <div class="text-[11px] text-slate-500 truncate">${window.authService.sanitizeHTML(p.position || '')} • ${window.authService.sanitizeHTML(p.academic_standing && p.academic_standing !== '-' ? `วิทยฐานะ ${p.academic_standing}` : p.department || '')}</div>
+                  </div>
+                </div>
+                <span class="text-[11px] font-bold text-amber-700 shrink-0">ดูประวัติ →</span>
+              </div>
+            `;
+          }).join('')}
+        </div>
+      `;
+    }
+
+    if (news.length > 0) {
+      html += `
+        <div class="space-y-1.5 pt-2">
+          <div class="text-xs font-extrabold text-blue-800 uppercase flex items-center gap-1.5">
+            <i data-lucide="newspaper" class="w-3.5 h-3.5 text-blue-600"></i>
+            <span>ข่าวสารและประกาศ (${news.length})</span>
+          </div>
+          ${news.slice(0, 4).map((n) => `
+            <div onclick="window.app.closeModal(); window.app.openNewsModal('${n.news_id}');" class="p-2.5 rounded-xl bg-white hover:bg-blue-50 border border-slate-200 hover:border-blue-300 transition cursor-pointer flex items-center justify-between gap-3 shadow-2xs">
+              <div class="min-w-0">
+                <div class="text-xs sm:text-sm font-bold text-slate-900 truncate">${window.authService.sanitizeHTML(n.title)}</div>
+                <div class="text-[11px] text-slate-500 truncate">${window.authService.sanitizeHTML(n.category)} • 📅 ${window.authService.sanitizeHTML(n.published_at || '')}</div>
+              </div>
+              <span class="text-[11px] font-bold text-blue-600 shrink-0">เปิดอ่าน →</span>
+            </div>
+          `).join('')}
+        </div>
+      `;
+    }
+
+    if (docs.length > 0) {
+      html += `
+        <div class="space-y-1.5 pt-2">
+          <div class="text-xs font-extrabold text-purple-800 uppercase flex items-center gap-1.5">
+            <i data-lucide="folder" class="w-3.5 h-3.5 text-purple-600"></i>
+            <span>เอกสารและแบบฟอร์ม (${docs.length})</span>
+          </div>
+          ${docs.slice(0, 4).map((d) => `
+            <div onclick="window.app.closeModal(); window.app.downloadDocumentById('${d.doc_id}');" class="p-2.5 rounded-xl bg-white hover:bg-purple-50 border border-slate-200 hover:border-purple-300 transition cursor-pointer flex items-center justify-between gap-3 shadow-2xs">
+              <div class="min-w-0">
+                <div class="text-xs sm:text-sm font-bold text-slate-900 truncate">${window.authService.sanitizeHTML(d.title)}</div>
+                <div class="text-[11px] text-slate-500 truncate">${window.authService.sanitizeHTML(d.category)} • เลขที่ ${window.authService.sanitizeHTML(d.doc_number || '-')}</div>
+              </div>
+              <span class="text-[11px] font-bold text-purple-600 shrink-0">เปิดเอกสาร 📥</span>
+            </div>
+          `).join('')}
+        </div>
+      `;
+    }
+
+    if (curriculums.length > 0) {
+      html += `
+        <div class="space-y-1.5 pt-2">
+          <div class="text-xs font-extrabold text-emerald-800 uppercase flex items-center gap-1.5">
+            <i data-lucide="book" class="w-3.5 h-3.5 text-emerald-600"></i>
+            <span>หลักสูตรสถานศึกษา (${curriculums.length})</span>
+          </div>
+          ${curriculums.slice(0, 3).map((c) => `
+            <div onclick="window.app.closeModal(); window.app.navigate('academic');" class="p-2.5 rounded-xl bg-white hover:bg-emerald-50 border border-slate-200 hover:border-emerald-300 transition cursor-pointer flex items-center justify-between gap-3 shadow-2xs">
+              <div class="min-w-0">
+                <div class="text-xs sm:text-sm font-bold text-slate-900 truncate">${window.authService.sanitizeHTML(c.title || c.course_name)}</div>
+                <div class="text-[11px] text-slate-500 truncate">${window.authService.sanitizeHTML(c.level || 'ประถมศึกษา')}</div>
+              </div>
+              <span class="text-[11px] font-bold text-emerald-600 shrink-0">ดูหลักสูตร →</span>
+            </div>
+          `).join('')}
+        </div>
+      `;
+    }
+
+    return html;
   }
 
   downloadDocumentById(docId) {

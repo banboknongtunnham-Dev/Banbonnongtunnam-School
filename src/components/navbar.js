@@ -99,8 +99,19 @@ class NavbarComponent {
               </div>
             </div>
 
-            <!-- ขวา: ปุ่มระบบครู / แอดมิน / เข้าสู่ระบบ (จัดระเบียบไม่ให้รก) -->
+            <!-- ขวา: ปุ่มค้นหา / ซิงค์ / ระบบครู / แอดมิน / เข้าสู่ระบบ -->
             <div class="flex items-center gap-1.5 sm:gap-2 shrink-0">
+              <!-- ปุ่มค้นหาด่วน Quick Search -->
+              <button
+                onclick="window.app.openQuickSearchModal()"
+                title="ค้นหาข้อมูลในเว็บไซต์ (Ctrl+K)"
+                class="inline-flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold border border-slate-200/90 transition cursor-pointer"
+              >
+                <i data-lucide="search" class="w-3.5 h-3.5 text-slate-500"></i>
+                <span class="hidden sm:inline">ค้นหา</span>
+                <kbd class="hidden lg:inline-block px-1.5 py-0.5 rounded bg-white text-[10px] text-slate-400 font-mono border border-slate-200 shadow-2xs">Ctrl K</kbd>
+              </button>
+
               <button
                 onclick="window.app.openGoogleWorkspaceHubModal()"
                 class="hidden md:inline-flex items-center gap-2 px-3 py-1.5 rounded-xl bg-slate-900 text-white hover:bg-slate-800 text-xs font-semibold transition cursor-pointer shadow-2xs whitespace-nowrap"
@@ -219,6 +230,20 @@ class NavbarComponent {
 
         <!-- เมนูสำหรับมือถือ (Mobile Drawer) -->
         <div id="mobile-nav-drawer" class="hidden xl:hidden bg-white border-t border-slate-200 px-4 pt-3 pb-5 shadow-xl">
+          <!-- ปุ่มค้นหาด่วนสำหรับมือถือ -->
+          <div class="mb-3">
+            <button
+              onclick="window.app.toggleMobileMenu(false); window.app.openQuickSearchModal();"
+              class="w-full flex items-center justify-between p-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold border border-slate-200 transition"
+            >
+              <div class="flex items-center gap-2">
+                <i data-lucide="search" class="w-4 h-4 text-slate-500"></i>
+                <span>ค้นหาข้อมูลในเว็บไซต์...</span>
+              </div>
+              <span class="text-[10px] text-amber-700 font-bold bg-amber-100 px-2 py-0.5 rounded-md">ค้นหาด่วน</span>
+            </button>
+          </div>
+
           <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
             ${navItems
               .map(
@@ -259,13 +284,17 @@ class NavbarComponent {
   renderFooter() {
     const profile = (window.dbAdapter.getTable('School_Profile')[0]) || {};
     const logoUrl = window.driveService.resolveDriveImageUrl(window.dbAdapter.getSetting('logo_url', 'assets/img/logo.png'));
+    const totalPersonnelCount = (window.dbAdapter.getTable('Personnel') || []).length;
     const visitorStats = window.dbAdapter && typeof window.dbAdapter.getVisitorStats === 'function'
       ? window.dbAdapter.getVisitorStats()
       : { total: 1280, today: 48 };
 
     return `
-      <footer class="bg-gradient-to-b from-red-950 to-slate-950 text-slate-300 border-t-4 border-yellow-400 mt-16">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+      <footer class="bg-gradient-to-b from-red-950 via-[#350707] to-slate-950 text-slate-300 border-t-4 border-yellow-400 mt-16 relative overflow-hidden">
+        <!-- Subtle Ambient Lighting in Footer -->
+        <div class="absolute top-0 right-10 w-96 h-96 rounded-full bg-amber-500/5 blur-3xl pointer-events-none"></div>
+
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 relative z-10">
           <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
             <!-- Col 1: School Identity -->
             <div class="space-y-3">
@@ -295,9 +324,10 @@ class NavbarComponent {
               </h4>
               <ul class="space-y-2 text-xs">
                 <li><button onclick="window.app.navigate('about')" class="hover:text-yellow-300 transition cursor-pointer">ข้อมูลพื้นฐานโรงเรียน 23 รายการ</button></li>
-                <li><button onclick="window.app.navigate('personnel')" class="hover:text-yellow-300 transition cursor-pointer">ทำเนียบบุคลากร (18 ท่าน)</button></li>
+                <li><button onclick="window.app.navigate('personnel')" class="hover:text-yellow-300 transition cursor-pointer">ทำเนียบบุคลากร (${totalPersonnelCount} ท่าน)</button></li>
                 <li><button onclick="window.app.navigate('news')" class="hover:text-yellow-300 transition cursor-pointer">บอร์ดข่าวสาร & สไลด์โอกาสสำคัญ</button></li>
                 <li><button onclick="window.app.navigate('dashboard')" class="hover:text-yellow-300 transition cursor-pointer">กราฟสถิตินักเรียน 3 ปีย้อนหลัง</button></li>
+                <li><button onclick="window.app.navigate('academic')" class="hover:text-yellow-300 transition cursor-pointer">วิชาการ & ผลสอบ O-NET</button></li>
                 <li><button onclick="window.app.navigate('teacher-portal')" class="text-yellow-300 hover:underline font-bold cursor-pointer">ระบบบริการดิจิทัลสำหรับครู</button></li>
               </ul>
             </div>

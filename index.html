@@ -14,6 +14,36 @@
 
   <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            bbk: {
+              red: '#B91C1C',
+              'red-dark': '#7F1D1D',
+              'red-deep': '#450A0A',
+              'red-light': '#DC2626',
+              gold: '#F59E0B',
+              'gold-dark': '#D97706',
+              'gold-light': '#FDE68A',
+              yellow: '#FACC15',
+            }
+          },
+          fontFamily: {
+            sans: ['Prompt', 'Kanit', 'Sarabun', 'sans-serif'],
+            prompt: ['Prompt', 'sans-serif'],
+            kanit: ['Kanit', 'sans-serif']
+          },
+          boxShadow: {
+            'card-hover': '0 20px 30px -10px rgba(15, 23, 42, 0.08), 0 0 0 1px rgba(245, 158, 11, 0.18)',
+            'glass-red': '0 8px 32px 0 rgba(185, 28, 28, 0.25)',
+            'glow-gold': '0 0 25px -4px rgba(245, 158, 11, 0.35)'
+          }
+        }
+      }
+    };
+  </script>
 
   <!-- Chart.js สำหรับระบบ Interactive Dashboard -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -22,15 +52,26 @@
   <script src="https://unpkg.com/lucide@latest"></script>
 
   <!-- Custom Styles -->
-  <link rel="stylesheet" href="assets/css/custom.css?v=20261106_prestige" />
+  <link rel="stylesheet" href="assets/css/custom.css?v=20261106_ultra" />
 </head>
-<body class="bg-white text-slate-900 antialiased selection:bg-amber-200 selection:text-slate-950">
+<body class="bg-[#F8FAFC] text-slate-900 antialiased selection:bg-amber-200 selection:text-slate-950 font-sans">
 
   <!-- Toast Notification Container -->
   <div id="toast-container" class="fixed top-4 right-4 z-50 flex flex-col gap-2 max-w-sm w-full pointer-events-none"></div>
 
   <!-- Dynamic Modal Container -->
   <div id="modal-root"></div>
+
+  <!-- Floating Back-to-Top Button -->
+  <button
+    id="back-to-top-btn"
+    onclick="window.scrollTo({ top: 0, behavior: 'smooth' })"
+    title="เลื่อนขึ้นด้านบนสุด"
+    aria-label="เลื่อนขึ้นด้านบนสุด"
+    class="fixed bottom-6 right-6 z-40 w-12 h-12 rounded-2xl bg-gradient-to-tr from-red-700 via-red-600 to-amber-500 text-white shadow-xl hover:shadow-2xl flex items-center justify-center cursor-pointer border border-amber-300/40 hover:scale-105 active:scale-95 transition"
+  >
+    <i data-lucide="arrow-up" class="w-5 h-5"></i>
+  </button>
 
   <!-- Main Application Root -->
   <div id="app-root">
@@ -43,21 +84,21 @@
   </div>
 
   <!-- Core Architecture & Services (Phases 1 - 10 + Google Workspace Fast-Engine) -->
-  <script src="src/config/defaultData.js?v=20261106_prestige"></script>
-  <script src="src/services/googleWorkspaceClient.js?v=20261106_prestige"></script>
-  <script src="src/services/dbAdapter.js?v=20261106_prestige"></script>
-  <script src="src/services/driveService.js?v=20261106_prestige"></script>
-  <script src="src/services/authService.js?v=20261106_prestige"></script>
+  <script src="src/config/defaultData.js?v=20261106_ultra"></script>
+  <script src="src/services/googleWorkspaceClient.js?v=20261106_ultra"></script>
+  <script src="src/services/dbAdapter.js?v=20261106_ultra"></script>
+  <script src="src/services/driveService.js?v=20261106_ultra"></script>
+  <script src="src/services/authService.js?v=20261106_ultra"></script>
 
   <!-- UI Components & Portals -->
-  <script src="src/components/navbar.js?v=20261106_prestige"></script>
-  <script src="src/components/publicViews.js?v=20261106_prestige"></script>
-  <script src="src/components/dashboardView.js?v=20261106_prestige"></script>
-  <script src="src/components/teacherPortalView.js?v=20261106_prestige"></script>
-  <script src="src/components/adminDashboardView.js?v=20261106_prestige"></script>
-  <script src="src/components/devConsoleView.js?v=20261106_prestige"></script>
+  <script src="src/components/navbar.js?v=20261106_ultra"></script>
+  <script src="src/components/publicViews.js?v=20261106_ultra"></script>
+  <script src="src/components/dashboardView.js?v=20261106_ultra"></script>
+  <script src="src/components/teacherPortalView.js?v=20261106_ultra"></script>
+  <script src="src/components/adminDashboardView.js?v=20261106_ultra"></script>
+  <script src="src/components/devConsoleView.js?v=20261106_ultra"></script>
 
   <!-- Main Application Controller -->
-  <script src="src/app.js?v=20261106_prestige"></script>
+  <script src="src/app.js?v=20261106_ultra"></script>
 </body>
 </html>
