@@ -60,6 +60,11 @@ class BanbokAppController {
   }
 
   navigate(pageId, pushHash = true) {
+    if (window.publicViews && typeof window.publicViews.stopSliderAutoPlay === 'function') {
+      try {
+        window.publicViews.stopSliderAutoPlay();
+      } catch (e) {}
+    }
     this.currentPage = pageId;
     if (pushHash) {
       history.replaceState(null, '', `#${pageId}`);

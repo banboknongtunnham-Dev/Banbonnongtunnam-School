@@ -239,6 +239,17 @@ class PublicViews {
     }, 3800);
   }
 
+  stopSliderAutoPlay() {
+    if (this.sliderTimer) {
+      clearInterval(this.sliderTimer);
+      this.sliderTimer = null;
+    }
+    if (this.bulletinTimer) {
+      clearInterval(this.bulletinTimer);
+      this.bulletinTimer = null;
+    }
+  }
+
   /**
    * เรนเดอร์เนื้อหาภายใน Pro Student & News Highlight Slider (สไลด์ภาพโอกาสสำคัญ + สไลด์ข่าวสาร)
    */
@@ -767,9 +778,17 @@ class PublicViews {
     const canvas = document.getElementById('visitor-3yr-student-chart');
     if (!canvas) return;
 
+    try {
+      const existing = Chart.getChart(canvas);
+      if (existing) existing.destroy();
+    } catch (e) {}
+
     if (this.visitorChartInstance && typeof this.visitorChartInstance.destroy === 'function') {
-      this.visitorChartInstance.destroy();
+      try {
+        this.visitorChartInstance.destroy();
+      } catch (e) {}
     }
+    this.visitorChartInstance = null;
 
     const trend3Years = this.getThreeYearStudentTrend();
     const labels = trend3Years.map((t) => `ปีการศึกษา ${t.academic_year}`);
@@ -1089,171 +1108,172 @@ class PublicViews {
     const fbSchoolUrl = profile.facebook_url || 'https://www.facebook.com/profile.php?id=100014526581847';
 
     return `
-      <!-- แถบขลิบสีทอง-แดงเกียรติยศด้านบนสุด -->
-      <div class="h-1.5 bbk-luxury-ribbon w-full"></div>
+      <!-- แถบสีทอง-แดงเกียรติยศด้านบนสุด -->
+      <div class="h-1.5 bbk-red-gold-bar w-full"></div>
 
-      <!-- ZONE 1: CLEAN LUXURY EXECUTIVE HERO + PORTRAIT SHOWCASE -->
-      <section class="bbk-luxury-hero border-b border-slate-200/80 relative overflow-hidden">
-        <!-- Subtle Ambient Lighting -->
-        <div class="absolute top-0 right-1/4 w-96 h-96 rounded-full bg-amber-400/10 blur-3xl pointer-events-none"></div>
-        <div class="absolute bottom-0 left-10 w-80 h-80 rounded-full bg-slate-900/5 blur-3xl pointer-events-none"></div>
+      <!-- ZONE 1: ICONIC CRIMSON RED EXECUTIVE HERO + PORTRAIT SHOWCASE -->
+      <section class="bbk-tech-hero border-b-4 border-amber-400 text-white relative overflow-hidden">
+        <!-- Subtle Grid & Ambient Lighting -->
+        <div class="absolute inset-0 bbk-tech-grid-overlay pointer-events-none"></div>
+        <div class="absolute top-0 right-1/4 w-96 h-96 rounded-full bg-amber-400/15 blur-3xl pointer-events-none"></div>
+        <div class="absolute bottom-0 left-10 w-80 h-80 rounded-full bg-red-950/70 blur-3xl pointer-events-none"></div>
 
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12 lg:py-14 relative z-10">
           <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
             
-            <!-- Left: ข้อมูลโรงเรียน สะอาดตา โปรขึ้น เรียบหรู ชัดเจน (7 Cols) -->
+            <!-- Left: ข้อมูลโรงเรียน สะอาดตา โปรขึ้น เรียบหรู ชัดเจน บนธีมแดงเอกลักษณ์ (7 Cols) -->
             <div class="lg:col-span-7 space-y-5">
               
               <!-- Badges: สังกัด สพป. และ รหัสสถานศึกษา -->
               <div class="flex flex-wrap items-center gap-2">
-                <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-slate-900/5 border border-slate-300 text-slate-800 text-xs font-semibold backdrop-blur-xs shadow-2xs">
+                <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/15 border border-white/25 text-white text-xs font-semibold backdrop-blur-md shadow-2xs">
                   <img src="assets/img/obec_logo.png" alt="โลโก้ สพป.อุบลราชธานี เขต 2" class="w-4 h-4 object-contain shrink-0" />
                   <span class="truncate">${window.authService.sanitizeHTML(heroBadge)}</span>
                 </div>
-                <div class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-amber-50 border border-amber-300/80 text-amber-900 text-xs font-bold font-mono shadow-2xs">
+                <div class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-amber-400/20 border border-amber-400/40 text-amber-200 text-xs font-bold font-mono shadow-2xs backdrop-blur-md">
                   <span>ID: ${window.authService.sanitizeHTML(profile.school_code_10 || profile.school_code || '1034710083')}</span>
                 </div>
               </div>
 
               <!-- หัวข้อชื่อโรงเรียน สไตล์สถาบันการศึกษาชั้นนำ -->
               <div class="space-y-2">
-                <div class="text-xs sm:text-sm font-extrabold tracking-widest uppercase text-amber-700 flex items-center gap-2">
+                <div class="text-xs sm:text-sm font-extrabold tracking-widest uppercase text-amber-300 flex items-center gap-2">
                   <span>BANBOKNONGTUNNAM SCHOOL</span>
-                  <span class="w-1.5 h-1.5 rounded-full bg-amber-600"></span>
-                  <span class="text-slate-500 font-semibold lowercase">ubon ratchathani primary education</span>
+                  <span class="w-1.5 h-1.5 rounded-full bg-amber-400"></span>
+                  <span class="text-rose-200/90 font-semibold lowercase">ubon ratchathani primary education</span>
                 </div>
-                <h1 class="text-2xl sm:text-4xl lg:text-5xl font-extrabold text-slate-900 tracking-tight leading-tight">
+                <h1 class="text-2xl sm:text-4xl lg:text-5xl font-extrabold text-white tracking-tight leading-tight drop-shadow-md">
                   ${window.authService.sanitizeHTML(heroTitle)}
                 </h1>
-                <p class="text-xs sm:text-sm text-slate-600 leading-relaxed font-normal">
-                  📍 ${window.authService.sanitizeHTML(profile.address || 'หมู่ที่ 2 บ้านบก ตำบลหนองทันน้ำ อำเภอกุดข้าวปุ้น จังหวัดอุบลราชธานี 34270')} • จัดการศึกษา <strong class="text-slate-900 font-semibold">${window.authService.sanitizeHTML(profile.education_level || 'อนุบาล-มัธยมศึกษาตอนต้น')}</strong>
+                <p class="text-xs sm:text-sm text-rose-100/90 leading-relaxed font-normal">
+                  📍 ${window.authService.sanitizeHTML(profile.address || 'หมู่ที่ 2 บ้านบก ตำบลหนองทันน้ำ อำเภอกุดข้าวปุ้น จังหวัดอุบลราชธานี 34270')} • จัดการศึกษา <strong class="text-amber-200 font-semibold">${window.authService.sanitizeHTML(profile.education_level || 'อนุบาล-มัธยมศึกษาตอนต้น')}</strong>
                 </p>
               </div>
 
-              <!-- คำขวัญโรงเรียนในกรอบทองแชมเปญเรียบหรู -->
-              <div class="p-4 sm:p-5 rounded-2xl bg-amber-50/60 border border-amber-200/90 border-l-4 border-l-amber-600 shadow-2xs">
-                <div class="text-[11px] font-extrabold uppercase tracking-wider text-amber-800 flex items-center gap-1.5">
+              <!-- คำขวัญโรงเรียนในกรอบทองกระจกหรูหราสง่างาม -->
+              <div class="p-4 sm:p-5 rounded-2xl bg-black/25 backdrop-blur-md border border-amber-400/40 border-l-4 border-l-amber-400 shadow-sm">
+                <div class="text-[11px] font-extrabold uppercase tracking-wider text-amber-300 flex items-center gap-1.5">
                   <span>✨ คำขวัญประจำสถานศึกษา</span>
                 </div>
-                <p class="text-sm sm:text-base font-bold text-slate-900 mt-1 italic leading-relaxed">
+                <p class="text-sm sm:text-base font-bold text-white mt-1 italic leading-relaxed">
                   “${window.authService.sanitizeHTML(profile.motto || 'เรียนรู้สู่ความเป็นเลิศ เชิดชูคุณธรรม นำพาชุมชน')}”
                 </p>
               </div>
 
-              <!-- Primary Action Bar (สะอาดตา โปร เรียบหรู) -->
+              <!-- Primary Action Bar (สะอาดตา โปร เรียบหรู บนพื้นแดงเอกลักษณ์) -->
               <div class="flex flex-wrap items-center gap-3 pt-1">
                 <button
                   onclick="window.app.navigate('about')"
-                  class="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs sm:text-sm font-bold shadow-sm hover:shadow transition cursor-pointer"
+                  class="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl bg-amber-400 hover:bg-amber-300 text-slate-950 text-xs sm:text-sm font-extrabold shadow-md hover:shadow-lg transition cursor-pointer"
                 >
-                  <i data-lucide="building-2" class="w-4 h-4 text-amber-400"></i>
+                  <i data-lucide="building-2" class="w-4 h-4 text-slate-950"></i>
                   <span>ข้อมูลพื้นฐานโรงเรียน</span>
                 </button>
                 <button
                   onclick="window.app.navigate('personnel')"
-                  class="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl bg-white hover:bg-slate-50 text-slate-800 border border-slate-300 text-xs sm:text-sm font-bold shadow-2xs transition cursor-pointer"
+                  class="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl bg-white/15 hover:bg-white/25 text-white border border-white/30 text-xs sm:text-sm font-bold backdrop-blur-md shadow-2xs transition cursor-pointer"
                 >
-                  <i data-lucide="users" class="w-4 h-4 text-slate-600"></i>
+                  <i data-lucide="users" class="w-4 h-4 text-amber-300"></i>
                   <span>ทำเนียบบุคลากร (${stats.totalPersonnel})</span>
                 </button>
                 <button
                   onclick="window.app.navigate('teacher-portal')"
-                  class="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-amber-50 hover:bg-amber-100 text-amber-900 border border-amber-300 text-xs sm:text-sm font-bold shadow-2xs transition cursor-pointer"
+                  class="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-rose-950/60 hover:bg-rose-900/70 text-amber-200 border border-amber-400/30 text-xs sm:text-sm font-bold shadow-2xs transition cursor-pointer backdrop-blur-md"
                 >
-                  <i data-lucide="laptop" class="w-4 h-4 text-amber-700"></i>
+                  <i data-lucide="laptop" class="w-4 h-4 text-amber-400"></i>
                   <span>ระบบบริการดิจิทัลครู</span>
                 </button>
                 <a
                   href="${window.authService.sanitizeHTML(fbSchoolUrl)}"
                   target="_blank"
                   rel="noopener"
-                  class="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-blue-50 hover:bg-blue-100 text-[#1877F2] border border-blue-200 text-xs sm:text-sm font-bold shadow-2xs transition"
+                  class="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-white hover:bg-blue-50 text-[#1877F2] text-xs sm:text-sm font-bold shadow-2xs transition"
                 >
                   <img src="assets/img/facebook_logo.png" alt="Facebook" class="w-4 h-4 object-contain shrink-0" />
                   <span>Facebook โรงเรียน</span>
                 </a>
               </div>
 
-              <!-- 4 Clean Bento KPI Metric Cards -->
+              <!-- 4 Clean Bento KPI Metric Cards (Glass on Red Theme) -->
               <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-2">
-                <div onclick="window.app.navigate('dashboard')" class="bbk-clean-stat-card p-3 sm:p-4 cursor-pointer">
-                  <div class="flex items-center justify-between text-slate-400 mb-1">
-                    <span class="text-[10px] font-bold uppercase tracking-wider text-slate-500">นักเรียนปี 2569</span>
-                    <i data-lucide="graduation-cap" class="w-4 h-4 text-amber-600"></i>
+                <div onclick="window.app.navigate('dashboard')" class="bbk-glass-on-red p-3 sm:p-4 rounded-2xl cursor-pointer hover:bg-white/15 transition shadow-sm">
+                  <div class="flex items-center justify-between text-rose-200 mb-1">
+                    <span class="text-[10px] font-bold uppercase tracking-wider text-rose-100">นักเรียนปี 2569</span>
+                    <i data-lucide="graduation-cap" class="w-4 h-4 text-amber-300"></i>
                   </div>
-                  <div class="text-xl sm:text-2xl font-extrabold text-slate-900 font-mono">
+                  <div class="text-xl sm:text-2xl font-extrabold text-white font-mono">
                     ${stats.totalStudents.toLocaleString()}
-                    <span class="text-xs font-normal text-slate-500">คน</span>
+                    <span class="text-xs font-normal text-rose-200">คน</span>
                   </div>
                 </div>
 
-                <div onclick="window.app.navigate('personnel')" class="bbk-clean-stat-card p-3 sm:p-4 cursor-pointer">
-                  <div class="flex items-center justify-between text-slate-400 mb-1">
-                    <span class="text-[10px] font-bold uppercase tracking-wider text-slate-500">บุคลากร</span>
-                    <i data-lucide="user-check" class="w-4 h-4 text-emerald-600"></i>
+                <div onclick="window.app.navigate('personnel')" class="bbk-glass-on-red p-3 sm:p-4 rounded-2xl cursor-pointer hover:bg-white/15 transition shadow-sm">
+                  <div class="flex items-center justify-between text-rose-200 mb-1">
+                    <span class="text-[10px] font-bold uppercase tracking-wider text-rose-100">บุคลากร</span>
+                    <i data-lucide="user-check" class="w-4 h-4 text-emerald-300"></i>
                   </div>
-                  <div class="text-xl sm:text-2xl font-extrabold text-slate-900 font-mono">
+                  <div class="text-xl sm:text-2xl font-extrabold text-white font-mono">
                     ${stats.totalPersonnel.toLocaleString()}
-                    <span class="text-xs font-normal text-slate-500">ท่าน</span>
+                    <span class="text-xs font-normal text-rose-200">ท่าน</span>
                   </div>
                 </div>
 
-                <div onclick="window.app.navigate('about')" class="bbk-clean-stat-card p-3 sm:p-4 cursor-pointer">
-                  <div class="flex items-center justify-between text-slate-400 mb-1">
-                    <span class="text-[10px] font-bold uppercase tracking-wider text-slate-500">รหัสสถานศึกษา</span>
-                    <i data-lucide="award" class="w-4 h-4 text-blue-600"></i>
+                <div onclick="window.app.navigate('about')" class="bbk-glass-on-red p-3 sm:p-4 rounded-2xl cursor-pointer hover:bg-white/15 transition shadow-sm">
+                  <div class="flex items-center justify-between text-rose-200 mb-1">
+                    <span class="text-[10px] font-bold uppercase tracking-wider text-rose-100">รหัสสถานศึกษา</span>
+                    <i data-lucide="award" class="w-4 h-4 text-amber-300"></i>
                   </div>
-                  <div class="text-sm sm:text-base font-extrabold text-slate-900 font-mono">
+                  <div class="text-sm sm:text-base font-extrabold text-white font-mono">
                     ${window.authService.sanitizeHTML(profile.school_code_10 || '1034710083')}
                   </div>
                 </div>
 
-                <div onclick="window.app.navigate('news')" class="bbk-clean-stat-card p-3 sm:p-4 cursor-pointer">
-                  <div class="flex items-center justify-between text-slate-400 mb-1">
-                    <span class="text-[10px] font-bold uppercase tracking-wider text-slate-500">ข่าวสาร & ผลงาน</span>
-                    <i data-lucide="newspaper" class="w-4 h-4 text-rose-600"></i>
+                <div onclick="window.app.navigate('news')" class="bbk-glass-on-red p-3 sm:p-4 rounded-2xl cursor-pointer hover:bg-white/15 transition shadow-sm">
+                  <div class="flex items-center justify-between text-rose-200 mb-1">
+                    <span class="text-[10px] font-bold uppercase tracking-wider text-rose-100">ข่าวสาร & ผลงาน</span>
+                    <i data-lucide="newspaper" class="w-4 h-4 text-amber-300"></i>
                   </div>
-                  <div class="text-xl sm:text-2xl font-extrabold text-slate-900 font-mono">
+                  <div class="text-xl sm:text-2xl font-extrabold text-white font-mono">
                     ${(this.getStudentSlides().length + stats.totalNews).toLocaleString()}
-                    <span class="text-xs font-normal text-slate-500">รายการ</span>
+                    <span class="text-xs font-normal text-rose-200">รายการ</span>
                   </div>
                 </div>
               </div>
 
             </div>
 
-            <!-- Right: ภาพผู้บริหารสถานศึกษาในกรอบ Executive Prestige สวยสง่างาม (5 Cols) -->
+            <!-- Right: ภาพผู้บริหารสถานศึกษาในกรอบ Executive Prestige สวยสง่างามบนพื้นหลังแดง (5 Cols) -->
             <div class="lg:col-span-5 flex flex-col items-center justify-center">
               <div
                 onclick="window.app.navigate('personnel')"
                 title="คลิกเพื่อดูทำเนียบบุคลากรทั้งหมด"
                 class="relative cursor-pointer group flex flex-col items-center select-none w-full max-w-sm sm:max-w-md"
               >
-                <!-- แสงเรืองทองอ่อนละมุนด้านหลังภาพ -->
-                <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-64 h-64 sm:w-80 sm:h-80 rounded-full bg-gradient-to-tr from-amber-200/40 via-yellow-100/20 to-transparent blur-3xl pointer-events-none"></div>
+                <!-- แสงเรืองทองด้านหลังภาพ -->
+                <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-64 h-64 sm:w-80 sm:h-80 rounded-full bg-gradient-to-tr from-amber-400/30 via-yellow-300/20 to-transparent blur-3xl pointer-events-none"></div>
 
                 <!-- กรอบรูปภาพผู้บริหาร -->
                 <div class="relative z-10 w-full flex justify-center">
                   <img
                     src="${directorImg}"
                     alt="นายทองพูล สิงห์บุตร ผู้อำนวยการโรงเรียนบ้านบกหนองทันน้ำ"
-                    class="w-[240px] sm:w-[310px] lg:w-[360px] max-h-[380px] sm:max-h-[460px] object-contain drop-shadow-[0_15px_25px_rgba(15,23,42,0.18)] group-hover:scale-102 transition duration-500"
+                    class="w-[240px] sm:w-[310px] lg:w-[360px] max-h-[380px] sm:max-h-[460px] object-contain drop-shadow-[0_20px_35px_rgba(0,0,0,0.45)] group-hover:scale-102 transition duration-500"
                     onerror="this.src='assets/img/logo.png'"
                   />
                 </div>
 
-                <!-- ป้ายชื่อตำแหน่งผู้บริหารหรูหราสะอาดตา -->
-                <div class="relative z-20 -mt-6 w-11/12 bg-white/95 backdrop-blur-md rounded-2xl p-3.5 sm:p-4 border border-slate-200/90 shadow-md text-center space-y-0.5">
-                  <span class="inline-block px-2.5 py-0.5 rounded-full bg-amber-50 border border-amber-200 text-amber-800 text-[10px] font-bold uppercase tracking-wider mb-0.5">
+                <!-- ป้ายชื่อตำแหน่งผู้บริหารหรูหรากระจกทองบนพื้นแดง -->
+                <div class="relative z-20 -mt-6 w-11/12 bg-slate-950/85 backdrop-blur-md rounded-2xl p-3.5 sm:p-4 border border-amber-400/40 shadow-xl text-center space-y-0.5">
+                  <span class="inline-block px-2.5 py-0.5 rounded-full bg-amber-400/20 border border-amber-400/40 text-amber-300 text-[10px] font-bold uppercase tracking-wider mb-0.5">
                     EXECUTIVE LEADERSHIP
                   </span>
-                  <h3 class="text-sm sm:text-base font-extrabold text-slate-900">
+                  <h3 class="text-sm sm:text-base font-extrabold text-white">
                     นายทองพูล สิงห์บุตร
                   </h3>
-                  <p class="text-xs font-semibold text-slate-600">
+                  <p class="text-xs font-semibold text-rose-200">
                     ผู้อำนวยการโรงเรียนบ้านบกหนองทันน้ำ
                   </p>
-                  <p class="text-[11px] text-amber-700 font-medium">
+                  <p class="text-[11px] text-amber-300 font-medium">
                     วิทยฐานะ ชำนาญการพิเศษ
                   </p>
                 </div>
@@ -2260,8 +2280,14 @@ class PublicViews {
     this.getExamConfigs().forEach((cfg) => {
       const canvas = document.getElementById(`exam-chart-${cfg.code}`);
       if (!canvas) return;
+      try {
+        const existing = Chart.getChart(canvas);
+        if (existing) existing.destroy();
+      } catch (e) {}
       if (this.examCharts[cfg.code] && typeof this.examCharts[cfg.code].destroy === 'function') {
-        this.examCharts[cfg.code].destroy();
+        try {
+          this.examCharts[cfg.code].destroy();
+        } catch (e) {}
       }
       this.examCharts[cfg.code] = new Chart(canvas, {
         type: 'bar',

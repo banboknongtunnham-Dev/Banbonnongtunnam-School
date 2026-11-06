@@ -1,21 +1,21 @@
 /* ==========================================================================
-   BANBOK DIGITAL SCHOOL PLATFORM - CLEAN LUXURY PRESTIGE THEME
-   ธีมเรียบหรู สะอาดตา โปรเฟสชันนอล (Clean Navy, Warm Champagne Gold & Royal Burgundy)
+   BANBOK DIGITAL SCHOOL PLATFORM - ICONIC CRIMSON RED & GOLD THEME
+   โทนสีแดงเลือดหมู-ทองเทคโนโลยี (Crimson Red & Warm Gold) เอกลักษณ์โรงเรียนบ้านบกหนองทันน้ำ
+   สะอาดตา เป็นสัดส่วน โปรเฟสชันนอล เรียบหรู ใช้งานได้ราบรื่น
    ========================================================================== */
 
 :root {
   --bbk-font-family: 'Prompt', 'Kanit', 'Sarabun', sans-serif;
   --bbk-primary-bg: #F8FAFC;
   --bbk-secondary-bg: #FFFFFF;
-  --bbk-brand-navy: #0F172A;
-  --bbk-brand-navy-light: #1E293B;
-  --bbk-brand-red: #881337;
-  --bbk-brand-red-light: #9F1239;
-  --bbk-brand-gold: #D97706;
-  --bbk-brand-gold-warm: #B45309;
-  --bbk-brand-gold-light: #FDE68A;
-  --bbk-accent-gold: #D97706;
-  --bbk-accent-navy: #0F172A;
+  --bbk-brand-red: #B91C1C;
+  --bbk-brand-red-dark: #7F1D1D;
+  --bbk-brand-red-light: #DC2626;
+  --bbk-brand-gold: #F59E0B;
+  --bbk-brand-gold-warm: #D97706;
+  --bbk-brand-yellow: #FACC15;
+  --bbk-accent-gold: #F59E0B;
+  --bbk-accent-navy: #7F1D1D;
 }
 
 html {
@@ -54,41 +54,55 @@ img, video, canvas, iframe {
 }
 
 /* ==========================================================================
-   CLEAN & LUXURY HERO + INSTITUTIONAL PRESTIGE CARDS
+   ICONIC SCHOOL RED & GOLD HERO + PRESTIGE CARDS
    ========================================================================== */
 
-/* Clean Luxury Executive Hero */
-.bbk-luxury-hero {
-  background: radial-gradient(circle at 80% 20%, rgba(245, 158, 11, 0.07) 0%, transparent 40%),
-              radial-gradient(circle at 10% 80%, rgba(15, 23, 42, 0.04) 0%, transparent 40%),
-              linear-gradient(180deg, #FFFFFF 0%, #F8FAFC 100%);
+/* Iconic School Red Hero Gradient */
+.bbk-tech-hero {
+  background: linear-gradient(135deg, #450A0A 0%, #7F1D1D 40%, #B91C1C 80%, #D97706 100%);
   position: relative;
 }
 
-.bbk-luxury-ribbon {
-  background: linear-gradient(90deg, #881337 0%, #9F1239 30%, #B45309 70%, #D97706 100%);
+.bbk-tech-grid-overlay {
+  background-image: 
+    linear-gradient(to right, rgba(250, 204, 21, 0.07) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(250, 204, 21, 0.07) 1px, transparent 1px);
+  background-size: 32px 32px;
 }
 
+.bbk-red-gold-bar {
+  background: linear-gradient(90deg, #7F1D1D 0%, #B91C1C 50%, #D97706 100%);
+}
+
+.bbk-red-gold-badge {
+  background: linear-gradient(135deg, #DC2626 0%, #D97706 100%);
+  color: #FFFFFF;
+}
+
+/* Bento Stat Card บนพื้นหลังแดง (กระจกหรูหรา คมชัด สบายตา) */
+.bbk-glass-on-red {
+  background: rgba(15, 23, 42, 0.45);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(251, 191, 36, 0.3);
+  box-shadow: 0 8px 24px -4px rgba(0, 0, 0, 0.35);
+  transition: all 0.22s ease;
+}
+
+.bbk-glass-on-red:hover {
+  background: rgba(15, 23, 42, 0.65);
+  border-color: rgba(251, 191, 36, 0.55);
+  transform: translateY(-2px);
+  box-shadow: 0 12px 28px -4px rgba(0, 0, 0, 0.45);
+}
+
+/* Executive Portrait Frame บนพื้นหลังสีแดง */
 .bbk-executive-portrait-frame {
   position: relative;
   border-radius: 2rem;
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.9) 0%, rgba(248, 250, 252, 0.8) 100%);
-  border: 1px solid rgba(226, 232, 240, 0.9);
-  box-shadow: 0 20px 40px -15px rgba(15, 23, 42, 0.08), 0 0 0 1px rgba(245, 158, 11, 0.15);
-}
-
-.bbk-clean-stat-card {
-  background: #FFFFFF;
-  border: 1px solid #E2E8F0;
-  border-radius: 1.25rem;
-  box-shadow: 0 2px 8px -2px rgba(15, 23, 42, 0.04);
-  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-.bbk-clean-stat-card:hover {
-  transform: translateY(-2px);
-  border-color: #CBD5E1;
-  box-shadow: 0 12px 24px -6px rgba(15, 23, 42, 0.08), 0 0 0 1px rgba(217, 119, 6, 0.15);
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(248, 250, 252, 0.9) 100%);
+  border: 1px solid rgba(251, 191, 36, 0.4);
+  box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.4);
 }
 
 /* Modular Bento Card - คมชัด เป็นสัดส่วน ไม่รก */

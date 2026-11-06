@@ -250,9 +250,21 @@ class DashboardView {
 
     // ทำลายอินสแตนซ์เดิมก่อนวาดใหม่เพื่อป้องกันกราฟซ้อน
     Object.values(this.chartInstances).forEach((inst) => {
-      if (inst && typeof inst.destroy === 'function') inst.destroy();
+      if (inst && typeof inst.destroy === 'function') {
+        try { inst.destroy(); } catch (e) {}
+      }
     });
     this.chartInstances = {};
+
+    ['chart-students-bar', 'chart-personnel-doughnut', 'chart-trend-line', 'chart-content-pie'].forEach((id) => {
+      const el = document.getElementById(id);
+      if (el) {
+        try {
+          const chart = Chart.getChart(el);
+          if (chart) chart.destroy();
+        } catch (e) {}
+      }
+    });
 
     const studentAll = window.dbAdapter.getTable('Students_Statistics').filter((s) => {
       const matchYear = String(s.academic_year || '2569') === String(this.selectedYear);

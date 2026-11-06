@@ -274,16 +274,23 @@ class DatabaseAdapter {
   saveLocal() {
     try {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(this.db));
-      if (this.broadcastChannel) {
-        try {
-          this.broadcastChannel.postMessage({ type: 'DB_UPDATED', database: this.db, timestamp: Date.now() });
-        } catch (e) {}
-      }
-      this.notifyListeners();
-      this.autoSyncToLocalServer();
     } catch (err) {
-      this.recordError('DB_SAVE_LOCAL_ERROR', err.message);
+      this.recordError('DB_LOCAL_STORAGE_QUOTA_ERROR', err.message);
     }
+
+    try {
+      if (this.broadcastChannel) {
+        this.broadcastChannel.postMessage({ type: 'DB_UPDATED', database: this.db, timestamp: Date.now() });
+      }
+    } catch (e) {}
+
+    try {
+      this.notifyListeners();
+    } catch (e) {}
+
+    try {
+      this.autoSyncToLocalServer();
+    } catch (e) {}
   }
 
   autoSyncToLocalServer() {
