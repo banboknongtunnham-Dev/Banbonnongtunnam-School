@@ -1,7 +1,7 @@
 {
   "_meta": {
-    "version": 1794234622090,
-    "updated_at": "2026-11-09T14:29:53.271Z"
+    "version": 1794234879659,
+    "updated_at": "2026-11-09T14:34:39.659Z"
   },
   "_tombstones": [
     "Personnel:PER-515461-60",
@@ -96,6 +96,24 @@
     }
   ],
   "Personnel": [
+    {
+      "prefix": "นางสาว",
+      "first_name": "ลลิตา",
+      "last_name": "สุทนต์",
+      "position": "เจ้าหน้าที่ดิจิทัลชุมชน",
+      "academic_standing": "-",
+      "role_group": "STAFF",
+      "department": "บุคลากรสนับสนุนการสอน",
+      "subject_group": "",
+      "education_degree": "",
+      "email": "",
+      "photo_url": "https://ntfy.sh/file/tch5Lha2lKka.jpg",
+      "sort_order": 20,
+      "status": "ปฏิบัติราชการ",
+      "personnel_id": "PER-878396-83",
+      "created_at": "2026-11-09T14:34:38.396Z",
+      "updated_at": "2026-11-09T14:34:38.396Z"
+    },
     {
       "prefix": "นางสาว",
       "first_name": "สวิญชญา",
@@ -2050,6 +2068,32 @@
     }
   ],
   "Audit_Logs": [
+    {
+      "log_id": "LOG-1794234878397-21",
+      "timestamp": "2026-11-09T14:34:38.397Z",
+      "user_id": "USR-DEV-001",
+      "user_name": "ผู้ดูแลระบบ ภานุวัฒน์ คุณแรง",
+      "user_role": "DEVELOPER",
+      "action_type": "INSERT",
+      "target_table": "Personnel",
+      "target_id": "PER-878396-83",
+      "details": "เพิ่มข้อมูลใหม่ในตาราง Personnel (ลลิตา)",
+      "ip_or_client": "Desktop Web Client",
+      "status": "SUCCESS"
+    },
+    {
+      "log_id": "LOG-1794234613398-8",
+      "timestamp": "2026-11-09T14:30:13.398Z",
+      "user_id": "USR-DEV-001",
+      "user_name": "ผู้ดูแลระบบ ภานุวัฒน์ คุณแรง",
+      "user_role": "DEVELOPER",
+      "action_type": "DRIVE_WEB_UPLOAD",
+      "target_table": "Google_Drive_Sync",
+      "target_id": "DRV-1BB663F97502",
+      "details": "อัปโหลดและซิงค์ภาพ 20.png เข้าสู่ไดร์ฟ (Personnel_Photos) และระบบคลาวด์สำเร็จ",
+      "ip_or_client": "Desktop Web Client",
+      "status": "SUCCESS"
+    },
     {
       "log_id": "LOG-1794234591999-28",
       "timestamp": "2026-11-09T14:29:51.999Z",
