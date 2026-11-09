@@ -1407,9 +1407,7 @@ class PublicViews {
       <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 pb-6">
         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-6">
           <div class="flex items-center gap-3">
-            <div class="w-10 h-10 rounded-xl bg-slate-900 text-amber-400 flex items-center justify-center shadow-xs shrink-0 text-xl font-bold p-1">
-              <img src="assets/img/icon_megaphone.png" alt="โทรโข่งประกาศ" class="w-7 h-7 object-contain drop-shadow-sm" />
-            </div>
+            <img src="assets/img/icon_megaphone.png" alt="ผลงานและประชาสัมพันธ์เด่น" class="w-11 h-11 object-contain shrink-0 drop-shadow-md" />
             <div>
               <span class="text-[11px] font-extrabold uppercase tracking-widest text-amber-700">
                 CAMPUS SPOTLIGHT & OFFICIAL NOTICES
@@ -2551,9 +2549,12 @@ class PublicViews {
         <!-- บอร์ดประชาสัมพันธ์เคลื่อนไหว & สไลด์ข่าวสารโอกาสสำคัญของนักเรียน -->
         <div class="space-y-4">
           <div class="flex flex-col sm:flex-row sm:items-end justify-between gap-3">
-            <div>
-              <span class="text-xs font-bold uppercase tracking-wider text-amber-700">LIVE BULLETIN BOARD & SLIDESHOW</span>
-              <h2 class="text-2xl sm:text-3xl font-extrabold text-slate-900">บอร์ดประชาสัมพันธ์เคลื่อนไหว & สไลด์ผลงานเด่น</h2>
+            <div class="flex items-center gap-3">
+              <img src="assets/img/icon_megaphone.png" alt="ผลงานและประชาสัมพันธ์เด่น" class="w-11 h-11 object-contain shrink-0 drop-shadow-md" />
+              <div>
+                <span class="text-xs font-bold uppercase tracking-wider text-amber-700">LIVE BULLETIN BOARD & SLIDESHOW</span>
+                <h2 class="text-2xl sm:text-3xl font-extrabold text-slate-900">บอร์ดประชาสัมพันธ์เคลื่อนไหว & สไลด์ผลงานเด่น</h2>
+              </div>
             </div>
             ${
               window.authService.isAdminOrAbove()
