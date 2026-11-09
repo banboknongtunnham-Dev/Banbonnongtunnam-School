@@ -1,14 +1,16 @@
 /**
  * BANBOK DIGITAL SCHOOL PLATFORM - DEFAULT MASTER DATABASE
- * Updated automatically via Multi-Platform Sync at 2026-11-09T10:48:17.999Z
+ * Updated automatically via Multi-Platform Sync at 2026-11-09T13:54:57.508Z
  */
 
 window.BANBOK_DEFAULT_DB = {
   "_meta": {
-    "version": 1794221297999,
-    "updated_at": "2026-11-09T10:48:17.999Z"
+    "version": 1794232497508,
+    "updated_at": "2026-11-09T13:54:57.508Z"
   },
   "_tombstones": [
+    "Personnel:PER-515461-60",
+    "Personnel:PER-019",
     "Gallery:GAL-SLIDE-01"
   ],
   "School_Profile": [
@@ -1944,20 +1946,20 @@ window.BANBOK_DEFAULT_DB = {
     {
       "setting_key": "total_visitors",
       "setting_group": "VISITOR_METRICS",
-      "setting_value": "1281",
+      "setting_value": "1282",
       "data_type": "number",
       "description": "ยอดผู้เข้าชมเว็บไซต์สะสมทั้งหมด",
       "updated_by": "SYSTEM",
-      "updated_at": "2026-11-09T10:48:02.366Z"
+      "updated_at": "2026-11-09T13:52:32.095Z"
     },
     {
       "setting_key": "today_visitors",
       "setting_group": "VISITOR_METRICS",
-      "setting_value": "49",
+      "setting_value": "50",
       "data_type": "number",
       "description": "ยอดผู้เข้าชมเว็บไซต์ประจำวัน",
       "updated_by": "SYSTEM",
-      "updated_at": "2026-11-09T10:48:02.366Z"
+      "updated_at": "2026-11-09T13:52:32.095Z"
     },
     {
       "setting_key": "today_visitor_date",
@@ -1971,20 +1973,20 @@ window.BANBOK_DEFAULT_DB = {
     {
       "setting_key": "visitor_history_json",
       "setting_group": "VISITOR_METRICS",
-      "setting_value": "{\"2026-11-04\":48,\"2026-11-09\":1}",
+      "setting_value": "{\"2026-11-04\":48,\"2026-11-09\":2}",
       "data_type": "string",
       "description": "ประวัติจำนวนผู้เข้าชมย้อนหลัง (JSON)",
       "updated_by": "SYSTEM",
-      "updated_at": "2026-11-09T10:48:02.366Z"
+      "updated_at": "2026-11-09T13:52:32.095Z"
     },
     {
       "setting_key": "last_daily_line_summary_date",
       "setting_group": "VISITOR_METRICS",
-      "setting_value": "",
+      "setting_value": "2026-11-09",
       "data_type": "string",
       "description": "วันที่ส่งสรุปยอดประจำวันเข้า LINE ล่าสุด",
-      "updated_by": "SYSTEM",
-      "updated_at": "2026-11-04"
+      "updated_by": "ADMIN",
+      "updated_at": "2026-11-09T13:52:34.619Z"
     },
     {
       "setting_key": "google_spreadsheet_id",
