@@ -471,15 +471,15 @@ class AdminDashboardView {
         <div class="bg-white rounded-3xl p-6 border border-slate-200/90 shadow-2xs">
           <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-5">
             <div>
-              <h3 class="text-lg font-bold text-slate-900">ระบบจัดการข่าวประชาสัมพันธ์ & ฝังลิงก์ Facebook (News CMS)</h3>
-              <p class="text-xs text-slate-500">รองรับการฝังลิงก์โพสต์จาก Facebook โรงเรียน, อัปโหลดรูปภาพสไลด์โอกาสสำคัญของนักเรียน และปักหมุดข่าวเด่น</p>
+              <h3 class="text-lg font-bold text-slate-900">ระบบจัดการข่าวประชาสัมพันธ์ & สไลด์ภาพหน้าเว็บ (Spotlight CMS)</h3>
+              <p class="text-xs text-slate-500">รองรับการจัดการสไลด์ภาพผลงานครู/นักเรียน/ประชาสัมพันธ์, ฝังลิงก์โพสต์ Facebook และปักหมุดข่าวเด่น</p>
             </div>
             <div class="flex flex-wrap gap-2">
               <button
                 onclick="window.app.handleAdminSlideAddClick()"
                 class="inline-flex items-center gap-1.5 px-3.5 py-2.5 rounded-xl bg-amber-500 text-slate-950 hover:bg-amber-400 text-xs font-extrabold transition cursor-pointer"
               >
-                <i data-lucide="sparkles" class="w-4 h-4"></i> + อัปโหลดภาพสไลด์โอกาสสำคัญนักเรียน
+                <i data-lucide="image-plus" class="w-4 h-4"></i> + จัดการ/เพิ่มสไลด์ประชาสัมพันธ์
               </button>
               <button
                 onclick="window.app.openNewsEditorModal()"

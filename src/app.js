@@ -1748,11 +1748,11 @@ class BanbokAppController {
   }
 
   /**
-   * 6.1 ระบบจัดการสไลด์ภาพโอกาสสำคัญของนักเรียน (Pro Student Highlight Slider)
-   * และระบบแก้ไขจำนวนนักเรียน 3 ปีย้อนหลัง (2567, 2568, 2569)
+   * 6.1 ระบบจัดการสไลด์ภาพประชาสัมพันธ์และผลงานเด่น (Spotlight Banner Slider CMS)
+   * อนุญาตเฉพาะ แอดมิน (ADMIN) และ ผู้ดูแลระบบ/ผู้พัฒนา (DEVELOPER) เท่านั้น
    */
   handleAdminSlideAddClick() {
-    if (!window.authService.isTeacherOrAbove()) {
+    if (!window.authService.isAdminOrAbove()) {
       this.openLoginModal(this.currentPage || 'home', () => this.openSlideUploadModal(null));
       return;
     }
@@ -1760,131 +1760,258 @@ class BanbokAppController {
   }
 
   handleAdminSlideEditClick(galleryId) {
-    if (!window.authService.isTeacherOrAbove()) {
+    if (!window.authService.isAdminOrAbove()) {
       this.openLoginModal(this.currentPage || 'home', () => this.openSlideUploadModal(galleryId));
       return;
     }
     this.openSlideUploadModal(galleryId);
   }
 
+  handleSlideCategoryChange(val) {
+    const customDiv = document.getElementById('slide-category-custom-div');
+    const occasionInput = document.getElementById('slide-occasion-tag-input');
+    if (val === 'CUSTOM') {
+      if (customDiv) customDiv.classList.remove('hidden');
+    } else {
+      if (customDiv) customDiv.classList.add('hidden');
+      if (occasionInput) occasionInput.value = val;
+    }
+  }
+
   openSlideUploadModal(galleryId = null) {
+    if (!window.authService.isAdminOrAbove()) {
+      this.openLoginModal(this.currentPage || 'home', () => this.openSlideUploadModal(galleryId));
+      return;
+    }
+
     const existing = galleryId ? window.dbAdapter.getTable('Gallery').find((g) => g.gallery_id === galleryId) : null;
     const item = existing || {
       title: '',
-      category: 'สไลด์โอกาสสำคัญนักเรียน',
-      occasion_tag: 'โอกาสสำคัญของนักเรียน',
+      category: 'ผลงานครู & บุคลากรทางการศึกษา',
+      occasion_tag: 'ผลงานครู & บุคลากรทางการศึกษา',
       caption: '',
-      image_url: 'assets/img/hero_banner.png',
-      facebook_url: 'https://www.facebook.com/profile.php?id=100014526581847',
+      image_url: '',
+      facebook_url: '',
+      show_overlay: true,
+      created_at: new Date().toISOString().slice(0, 10),
       is_slider: true
     };
 
-    const previewImg = item.image_url ? window.driveService.resolveDriveImageUrl(item.image_url) : 'assets/img/hero_banner.png';
+    const previewImg = item.image_url ? window.driveService.resolveDriveImageUrl(item.image_url) : 'assets/img/logo.png';
+    const standardCategories = [
+      'ผลงานครู & บุคลากรทางการศึกษา',
+      'ผลงาน & โอกาสสำคัญของนักเรียน',
+      'ข่าวประชาสัมพันธ์ & ประกาศโรงเรียน',
+      'เกียรติยศ & รางวัลสถานศึกษา',
+      'กิจกรรมโรงเรียน & ชุมชน',
+      'ข้อมูลทั่วไป & ยินดีต้อนรับสู่โรงเรียน'
+    ];
+    const isCustomCat = Boolean(item.category && !standardCategories.includes(item.category) && item.category !== 'สไลด์โอกาสสำคัญนักเรียน');
 
     this.openModal(
-      existing ? 'แก้ไขสไลด์โอกาสสำคัญของนักเรียน' : 'อัปโหลดภาพสไลด์โอกาสสำคัญของนักเรียน (Pro Student Slider)',
+      existing ? 'แก้ไขภาพสไลด์ประชาสัมพันธ์' : 'อัปโหลดภาพสไลด์ประชาสัมพันธ์ใหม่ (Spotlight Banner)',
       `
       <form onsubmit="window.app.saveSlideUploadForm(event, '${existing ? existing.gallery_id : ''}')" class="space-y-4">
-        <div class="p-4 rounded-2xl bg-amber-50/60 border border-amber-200 space-y-3">
-          <div class="aspect-16/9 max-h-52 w-full rounded-xl overflow-hidden bg-slate-900 border border-amber-300 flex items-center justify-center">
-            <img id="slide-preview-img" src="${previewImg}" alt="ตัวอย่างภาพสไลด์" class="w-full h-full object-cover" onerror="this.src='assets/img/hero_banner.png'" />
+        <!-- 1. ส่วนเลือก/อัปโหลดภาพ -->
+        <div class="p-4 rounded-2xl bg-amber-50/70 border border-amber-200/90 space-y-3">
+          <div class="flex items-center justify-between">
+            <label class="block text-xs font-extrabold text-amber-950">
+              1. เลือกรูปภาพงานที่ต้องการประชาสัมพันธ์บนสไลด์ *
+            </label>
+            <span class="text-[11px] font-semibold text-amber-800">รองรับทั้งภาพแนวนอนและโปสเตอร์</span>
           </div>
-          <div class="space-y-2">
-            <label class="block text-xs font-extrabold text-amber-950">1. อัปโหลดไฟล์ภาพสไลด์จากเครื่อง (เชื่อมต่อ Google Drive อัตโนมัติ) *</label>
+
+          <div class="relative aspect-16/9 max-h-56 w-full rounded-xl overflow-hidden bg-slate-900 border border-amber-300 flex items-center justify-center">
+            <img id="slide-preview-img" src="${previewImg}" alt="ตัวอย่างภาพสไลด์" class="w-full h-full object-contain" onerror="this.src='assets/img/logo.png'" />
+          </div>
+
+          <div class="flex flex-col sm:flex-row gap-2">
+            <label class="flex-1 cursor-pointer">
+              <input type="file" accept="image/*" onchange="window.app.handleInlineImageUpload(event, 'slide-img-url', 'Banner_Images', 'slide-preview-img')" class="hidden" />
+              <div class="w-full py-2.5 px-3 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-xs flex items-center justify-center gap-1.5 shadow-xs transition">
+                <i data-lucide="image-plus" class="w-4 h-4"></i>
+                <span>📁 คลิกเพื่อเลือกไฟล์รูปภาพจากเครื่อง (อัปโหลดอัตโนมัติ)</span>
+              </div>
+            </label>
+          </div>
+
+          <div>
+            <label class="block text-[11px] font-semibold text-slate-600 mb-1">หรือ วางลิงก์รูปภาพ / Google Drive / URL ภาพถ่าย</label>
             <input
               type="text"
               id="slide-img-url"
               name="image_url"
               required
               value="${window.authService.sanitizeHTML(item.image_url)}"
-              oninput="document.getElementById('slide-preview-img').src = this.value ? window.driveService.resolveDriveImageUrl(this.value) : 'assets/img/hero_banner.png'"
-              placeholder="วางลิงก์รูปภาพ หรือคลิกปุ่มเลือกไฟล์ภาพด้านล่าง"
+              oninput="document.getElementById('slide-preview-img').src = this.value ? window.driveService.resolveDriveImageUrl(this.value) : 'assets/img/logo.png'"
+              placeholder="https://... หรือคลิกปุ่มเลือกไฟล์ภาพด้านบน"
               class="w-full px-3 py-2 rounded-xl bg-white border border-slate-200 text-xs"
             />
-            <input type="file" accept="image/*" onchange="window.app.handleInlineImageUpload(event, 'slide-img-url', 'Banner_Images', 'slide-preview-img')" class="text-xs text-slate-700" />
           </div>
         </div>
 
+        <!-- 2. หัวข้อเกี่ยวข้องกับอะไร (เลือกหมวดหมู่ของงาน) -->
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
           <div>
-            <label class="block text-xs font-bold text-slate-700 mb-1">ป้ายกำกับโอกาสสำคัญ (Badge) *</label>
+            <label class="block text-xs font-bold text-slate-800 mb-1">2. งานนี้เป็นงานหัวข้อเกี่ยวข้องกับอะไร *</label>
+            <select
+              name="category"
+              onchange="window.app.handleSlideCategoryChange(this.value)"
+              class="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs font-bold bg-white focus:outline-none focus:border-amber-500"
+            >
+              <option value="ผลงานครู & บุคลากรทางการศึกษา" ${item.category === 'ผลงานครู & บุคลากรทางการศึกษา' ? 'selected' : ''}>👨‍🏫 ผลงานครู & บุคลากรทางการศึกษา</option>
+              <option value="ผลงาน & โอกาสสำคัญของนักเรียน" ${item.category === 'ผลงาน & โอกาสสำคัญของนักเรียน' || item.category === 'สไลด์โอกาสสำคัญนักเรียน' ? 'selected' : ''}>🎓 ผลงาน & โอกาสสำคัญของนักเรียน</option>
+              <option value="ข่าวประชาสัมพันธ์ & ประกาศโรงเรียน" ${item.category === 'ข่าวประชาสัมพันธ์ & ประกาศโรงเรียน' ? 'selected' : ''}>📢 ข่าวประชาสัมพันธ์ & ประกาศโรงเรียน</option>
+              <option value="เกียรติยศ & รางวัลสถานศึกษา" ${item.category === 'เกียรติยศ & รางวัลสถานศึกษา' ? 'selected' : ''}>🏆 เกียรติยศ & รางวัลสถานศึกษา</option>
+              <option value="กิจกรรมโรงเรียน & ชุมชน" ${item.category === 'กิจกรรมโรงเรียน & ชุมชน' ? 'selected' : ''}>🌟 กิจกรรมโรงเรียน & ชุมชน</option>
+              <option value="ข้อมูลทั่วไป & ยินดีต้อนรับสู่โรงเรียน" ${item.category === 'ข้อมูลทั่วไป & ยินดีต้อนรับสู่โรงเรียน' ? 'selected' : ''}>🏫 ข้อมูลทั่วไป & ยินดีต้อนรับสู่โรงเรียน</option>
+              <option value="CUSTOM" ${isCustomCat ? 'selected' : ''}>➕ อื่นๆ (พิมพ์หัวข้อเอง)</option>
+            </select>
+          </div>
+
+          <div>
+            <label class="block text-xs font-bold text-slate-800 mb-1">ป้ายกำกับบนการ์ดสไลด์ (Badge Text)</label>
             <input
               type="text"
+              id="slide-occasion-tag-input"
               name="occasion_tag"
-              list="occasion-options"
-              required
-              value="${window.authService.sanitizeHTML(item.occasion_tag || 'โอกาสสำคัญของนักเรียน')}"
+              value="${window.authService.sanitizeHTML(item.occasion_tag || item.category || 'ข่าวประชาสัมพันธ์')}"
+              placeholder="ข้อความบนป้าย เช่น ผลงานครู, โอกาสสำคัญนักเรียน"
               class="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs font-bold"
             />
-            <datalist id="occasion-options">
-              <option value="โอกาสสำคัญของนักเรียน"></option>
-              <option value="แสดงความยินดีนักเรียน"></option>
-              <option value="ผลงานดีเด่นระดับเขตพื้นที่ฯ"></option>
-              <option value="กิจกรรมจิตอาสาและคุณธรรม"></option>
-              <option value="กีฬาสีและกิจกรรมพัฒนาผู้เรียน"></option>
-            </datalist>
+          </div>
+        </div>
+
+        <div id="slide-category-custom-div" class="${isCustomCat ? '' : 'hidden'}">
+          <label class="block text-xs font-bold text-slate-800 mb-1">ระบุหัวข้องานที่ต้องการ (กำหนดเอง)</label>
+          <input
+            type="text"
+            name="category_custom"
+            value="${isCustomCat ? window.authService.sanitizeHTML(item.category) : ''}"
+            placeholder="พิมพ์หัวข้อเรื่องที่เกี่ยวข้อง เช่น กิจกรรมลูกเสือ, วันสำคัญ..."
+            class="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs font-bold"
+          />
+        </div>
+
+        <!-- 3. หัวข้อเรื่องบนสไลด์ -->
+        <div>
+          <label class="block text-xs font-bold text-slate-800 mb-1">3. ชื่องาน / หัวข้อเรื่องบนสไลด์ (Title) *</label>
+          <input
+            type="text"
+            name="title"
+            required
+            value="${window.authService.sanitizeHTML(item.title)}"
+            placeholder="เช่น ขอแสดงความยินดีกับ นางสาวนภาวรรณ ฉลูศรี ได้รับรางวัลครูผู้สอนต้นแบบ Active Learning ชนะเลิศอันดับ 1..."
+            class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-xs sm:text-sm font-bold focus:outline-none focus:border-amber-500"
+          />
+        </div>
+
+        <!-- 4. ช่องให้อธิบายรายละเอียดด้านล่าง -->
+        <div>
+          <label class="block text-xs font-bold text-slate-800 mb-1">
+            4. คำบรรยายและรายละเอียดงานด้านล่าง (Description)
+          </label>
+          <textarea
+            name="caption"
+            rows="3"
+            placeholder="ระบุรายละเอียดของงาน รางวัล หรือข้อมูลเพิ่มเติมที่ต้องการให้อธิบายด้านล่างสไลด์ เช่น ครูผู้สอนกลุ่มสาระคณิตศาสตร์ ได้รับรางวัลระดับดีเยี่ยม..."
+            class="w-full px-3.5 py-2 rounded-xl border border-slate-200 text-xs sm:text-sm focus:outline-none focus:border-amber-500"
+          >${window.authService.sanitizeHTML(item.caption || '')}</textarea>
+        </div>
+
+        <!-- 5. วันที่ & ลิงก์ Facebook -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs font-bold text-slate-700 mb-1">วันที่เผยแพร่</label>
+            <input
+              type="date"
+              name="created_at"
+              value="${item.created_at ? item.created_at.slice(0, 10) : new Date().toISOString().slice(0, 10)}"
+              class="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs font-mono"
+            />
           </div>
           <div>
             <label class="block text-xs font-bold text-slate-700 mb-1">ลิงก์โพสต์ Facebook ที่เกี่ยวข้อง (ถ้ามี)</label>
             <input
               type="text"
               name="facebook_url"
-              value="${window.authService.sanitizeHTML(item.facebook_url || 'https://www.facebook.com/profile.php?id=100014526581847')}"
+              value="${window.authService.sanitizeHTML(item.facebook_url || '')}"
               placeholder="https://www.facebook.com/..."
               class="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs font-mono"
             />
           </div>
         </div>
 
-        <div>
-          <label class="block text-xs font-bold text-slate-700 mb-1">หัวข้อเรื่องบนสไลด์ (Title) *</label>
-          <input type="text" name="title" required value="${window.authService.sanitizeHTML(item.title)}" placeholder="เช่น ขอแสดงความยินดีกับนักเรียนตัวแทนการแข่งขันทักษะวิชาการ..." class="w-full px-3.5 py-2 rounded-xl border border-slate-200 text-xs sm:text-sm font-bold" />
+        <!-- 6. ตัวเลือกรูปแบบการแสดงผลข้อความบนภาพ -->
+        <div class="p-3.5 rounded-2xl bg-slate-50 border border-slate-200 space-y-2">
+          <label class="block text-xs font-bold text-slate-800">5. รูปแบบการแสดงผลบนภาพสไลด์</label>
+          <label class="flex items-start gap-2.5 text-xs text-slate-700 cursor-pointer">
+            <input
+              type="checkbox"
+              name="show_overlay"
+              ${item.show_overlay !== false && String(item.show_overlay) !== 'false' ? 'checked' : ''}
+              class="w-4 h-4 mt-0.5 accent-amber-500 rounded cursor-pointer"
+            />
+            <div>
+              <span class="font-bold text-slate-900">แสดงแถบข้อความและคำบรรยายทับบนภาพ</span>
+              <p class="text-[11px] text-slate-500 mt-0.5">ติ๊กออกหากรูปภาพเป็นโปสเตอร์สำเร็จรูปที่มีข้อความชื่อและรางวัลในรูปอยู่แล้ว เพื่อให้ผู้ชมเห็นภาพโปสเตอร์ได้เต็มๆ โดยไม่มีข้อความบัง</p>
+            </div>
+          </label>
         </div>
 
-        <div>
-          <label class="block text-xs font-bold text-slate-700 mb-1">คำบรรยายรายละเอียดใต้หัวข้อ (Caption)</label>
-          <textarea name="caption" rows="2" placeholder="ระบุรายละเอียดความสำเร็จหรือกิจกรรมของนักเรียน..." class="w-full px-3.5 py-2 rounded-xl border border-slate-200 text-xs sm:text-sm">${window.authService.sanitizeHTML(item.caption || '')}</textarea>
-        </div>
-
+        <!-- ปุ่มดำเนินการ -->
         <div class="flex items-center justify-between pt-2 border-t border-slate-100">
           ${
             existing
-              ? `<button type="button" onclick="window.app.closeModal(); window.app.deleteRowConfirm('Gallery', '${existing.gallery_id}');" class="px-3.5 py-2 rounded-xl bg-rose-50 text-rose-700 text-xs font-bold cursor-pointer">ลบสไลด์นี้</button>`
+              ? `<button type="button" onclick="window.app.closeModal(); window.app.deleteRowConfirm('Gallery', '${existing.gallery_id}');" class="px-3.5 py-2 rounded-xl bg-rose-50 text-rose-700 hover:bg-rose-100 text-xs font-bold transition cursor-pointer">ลบสไลด์นี้</button>`
               : `<div></div>`
           }
           <div class="flex gap-2">
-            <button type="button" onclick="window.app.closeModal()" class="px-4 py-2 rounded-xl bg-slate-100 text-slate-700 text-xs font-bold cursor-pointer">ยกเลิก</button>
-            <button type="submit" class="px-5 py-2 rounded-xl bg-slate-900 text-amber-300 hover:bg-amber-500 hover:text-slate-950 text-xs font-bold cursor-pointer">บันทึกขึ้นสไลด์หน้าเว็บไซต์</button>
+            <button type="button" onclick="window.app.closeModal()" class="px-4 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold transition cursor-pointer">ยกเลิก</button>
+            <button type="submit" class="px-5 py-2.5 rounded-xl bg-slate-900 text-amber-300 hover:bg-amber-500 hover:text-slate-950 text-xs font-extrabold shadow-sm transition cursor-pointer">บันทึกสไลด์ประชาสัมพันธ์</button>
           </div>
         </div>
       </form>
       `
     );
+    if (window.lucide) window.lucide.createIcons();
   }
 
   async saveSlideUploadForm(e, existingId) {
     e.preventDefault();
+    if (!window.authService.isAdminOrAbove()) {
+      this.showToast('เฉพาะแอดมินและผู้ดูแลระบบเท่านั้นที่มีสิทธิ์จัดการสไลด์', 'error');
+      return;
+    }
+
     const f = e.target;
     const user = window.authService.getCurrentUser();
+    let cat = f.category.value;
+    if (cat === 'CUSTOM' && f.category_custom && f.category_custom.value.trim()) {
+      cat = f.category_custom.value.trim();
+    }
+
     const payload = {
       title: f.title.value.trim(),
-      category: 'สไลด์โอกาสสำคัญนักเรียน',
-      occasion_tag: f.occasion_tag.value.trim() || 'โอกาสสำคัญของนักเรียน',
+      category: cat,
+      occasion_tag: f.occasion_tag && f.occasion_tag.value.trim() ? f.occasion_tag.value.trim() : cat,
       caption: f.caption.value.trim(),
-      image_url: f.image_url.value.trim() || 'assets/img/hero_banner.png',
+      image_url: f.image_url.value.trim() || 'assets/img/logo.png',
       facebook_url: f.facebook_url ? f.facebook_url.value.trim() : '',
+      show_overlay: f.show_overlay ? f.show_overlay.checked : true,
       is_slider: true,
       uploaded_by: user ? user.full_name : 'Admin',
-      created_at: new Date().toISOString().slice(0, 10)
+      created_at: f.created_at && f.created_at.value ? f.created_at.value : new Date().toISOString().slice(0, 10)
     };
 
     if (existingId) {
       await window.dbAdapter.update('Gallery', existingId, payload);
-      this.showToast('อัปเดตภาพสไลด์โอกาสสำคัญของนักเรียนเรียบร้อยแล้ว');
+      this.showToast('อัปเดตภาพสไลด์ประชาสัมพันธ์เรียบร้อยแล้ว');
     } else {
       await window.dbAdapter.insert('Gallery', payload);
-      this.showToast('เพิ่มภาพสไลด์โอกาสสำคัญของนักเรียนขึ้นหน้าเว็บไซต์เรียบร้อยแล้ว');
+      this.showToast('เพิ่มภาพสไลด์ประชาสัมพันธ์ขึ้นหน้าเว็บไซต์เรียบร้อยแล้ว');
     }
+    await window.dbAdapter.syncToCentralServer();
     this.closeModal();
     this.render();
   }

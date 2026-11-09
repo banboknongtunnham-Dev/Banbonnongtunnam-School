@@ -28,51 +28,55 @@ class PublicViews {
   }
 
   /**
-   * ดึงรายการภาพสไลด์โชว์โอกาสสำคัญของนักเรียน (Pro Student Highlight Slider)
+   * ดึงรายการภาพสไลด์ประชาสัมพันธ์หลัก (Spotlight Banner Slides)
+   * ดึงจากตาราง Gallery ที่ตั้งค่าเป็นภาพสไลด์ (is_slider === true) หรือหมวดสไลด์
    */
-  getStudentSlides() {
-    const gallery = window.dbAdapter.getTable('Gallery');
+  getShowcaseSlides() {
+    const gallery = window.dbAdapter.getTable('Gallery') || [];
     const slides = gallery.filter(
       (g) => g.is_slider === true || String(g.is_slider) === 'true' || String(g.category || '').includes('สไลด์')
     );
-    if (slides.length > 0) return slides;
-    return gallery.slice(0, 4);
+    const targetList = slides.length > 0 ? slides : gallery.slice(0, 4);
+    return targetList.map((s) => ({
+      slide_type: 'SHOWCASE_SLIDE',
+      id: s.gallery_id,
+      title: s.title || '',
+      subtitle: s.caption || '',
+      category: s.category || 'ข่าวประชาสัมพันธ์ & ประกาศโรงเรียน',
+      tag: s.occasion_tag || s.category || 'ประชาสัมพันธ์',
+      date: s.created_at || 'ปีการศึกษา 2569',
+      image_url: s.image_url || 'assets/img/logo.png',
+      facebook_url: s.facebook_url || '',
+      show_overlay: s.show_overlay !== false && String(s.show_overlay) !== 'false',
+      raw: s
+    }));
   }
 
   /**
-   * ดึงรายการสไลด์แบบรวม (ภาพโอกาสสำคัญของนักเรียน + ข่าวสารประชาสัมพันธ์ล่าสุด)
+   * ดึงรายการหมวดหมู่ที่มีอยู่จริงของสไลด์เพื่อสร้างปุ่มกรองอัตโนมัติ
+   */
+  getAvailableSliderCategories() {
+    const all = this.getShowcaseSlides();
+    const cats = [];
+    all.forEach((s) => {
+      const c = s.category || s.tag;
+      if (c && !cats.includes(c)) {
+        cats.push(c);
+      }
+    });
+    return cats;
+  }
+
+  /**
+   * ดึงรายการสไลด์ตามตัวกรองที่เลือก (สไลด์ทั้งหมด หรือตามหมวดหมู่)
    */
   getCombinedShowcaseSlides() {
-    const studentSlides = this.getStudentSlides().map((s) => ({
-      slide_type: 'STUDENT_SLIDE',
-      id: s.gallery_id,
-      title: s.title,
-      subtitle: s.caption || '',
-      tag: s.occasion_tag || s.category || 'โอกาสสำคัญของนักเรียน',
-      date: s.created_at || 'ปีการศึกษา 2569',
-      image_url: s.image_url,
-      facebook_url: s.facebook_url || 'https://www.facebook.com/profile.php?id=100014526581847',
-      raw: s
-    }));
-
-    const newsSlides = window.dbAdapter
-      .getTable('News')
-      .filter((n) => n.publish_status !== 'DRAFT')
-      .map((n) => ({
-        slide_type: 'NEWS_SLIDE',
-        id: n.news_id,
-        title: n.title,
-        subtitle: n.summary || n.content || '',
-        tag: n.category || 'ข่าวประชาสัมพันธ์',
-        date: n.published_at || 'ปีการศึกษา 2569',
-        image_url: n.cover_image_url || 'assets/img/hero_banner.png',
-        facebook_url: n.facebook_url || 'https://www.facebook.com/profile.php?id=100014526581847',
-        raw: n
-      }));
-
-    if (this.sliderMode === 'STUDENT') return studentSlides;
-    if (this.sliderMode === 'NEWS') return newsSlides.length > 0 ? newsSlides : studentSlides;
-    return [...studentSlides, ...newsSlides];
+    const allSlides = this.getShowcaseSlides();
+    if (!this.sliderMode || this.sliderMode === 'ALL') {
+      return allSlides;
+    }
+    const filtered = allSlides.filter((s) => s.category === this.sliderMode || s.tag === this.sliderMode);
+    return filtered.length > 0 ? filtered : allSlides;
   }
 
   setSliderMode(mode) {
@@ -253,18 +257,21 @@ class PublicViews {
   /**
    * เรนเดอร์เนื้อหาภายใน Pro Student & News Highlight Slider (สไลด์ภาพโอกาสสำคัญ + สไลด์ข่าวสาร)
    */
+  /**
+   * เรนเดอร์เนื้อหาภายใน Spotlight Banner Slider (สไลด์ภาพประชาสัมพันธ์และผลงานเด่น)
+   */
   renderStudentSliderInner() {
     const slides = this.getCombinedShowcaseSlides();
-    const canManage = window.authService.isTeacherOrAbove();
+    const canManage = window.authService.isAdminOrAbove();
     if (slides.length === 0) {
       return `
         <div class="p-12 text-center bg-white rounded-3xl border border-dashed border-amber-300">
-          <p class="text-sm text-slate-600 font-semibold">ยังไม่มีรายการสไลด์</p>
+          <p class="text-sm text-slate-600 font-semibold">ยังไม่มีรายการภาพสไลด์ประชาสัมพันธ์</p>
           ${
             canManage
               ? `
-              <button onclick="window.app.handleAdminSlideAddClick()" class="mt-3 px-4 py-2 rounded-xl bg-slate-900 text-amber-300 text-xs font-bold cursor-pointer">
-                + อัปโหลดภาพสไลด์แรก
+              <button onclick="window.app.handleAdminSlideAddClick()" class="mt-3 px-4 py-2 rounded-xl bg-slate-900 text-amber-300 text-xs font-bold cursor-pointer hover:bg-amber-500 hover:text-slate-950 transition">
+                + เพิ่มภาพสไลด์แรก
               </button>
               `
               : ''
@@ -278,44 +285,44 @@ class PublicViews {
     }
     const current = slides[this.currentSlideIndex];
     const imgUrl = window.driveService.resolveDriveImageUrl(current.image_url);
-    const fbUrl = current.facebook_url || 'https://www.facebook.com/profile.php?id=100014526581847';
-    const isNewsSlide = current.slide_type === 'NEWS_SLIDE';
+    const fbUrl = current.facebook_url || '';
+    const availableCategories = this.getAvailableSliderCategories();
 
     return `
       <div class="bbk-soft-card rounded-3xl overflow-hidden bg-white flex flex-col h-full border border-slate-200/90 shadow-2xs">
-        <!-- แถบเลือกโหมดสไลด์ด้านบน เรียบหรู สะอาดตา -->
+        <!-- แถบเลือกโหมดสไลด์ด้านบน เรียบหรู สะอาดตา ปรับตามหมวดหมู่จริง -->
         <div class="px-5 py-3.5 bg-white border-b border-slate-100 flex flex-wrap items-center justify-between gap-2">
-          <div class="flex flex-wrap items-center gap-1.5">
+          <div class="flex flex-wrap items-center gap-1.5 overflow-x-auto no-scrollbar">
             <button
               onclick="window.publicViews.setSliderMode('ALL')"
-              class="px-3.5 py-1.5 rounded-xl text-xs font-bold transition cursor-pointer ${
-                this.sliderMode === 'ALL'
+              class="px-3.5 py-1.5 rounded-xl text-xs font-bold transition cursor-pointer shrink-0 ${
+                !this.sliderMode || this.sliderMode === 'ALL'
                   ? 'bg-slate-900 text-white shadow-2xs'
                   : 'bg-slate-50 text-slate-600 hover:bg-slate-100'
               }"
             >
-              สไลด์ทั้งหมด
+              สไลด์ทั้งหมด (${this.getShowcaseSlides().length})
             </button>
-            <button
-              onclick="window.publicViews.setSliderMode('STUDENT')"
-              class="px-3.5 py-1.5 rounded-xl text-xs font-bold transition cursor-pointer ${
-                this.sliderMode === 'STUDENT'
-                  ? 'bg-amber-600 text-white shadow-2xs'
-                  : 'bg-slate-50 text-slate-600 hover:bg-amber-50 hover:text-amber-800'
-              }"
-            >
-              ผลงาน & โอกาสสำคัญนักเรียน
-            </button>
-            <button
-              onclick="window.publicViews.setSliderMode('NEWS')"
-              class="px-3.5 py-1.5 rounded-xl text-xs font-bold transition cursor-pointer ${
-                this.sliderMode === 'NEWS'
-                  ? 'bg-blue-600 text-white shadow-2xs'
-                  : 'bg-slate-50 text-slate-600 hover:bg-blue-50 hover:text-blue-700'
-              }"
-            >
-              ข่าวประชาสัมพันธ์
-            </button>
+            ${
+              availableCategories.length > 1
+                ? availableCategories
+                    .map(
+                      (cat) => `
+                    <button
+                      onclick="window.publicViews.setSliderMode('${cat}')"
+                      class="px-3 py-1.5 rounded-xl text-xs font-bold transition cursor-pointer shrink-0 ${
+                        this.sliderMode === cat
+                          ? 'bg-amber-600 text-white shadow-2xs'
+                          : 'bg-slate-50 text-slate-600 hover:bg-amber-50 hover:text-amber-800'
+                      }"
+                    >
+                      ${window.authService.sanitizeHTML(cat)}
+                    </button>
+                  `
+                    )
+                    .join('')
+                : ''
+            }
           </div>
 
           <div class="flex items-center gap-2">
@@ -335,32 +342,28 @@ class PublicViews {
           <div class="h-full bg-gradient-to-r from-amber-500 to-amber-400 ${this.isSliderPaused ? 'w-1/2' : 'bbk-slide-progress'}"></div>
         </div>
 
-        <!-- พื้นที่แสดงภาพสไลด์หลัก -->
-        <div class="relative aspect-16/9 w-full bg-slate-950 overflow-hidden flex items-center justify-center group flex-1">
+        <!-- พื้นที่แสดงภาพสไลด์หลัก (คมชัด ไม่ถูกตัดขอบ รองรับทั้งแนวนอน แนวตั้ง และโปสเตอร์กราฟิก) -->
+        <div class="relative aspect-16/9 w-full bg-slate-950 overflow-hidden flex items-center justify-center group flex-1 select-none">
+          <!-- ภาพพื้นหลังเบลอสวยงาม ป้องกันขอบดำว่างเปล่า -->
           <img
             src="${imgUrl}"
             alt=""
             class="absolute inset-0 w-full h-full object-cover blur-2xl opacity-40 scale-110 pointer-events-none"
             onerror="this.src='assets/img/logo.png'"
           />
+          <!-- ภาพสไลด์จริง โชว์เต็มกรอบแบบ object-contain คมชัดทุกสัดส่วน -->
           <img
             src="${imgUrl}"
             alt="${window.authService.sanitizeHTML(current.title)}"
-            onclick="${
-              isNewsSlide
-                ? `window.app.openNewsModal('${current.id}')`
-                : `window.app.openImageLightbox('${imgUrl}', '${window.authService.sanitizeHTML(current.title)}', '${window.authService.sanitizeHTML(current.subtitle)}')`
-            }"
-            class="relative z-10 w-full h-full object-cover cursor-pointer transition duration-700 group-hover:scale-[1.02] animate-fade-in"
+            onclick="window.app.openImageLightbox('${imgUrl}', '${window.authService.sanitizeHTML(current.title)}', '${window.authService.sanitizeHTML(current.subtitle)}')"
+            class="relative z-10 max-h-full max-w-full object-contain cursor-pointer transition duration-500 group-hover:scale-[1.01]"
             onerror="this.src='assets/img/logo.png'"
           />
 
-          <div class="absolute inset-0 z-20 bg-gradient-to-t from-slate-950/90 via-slate-950/25 to-transparent pointer-events-none"></div>
-
-          <!-- ป้ายกำกับด้านบนซ้าย & ปุ่มแก้ไขด่วนสำหรับครู/แอดมิน/ผู้พัฒนาเท่านั้น -->
-          <div class="absolute top-4 left-4 right-4 z-30 flex items-center justify-between gap-2">
-            <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-slate-900/80 backdrop-blur-md text-amber-300 text-xs font-bold border border-white/20 shadow-xs">
-              <i data-lucide="${isNewsSlide ? 'newspaper' : 'award'}" class="w-3.5 h-3.5 text-amber-300"></i>
+          <!-- ป้ายกำกับด้านบนซ้าย & ปุ่มแก้ไขด่วนสำหรับแอดมินและผู้ดูแลระบบ -->
+          <div class="absolute top-4 left-4 right-4 z-30 flex items-center justify-between gap-2 pointer-events-auto">
+            <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-900/85 backdrop-blur-md text-amber-300 text-xs font-bold border border-amber-400/30 shadow-md">
+              <i data-lucide="tag" class="w-3.5 h-3.5 text-amber-300"></i>
               <span>${window.authService.sanitizeHTML(current.tag)}</span>
             </span>
 
@@ -368,15 +371,11 @@ class PublicViews {
               canManage
                 ? `
                 <button
-                  onclick="${
-                    isNewsSlide
-                      ? `window.app.openNewsEditorModal('${current.id}')`
-                      : `window.app.handleAdminSlideEditClick('${current.id}')`
-                  }"
-                  class="px-3 py-1.5 rounded-xl bg-white/95 hover:bg-white text-slate-900 text-xs font-bold shadow-md inline-flex items-center gap-1.5 transition cursor-pointer"
+                  onclick="window.app.handleAdminSlideEditClick('${current.id}')"
+                  class="px-3.5 py-1.5 rounded-xl bg-white/95 hover:bg-white text-slate-900 text-xs font-bold shadow-md inline-flex items-center gap-1.5 transition cursor-pointer"
                 >
                   <i data-lucide="edit-3" class="w-3.5 h-3.5 text-amber-700"></i>
-                  <span>แก้ไขสไลด์</span>
+                  <span>แก้ไขสไลด์นี้</span>
                 </button>
                 `
                 : ''
@@ -387,72 +386,113 @@ class PublicViews {
           <button
             onclick="window.publicViews.prevSlide()"
             aria-label="สไลด์ก่อนหน้า"
-            class="absolute left-3 top-1/2 -translate-y-1/2 z-30 w-10 h-10 rounded-full bg-black/40 hover:bg-white hover:text-slate-950 text-white border border-white/20 flex items-center justify-center backdrop-blur-xs transition cursor-pointer"
+            class="absolute left-3 top-1/2 -translate-y-1/2 z-30 w-10 h-10 rounded-full bg-black/50 hover:bg-white hover:text-slate-950 text-white border border-white/25 flex items-center justify-center backdrop-blur-xs transition cursor-pointer shadow-lg"
           >
             <i data-lucide="chevron-left" class="w-5 h-5"></i>
           </button>
           <button
             onclick="window.publicViews.nextSlide()"
             aria-label="สไลด์ถัดไป"
-            class="absolute right-3 top-1/2 -translate-y-1/2 z-30 w-10 h-10 rounded-full bg-black/40 hover:bg-white hover:text-slate-950 text-white border border-white/20 flex items-center justify-center backdrop-blur-xs transition cursor-pointer"
+            class="absolute right-3 top-1/2 -translate-y-1/2 z-30 w-10 h-10 rounded-full bg-black/50 hover:bg-white hover:text-slate-950 text-white border border-white/25 flex items-center justify-center backdrop-blur-xs transition cursor-pointer shadow-lg"
           >
             <i data-lucide="chevron-right" class="w-5 h-5"></i>
           </button>
 
-          <!-- คำบรรยายสไลด์ด้านล่าง กระชับ ชัดเจน -->
-          <div class="absolute bottom-0 inset-x-0 z-30 p-5 sm:p-6 flex flex-col sm:flex-row sm:items-end justify-between gap-4">
-            <div class="space-y-1 max-w-2xl">
-              <div class="text-xs font-bold text-amber-300">
-                📅 ${window.authService.sanitizeHTML(current.date)}
-              </div>
-              <h3 class="text-lg sm:text-2xl font-extrabold text-white leading-snug">
-                ${window.authService.sanitizeHTML(current.title)}
-              </h3>
-              <p class="text-xs sm:text-sm text-slate-200 line-clamp-2">
-                ${window.authService.sanitizeHTML(current.subtitle)}
-              </p>
-            </div>
+          <!-- คำบรรยายสไลด์ด้านล่าง (กรณีแสดงแถบข้อความ) หรือแถบปุ่มขยายด้านล่าง (กรณีซ่อนแถบข้อความสำหรับโปสเตอร์) -->
+          ${
+            current.show_overlay
+              ? `
+              <div class="absolute bottom-0 inset-x-0 z-20 bg-gradient-to-t from-slate-950/95 via-slate-950/70 to-transparent pt-12 pb-4 px-5 sm:px-6 flex flex-col sm:flex-row sm:items-end justify-between gap-3 pointer-events-auto">
+                <div class="space-y-1 max-w-2xl">
+                  <div class="text-xs font-bold text-amber-300 flex items-center gap-1.5">
+                    <span>📅</span>
+                    <span>${window.authService.sanitizeHTML(current.date)}</span>
+                  </div>
+                  <h3 class="text-base sm:text-xl font-extrabold text-white leading-snug drop-shadow-sm line-clamp-2">
+                    ${window.authService.sanitizeHTML(current.title)}
+                  </h3>
+                  ${
+                    current.subtitle
+                      ? `
+                      <p class="text-xs sm:text-sm text-slate-200 line-clamp-2 leading-relaxed">
+                        ${window.authService.sanitizeHTML(current.subtitle)}
+                      </p>
+                      `
+                      : ''
+                  }
+                </div>
 
-            <div class="flex items-center gap-2 shrink-0">
-              <button
-                onclick="${
-                  isNewsSlide
-                    ? `window.app.openNewsModal('${current.id}')`
-                    : `window.app.openImageLightbox('${imgUrl}', '${window.authService.sanitizeHTML(current.title)}', '${window.authService.sanitizeHTML(current.subtitle)}')`
-                }"
-                class="px-4 py-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 text-xs font-extrabold shadow-xs inline-flex items-center gap-1.5 transition cursor-pointer"
-              >
-                <span>${isNewsSlide ? 'อ่านรายละเอียด' : 'ดูภาพขยาย'}</span>
-              </button>
-              <a
-                href="${window.authService.sanitizeHTML(fbUrl)}"
-                target="_blank"
-                rel="noopener"
-                class="px-3.5 py-2 rounded-xl bg-[#1877F2] hover:bg-[#166fe5] text-white text-xs font-bold shadow-xs inline-flex items-center gap-1.5 transition"
-              >
-                <svg class="w-3.5 h-3.5 fill-white shrink-0 inline-block" viewBox="0 0 24 24"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
-                <span>Facebook</span>
-              </a>
-            </div>
-          </div>
+                <div class="flex items-center gap-2 shrink-0">
+                  <button
+                    onclick="window.app.openImageLightbox('${imgUrl}', '${window.authService.sanitizeHTML(current.title)}', '${window.authService.sanitizeHTML(current.subtitle)}')"
+                    class="px-3.5 py-1.5 sm:py-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 text-xs font-extrabold shadow-xs inline-flex items-center gap-1.5 transition cursor-pointer"
+                  >
+                    <i data-lucide="maximize-2" class="w-3.5 h-3.5"></i>
+                    <span>ดูภาพขยาย</span>
+                  </button>
+                  ${
+                    fbUrl
+                      ? `
+                      <a
+                        href="${window.authService.sanitizeHTML(fbUrl)}"
+                        target="_blank"
+                        rel="noopener"
+                        class="px-3.5 py-1.5 sm:py-2 rounded-xl bg-[#1877F2] hover:bg-[#166fe5] text-white text-xs font-bold shadow-xs inline-flex items-center gap-1.5 transition"
+                      >
+                        <svg class="w-3.5 h-3.5 fill-white shrink-0 inline-block" viewBox="0 0 24 24"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+                        <span>Facebook</span>
+                      </a>
+                      `
+                      : ''
+                  }
+                </div>
+              </div>
+              `
+              : `
+              <div class="absolute bottom-3 right-4 z-20 flex items-center gap-2 pointer-events-auto">
+                <button
+                  onclick="window.app.openImageLightbox('${imgUrl}', '${window.authService.sanitizeHTML(current.title)}', '${window.authService.sanitizeHTML(current.subtitle)}')"
+                  class="px-3.5 py-1.5 rounded-xl bg-slate-950/80 hover:bg-slate-900 text-white text-xs font-bold border border-white/20 backdrop-blur-md shadow-md inline-flex items-center gap-1.5 transition cursor-pointer"
+                >
+                  <i data-lucide="maximize-2" class="w-3.5 h-3.5 text-amber-400"></i>
+                  <span>ดูภาพขยาย</span>
+                </button>
+                ${
+                  fbUrl
+                    ? `
+                    <a
+                      href="${window.authService.sanitizeHTML(fbUrl)}"
+                      target="_blank"
+                      rel="noopener"
+                      class="px-3.5 py-1.5 rounded-xl bg-[#1877F2]/90 hover:bg-[#1877F2] text-white text-xs font-bold shadow-md inline-flex items-center gap-1.5 transition"
+                    >
+                      <svg class="w-3.5 h-3.5 fill-white shrink-0 inline-block" viewBox="0 0 24 24"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+                      <span>Facebook</span>
+                    </a>
+                    `
+                    : ''
+                }
+              </div>
+              `
+          }
         </div>
 
-        <!-- แถบจุดเลือกสไลด์ย่อด้านล่าง -->
+        <!-- แถบเลือกสไลด์ย่อด้านล่าง -->
         <div class="px-5 py-3 bg-white border-t border-slate-100 flex items-center justify-between gap-3">
-          <div class="flex items-center gap-2 overflow-x-auto no-scrollbar">
+          <div class="flex items-center gap-2 overflow-x-auto no-scrollbar py-0.5">
             ${slides
               .map((s, idx) => {
                 const active = idx === this.currentSlideIndex;
                 return `
                   <button
                     onclick="window.publicViews.goToSlide(${idx})"
-                    class="px-3 py-1 rounded-lg text-xs font-bold border transition cursor-pointer shrink-0 max-w-[160px] truncate ${
+                    class="px-3 py-1.5 rounded-xl text-xs font-bold border transition cursor-pointer shrink-0 max-w-[170px] truncate ${
                       active
-                        ? 'bg-red-50 border-red-500 text-red-800'
-                        : 'bg-slate-50 border-slate-200 text-slate-500 hover:text-slate-800'
+                        ? 'bg-amber-500 border-amber-600 text-slate-950 shadow-xs'
+                        : 'bg-slate-50 border-slate-200 text-slate-600 hover:text-slate-900 hover:bg-slate-100'
                     }"
                   >
-                    ${idx + 1}. ${window.authService.sanitizeHTML(s.title)}
+                    ${idx + 1}. ${window.authService.sanitizeHTML(s.title || `สไลด์ที่ ${idx + 1}`)}
                   </button>
                 `;
               })
@@ -464,10 +504,10 @@ class PublicViews {
               ? `
               <button
                 onclick="window.app.handleAdminSlideAddClick()"
-                class="inline-flex items-center gap-1 px-3 py-1 rounded-lg bg-red-700 hover:bg-red-800 text-yellow-300 text-xs font-bold transition cursor-pointer shrink-0"
+                class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-900 hover:bg-amber-500 hover:text-slate-950 text-amber-300 text-xs font-bold transition cursor-pointer shrink-0 shadow-2xs"
               >
-                <i data-lucide="plus" class="w-3.5 h-3.5"></i>
-                <span>อัปโหลดสไลด์</span>
+                <i data-lucide="plus-circle" class="w-3.5 h-3.5"></i>
+                <span>+ เพิ่มสไลด์</span>
               </button>
               `
               : ''
@@ -1376,21 +1416,21 @@ class PublicViews {
                 CAMPUS SPOTLIGHT & OFFICIAL NOTICES
               </span>
               <h2 class="text-xl sm:text-2xl font-extrabold text-slate-900">
-                ผลงานและโอกาสสำคัญนักเรียน & ประกาศทางการ
+                ผลงานและประชาสัมพันธ์เด่น & ประกาศทางการ
               </h2>
             </div>
           </div>
 
           ${
-            window.authService.isTeacherOrAbove()
+            window.authService.isAdminOrAbove()
               ? `
               <div class="flex flex-wrap items-center gap-2">
                 <button
                   onclick="window.app.handleAdminSlideAddClick()"
-                  class="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-slate-900 text-white hover:bg-slate-800 text-xs font-bold shadow-2xs transition cursor-pointer"
+                  class="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-slate-900 text-amber-300 hover:bg-slate-800 text-xs font-bold shadow-2xs transition cursor-pointer"
                 >
                   <i data-lucide="image-plus" class="w-3.5 h-3.5 text-amber-400"></i>
-                  <span>+ เพิ่มสไลด์ภาพ</span>
+                  <span>+ จัดการ/เพิ่มสไลด์ประชาสัมพันธ์</span>
                 </button>
                 <button
                   onclick="window.app.handleAdminFacebookNewsClick()"
@@ -2514,10 +2554,10 @@ class PublicViews {
           <div class="flex flex-col sm:flex-row sm:items-end justify-between gap-3">
             <div>
               <span class="text-xs font-bold uppercase tracking-wider text-amber-700">LIVE BULLETIN BOARD & SLIDESHOW</span>
-              <h2 class="text-2xl sm:text-3xl font-extrabold text-slate-900">บอร์ดประชาสัมพันธ์เคลื่อนไหว & สไลด์โอกาสสำคัญนักเรียน</h2>
+              <h2 class="text-2xl sm:text-3xl font-extrabold text-slate-900">บอร์ดประชาสัมพันธ์เคลื่อนไหว & สไลด์ผลงานเด่น</h2>
             </div>
             ${
-              window.authService.isTeacherOrAbove()
+              window.authService.isAdminOrAbove()
                 ? `
                 <div class="flex flex-wrap gap-2">
                   <button
@@ -2525,7 +2565,7 @@ class PublicViews {
                     class="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-amber-500 text-slate-950 hover:bg-amber-400 text-xs font-bold shadow-2xs transition cursor-pointer"
                   >
                     <i data-lucide="image-plus" class="w-4 h-4"></i>
-                    <span>+ อัปโหลดไฟล์ภาพขึ้นสไลด์</span>
+                    <span>+ จัดการ/เพิ่มสไลด์ประชาสัมพันธ์</span>
                   </button>
                   <button
                     onclick="window.app.handleAdminFacebookNewsClick()"
