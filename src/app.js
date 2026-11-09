@@ -2377,7 +2377,8 @@ class BanbokAppController {
   async deleteRowConfirm(tableName, pkValue) {
     if (!confirm(`ยืนยันการลบข้อมูลรหัส ${pkValue} ออกจากตาราง ${tableName} หรือไม่?`)) return;
     await window.dbAdapter.remove(tableName, pkValue);
-    this.showToast(`ลบข้อมูล ${pkValue} ออกจาก ${tableName} เรียบร้อยแล้ว`);
+    await window.dbAdapter.syncToCentralServer();
+    this.showToast(`✅ ลบข้อมูล ${pkValue} ออกจาก ${tableName} เรียบร้อยแล้ว`);
     this.render();
   }
 

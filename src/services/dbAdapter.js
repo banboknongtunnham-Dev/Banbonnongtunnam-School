@@ -46,6 +46,46 @@ class DatabaseAdapter {
     this.startAutoRevalidation();
   }
 
+  getTombstones() {
+    try {
+      if (typeof localStorage === 'undefined') return [];
+      return JSON.parse(localStorage.getItem('BANBOK_TOMBSTONES_V1') || '[]');
+    } catch (_) {
+      return [];
+    }
+  }
+
+  markDeleted(tableName, pkValue) {
+    try {
+      if (typeof localStorage === 'undefined') return;
+      const list = this.getTombstones();
+      const key = `${tableName}:${String(pkValue).trim()}`;
+      if (!list.includes(key)) {
+        list.push(key);
+        localStorage.setItem('BANBOK_TOMBSTONES_V1', JSON.stringify(list));
+      }
+    } catch (_) {}
+  }
+
+  unmarkDeleted(tableName, pkValue) {
+    try {
+      if (typeof localStorage === 'undefined') return;
+      let list = this.getTombstones();
+      const key = `${tableName}:${String(pkValue).trim()}`;
+      list = list.filter((k) => k !== key);
+      localStorage.setItem('BANBOK_TOMBSTONES_V1', JSON.stringify(list));
+    } catch (_) {}
+  }
+
+  isDeleted(tableName, pkValue) {
+    try {
+      const list = this.getTombstones();
+      return list.includes(`${tableName}:${String(pkValue).trim()}`);
+    } catch (_) {
+      return false;
+    }
+  }
+
   initStorageListener() {
     if (typeof window !== 'undefined') {
       // 1. Cross-Tab Real-time Broadcast Synchronization
@@ -89,12 +129,14 @@ class DatabaseAdapter {
       const saved = localStorage.getItem(STORAGE_KEY);
       if (saved) {
         const parsed = JSON.parse(saved);
-        // ตรวจสอบให้ครบทั้ง 17 ตาราง หากตารางไหนขาดให้เติมจากค่าเริ่มต้น
+        // ตรวจสอบให้ครบทั้ง 17 ตาราง หากตารางไหนขาดให้เติมจากค่าเริ่มต้น พร้อมกรองรายการที่ถูกลบออก
         this.db = {};
         Object.keys(TABLE_PRIMARY_KEYS).forEach((table) => {
-          this.db[table] = Array.isArray(parsed[table]) && parsed[table].length > 0
+          const pk = TABLE_PRIMARY_KEYS[table];
+          const rawList = Array.isArray(parsed[table])
             ? parsed[table]
             : JSON.parse(JSON.stringify(window.BANBOK_DEFAULT_DB[table] || []));
+          this.db[table] = rawList.filter((r) => !this.isDeleted(table, r[pk]));
         });
         // อัปเดต URL ของ Google Apps Script อัตโนมัติหากในแคชเดิมยังว่างอยู่
         const currentGasUrl = this.getSetting('gas_webapp_url', '');
@@ -132,14 +174,6 @@ class DatabaseAdapter {
         // อัปเดตภาพถ่ายบุคลากรทั้งหมดอัตโนมัติหากในแคชเดิมยังว่างอยู่
         if (Array.isArray(this.db.Personnel)) {
           let updatedAny = false;
-          // ตรวจสอบและเติมบุคลากรใหม่จากค่าเริ่มต้น (เช่น PER-019, PER-020)
-          (window.BANBOK_DEFAULT_DB.Personnel || []).forEach((defP) => {
-            const exists = this.db.Personnel.some((p) => p.personnel_id === defP.personnel_id);
-            if (!exists) {
-              this.db.Personnel.push(JSON.parse(JSON.stringify(defP)));
-              updatedAny = true;
-            }
-          });
           this.db.Personnel.forEach((p) => {
             const def = (window.BANBOK_DEFAULT_DB.Personnel || []).find((dp) => dp.personnel_id === p.personnel_id);
             if (def && def.photo_url && (!p.photo_url || p.photo_url === '' || p.photo_url === 'assets/img/logo.png')) {
@@ -252,7 +286,8 @@ class DatabaseAdapter {
       try {
         const rows = await window.googleWorkspaceClient.fetchSheetViaGvizEdge(spreadsheetId, table);
         if (Array.isArray(rows) && rows.length > 0) {
-          this.db[table] = rows;
+          const pk = this.getPrimaryKeyName(table);
+          this.db[table] = rows.filter((r) => !this.isDeleted(table, r[pk]));
           updatedCount++;
         }
       } catch (e) { /* ignore individual sheet error */ }
@@ -327,6 +362,12 @@ class DatabaseAdapter {
         if (res.ok) {
           const remoteDb = await res.json();
           if (remoteDb && remoteDb.School_Profile && Array.isArray(remoteDb.School_Profile)) {
+            Object.keys(TABLE_PRIMARY_KEYS).forEach((tbl) => {
+              if (Array.isArray(remoteDb[tbl])) {
+                const pk = this.getPrimaryKeyName(tbl);
+                remoteDb[tbl] = remoteDb[tbl].filter((r) => !this.isDeleted(tbl, r[pk]));
+              }
+            });
             this.db = remoteDb;
             localStorage.setItem(STORAGE_KEY, JSON.stringify(this.db));
             if (this.broadcastChannel) {
@@ -506,6 +547,7 @@ class DatabaseAdapter {
     if (!newRow.created_at) newRow.created_at = now;
     newRow.updated_at = now;
 
+    this.unmarkDeleted(tableName, newRow[pk]);
     this.db[tableName].unshift(newRow);
     this.logAudit('INSERT', tableName, newRow[pk], `เพิ่มข้อมูลใหม่ในตาราง ${tableName} (${newRow.title || newRow.first_name || newRow.module_name || newRow[pk]})`, 'SUCCESS', actor);
     this.saveLocal();
@@ -545,15 +587,19 @@ class DatabaseAdapter {
       throw new Error(`ตาราง ${tableName} ไม่ถูกต้องตามโครงสร้างฐานข้อมูล`);
     }
     const pk = this.getPrimaryKeyName(tableName);
+    const cleanPk = String(pkValue).trim();
     const list = this.db[tableName] || [];
-    const target = list.find((item) => String(item[pk]) === String(pkValue));
-    this.db[tableName] = list.filter((item) => String(item[pk]) !== String(pkValue));
+    const target = list.find((item) => String(item[pk]).trim() === cleanPk);
+    this.db[tableName] = list.filter((item) => String(item[pk]).trim() !== cleanPk);
 
-    const label = target ? (target.title || target.first_name || target.module_name || pkValue) : pkValue;
-    this.logAudit('DELETE', tableName, pkValue, `ลบข้อมูลจากตาราง ${tableName}: ${label}`, 'SUCCESS', actor);
+    this.markDeleted(tableName, cleanPk);
+
+    const label = target ? (target.title || target.first_name || target.module_name || cleanPk) : cleanPk;
+    this.logAudit('DELETE', tableName, cleanPk, `ลบข้อมูลจากตาราง ${tableName}: ${label}`, 'SUCCESS', actor);
     this.saveLocal();
+    await this.syncToCentralServer();
 
-    await this.pushChangeToCloud('deleteRow', tableName, pk, pkValue, null, actor);
+    await this.pushChangeToCloud('deleteRow', tableName, pk, cleanPk, null, actor);
     return true;
   }
 
@@ -723,7 +769,8 @@ class DatabaseAdapter {
 
     Object.keys(payload.data).forEach((table) => {
       if (Array.isArray(payload.data[table]) && payload.data[table].length > 0) {
-        this.db[table] = payload.data[table];
+        const pk = this.getPrimaryKeyName(table);
+        this.db[table] = payload.data[table].filter((r) => !this.isDeleted(table, r[pk]));
       }
     });
 
