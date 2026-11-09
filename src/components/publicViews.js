@@ -228,7 +228,7 @@ class PublicViews {
       if (box && !this.isSliderPaused && !box.matches(':hover')) {
         this.nextSlide();
       }
-    }, 5500);
+    }, 7000);
 
     if (this.bulletinTimer) clearInterval(this.bulletinTimer);
     this.bulletinTimer = setInterval(() => {
@@ -236,7 +236,7 @@ class PublicViews {
       if (bBox && !this.isBulletinPaused && !bBox.matches(':hover')) {
         this.nextBulletinItem();
       }
-    }, 3800);
+    }, 8000);
   }
 
   stopSliderAutoPlay() {
@@ -556,24 +556,24 @@ class PublicViews {
           <span class="text-[11px] font-mono font-bold text-slate-500">${this.activeBulletinIndex + 1}/${items.length}</span>
         </div>
 
-        <!-- กล่องไฮไลต์ข่าวที่กำลังแสดงผลบนบอร์ด -->
+        <!-- กล่องไฮไลต์ข่าวที่กำลังแสดงผลบนบอร์ด (ล็อคความสูงคงที่ ป้องกันอาการกระตุก layout shift) -->
         ${
           activeItem
             ? `
             <div
               onclick="${activeItem.onClick}"
-              class="mx-4 mt-4 p-4 rounded-2xl bg-slate-50/80 border-l-4 border-l-amber-600 border border-slate-200/80 shadow-2xs cursor-pointer transition animate-fade-in hover:bg-white"
+              class="mx-4 mt-4 p-3.5 sm:p-4 rounded-2xl bg-slate-50/80 border-l-4 border-l-amber-600 border border-slate-200/80 shadow-2xs cursor-pointer transition hover:bg-white h-[115px] flex flex-col justify-between overflow-hidden shrink-0"
             >
-              <div class="flex items-center justify-between gap-2 mb-1.5">
+              <div class="flex items-center justify-between gap-2 mb-1">
                 <span class="px-2.5 py-0.5 rounded-full bg-slate-900 text-amber-300 text-[10px] font-bold">
                   ${window.authService.sanitizeHTML(activeItem.badge)}
                 </span>
                 <span class="text-[11px] font-semibold text-slate-500">📅 ${window.authService.sanitizeHTML(activeItem.date)}</span>
               </div>
-              <h5 class="text-sm font-bold text-slate-900 leading-snug">
+              <h5 class="text-sm font-bold text-slate-900 leading-snug line-clamp-1">
                 ${window.authService.sanitizeHTML(activeItem.title)}
               </h5>
-              <p class="text-xs text-slate-600 mt-1 line-clamp-2">
+              <p class="text-xs text-slate-600 mt-0.5 line-clamp-2">
                 ${window.authService.sanitizeHTML(activeItem.desc)}
               </p>
             </div>
@@ -581,8 +581,8 @@ class PublicViews {
             : ''
         }
 
-        <!-- รายการข่าวสารบนบอร์ด -->
-        <div class="p-4 space-y-2 flex-1 overflow-y-auto max-h-[270px]">
+        <!-- รายการข่าวสารบนบอร์ด (ความสูงคงที่ เลื่อน scroll ได้ลื่นไหล) -->
+        <div class="p-4 space-y-2 flex-1 overflow-y-auto h-[260px] max-h-[260px]">
           ${items
             .map((item, idx) => {
               const isCurrent = idx === this.activeBulletinIndex;
@@ -1259,28 +1259,14 @@ class PublicViews {
                 <!-- แสงเรืองทองด้านหลังภาพ -->
                 <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-64 h-64 sm:w-80 sm:h-80 rounded-full bg-gradient-to-tr from-amber-400/30 via-yellow-300/20 to-transparent blur-3xl pointer-events-none"></div>
 
-                <!-- กรอบรูปภาพผู้บริหาร -->
+                <!-- กรอบรูปภาพผู้บริหาร (ไม่มีกล่องดำด้านล่าง สะอาดตา โดดเด่น สง่างาม) -->
                 <div class="relative z-10 w-full flex justify-center">
                   <img
                     src="${directorImg}"
                     alt="นายทองพูล สิงห์บุตร ผู้อำนวยการโรงเรียนบ้านบกหนองทันน้ำ"
-                    class="w-[240px] sm:w-[310px] lg:w-[350px] max-h-[360px] sm:max-h-[420px] object-contain drop-shadow-[0_20px_35px_rgba(0,0,0,0.45)] group-hover:scale-102 transition duration-500"
+                    class="w-[260px] sm:w-[320px] lg:w-[360px] max-h-[380px] sm:max-h-[440px] object-contain drop-shadow-[0_20px_35px_rgba(0,0,0,0.45)] group-hover:scale-102 transition duration-500"
                     onerror="this.src='assets/img/logo.png'"
                   />
-                </div>
-
-                <!-- ป้ายชื่อตำแหน่งผู้บริหารหรูหรากระจกทองบนพื้นแดง (จัดวางลงตัว ไม่ทับริบบิ้นภาพ) -->
-                <div class="relative z-20 mt-2 w-full max-w-xs bg-slate-950/85 backdrop-blur-md rounded-2xl py-2 px-4 border border-amber-400/40 shadow-xl text-center space-y-1">
-                  <div class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-amber-400/20 border border-amber-400/40 text-amber-300 text-[10px] font-bold uppercase tracking-wider">
-                    <span class="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse"></span>
-                    <span>EXECUTIVE LEADERSHIP</span>
-                  </div>
-                  <h3 class="text-sm sm:text-base font-extrabold text-white leading-tight">
-                    นายทองพูล สิงห์บุตร
-                  </h3>
-                  <div class="text-[11px] font-semibold text-rose-200/90 leading-tight">
-                    ผู้อำนวยการโรงเรียนบ้านบกหนองทันน้ำ • ชำนาญการพิเศษ
-                  </div>
                 </div>
               </div>
             </div>

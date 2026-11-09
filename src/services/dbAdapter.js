@@ -287,8 +287,11 @@ class DatabaseAdapter {
         const rows = await window.googleWorkspaceClient.fetchSheetViaGvizEdge(spreadsheetId, table);
         if (Array.isArray(rows) && rows.length > 0) {
           const pk = this.getPrimaryKeyName(table);
-          this.db[table] = rows.filter((r) => !this.isDeleted(table, r[pk]));
-          updatedCount++;
+          const filtered = rows.filter((r) => !this.isDeleted(table, r[pk]));
+          if (JSON.stringify(filtered) !== JSON.stringify(this.db[table])) {
+            this.db[table] = filtered;
+            updatedCount++;
+          }
         }
       } catch (e) { /* ignore individual sheet error */ }
     }
@@ -336,7 +339,6 @@ class DatabaseAdapter {
   }
 
   async syncToCentralServer() {
-    this.saveLocal();
     if (typeof window !== 'undefined' && typeof fetch === 'function') {
       try {
         const res = await fetch('/api/database', {
@@ -368,14 +370,18 @@ class DatabaseAdapter {
                 remoteDb[tbl] = remoteDb[tbl].filter((r) => !this.isDeleted(tbl, r[pk]));
               }
             });
-            this.db = remoteDb;
-            localStorage.setItem(STORAGE_KEY, JSON.stringify(this.db));
-            if (this.broadcastChannel) {
-              try {
-                this.broadcastChannel.postMessage({ type: 'DB_UPDATED', database: this.db, timestamp: Date.now() });
-              } catch (_) {}
+            const remoteStr = JSON.stringify(remoteDb);
+            const currentStr = JSON.stringify(this.db);
+            if (remoteStr !== currentStr) {
+              this.db = remoteDb;
+              localStorage.setItem(STORAGE_KEY, remoteStr);
+              if (this.broadcastChannel) {
+                try {
+                  this.broadcastChannel.postMessage({ type: 'DB_UPDATED', database: this.db, timestamp: Date.now() });
+                } catch (_) {}
+              }
+              this.notifyListeners();
             }
-            this.notifyListeners();
             return true;
           }
         }
