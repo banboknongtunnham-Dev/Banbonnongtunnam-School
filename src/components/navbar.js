@@ -323,6 +323,7 @@ class NavbarComponent {
                 <span class="w-1.5 h-4 bg-yellow-400 rounded-full"></span> หมวดหมู่ข้อมูลหลัก
               </h4>
               <ul class="space-y-2 text-xs">
+                <li><button onclick="window.app.navigate('home')" class="hover:text-yellow-300 transition cursor-pointer font-bold flex items-center gap-1.5">🏠 หน้าแรกสถานศึกษา</button></li>
                 <li><button onclick="window.app.navigate('about')" class="hover:text-yellow-300 transition cursor-pointer">ข้อมูลพื้นฐานโรงเรียน 23 รายการ</button></li>
                 <li><button onclick="window.app.navigate('personnel')" class="hover:text-yellow-300 transition cursor-pointer">ทำเนียบบุคลากร (${totalPersonnelCount} ท่าน)</button></li>
                 <li><button onclick="window.app.navigate('news')" class="hover:text-yellow-300 transition cursor-pointer">บอร์ดข่าวสาร & สไลด์โอกาสสำคัญ</button></li>

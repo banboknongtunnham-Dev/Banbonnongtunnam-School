@@ -85,11 +85,24 @@ class BanbokAppController {
         window.publicViews.stopSliderAutoPlay();
       } catch (e) {}
     }
-    this.currentPage = pageId;
+    const targetPage = pageId && pageId.trim() ? pageId.trim() : 'home';
+    this.currentPage = targetPage;
     if (pushHash) {
-      history.replaceState(null, '', `#${pageId}`);
+      try {
+        if (typeof history !== 'undefined' && history.replaceState) {
+          history.replaceState(null, '', `#${targetPage}`);
+        } else if (typeof window !== 'undefined' && window.location) {
+          window.location.hash = targetPage;
+        }
+      } catch (e) {}
     }
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    if (typeof window !== 'undefined' && typeof window.scrollTo === 'function') {
+      try {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      } catch (e) {
+        window.scrollTo(0, 0);
+      }
+    }
     this.render();
   }
 

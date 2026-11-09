@@ -27,6 +27,10 @@ class PublicViews {
     this.visitorChartInstance = null;
   }
 
+  getStudentSlides() {
+    return this.getShowcaseSlides();
+  }
+
   /**
    * ดึงรายการภาพสไลด์ประชาสัมพันธ์หลัก (Spotlight Banner Slides)
    * ดึงจากตาราง Gallery ที่ตั้งค่าเป็นภาพสไลด์ (is_slider === true) หรือหมวดสไลด์
@@ -229,7 +233,8 @@ class PublicViews {
     if (this.sliderTimer) clearInterval(this.sliderTimer);
     this.sliderTimer = setInterval(() => {
       const box = document.getElementById('pro-student-slider-box');
-      if (box && !this.isSliderPaused && !box.matches(':hover')) {
+      const isHovered = box && typeof box.matches === 'function' ? box.matches(':hover') : false;
+      if (box && !this.isSliderPaused && !isHovered) {
         this.nextSlide();
       }
     }, 7000);
@@ -237,7 +242,8 @@ class PublicViews {
     if (this.bulletinTimer) clearInterval(this.bulletinTimer);
     this.bulletinTimer = setInterval(() => {
       const bBox = document.getElementById('live-bulletin-board-box');
-      if (bBox && !this.isBulletinPaused && !bBox.matches(':hover')) {
+      const isHovered = bBox && typeof bBox.matches === 'function' ? bBox.matches(':hover') : false;
+      if (bBox && !this.isBulletinPaused && !isHovered) {
         this.nextBulletinItem();
       }
     }, 8000);
@@ -1279,7 +1285,7 @@ class PublicViews {
                   </div>
                   <div>
                     <div class="text-2xl sm:text-3xl font-extrabold text-white font-mono tracking-tight leading-none">
-                      ${(this.getStudentSlides().length + stats.totalNews).toLocaleString()}
+                      ${(this.getShowcaseSlides().length + stats.totalNews).toLocaleString()}
                       <span class="text-xs font-normal text-rose-200 ml-0.5">รายการ</span>
                     </div>
                     <p class="text-[10px] text-rose-200/80 mt-1">อัปเดตต่อเนื่อง</p>
