@@ -146,7 +146,7 @@ class DatabaseAdapter {
               p.photo_url = def.photo_url;
               updatedAny = true;
             }
-            if (p.personnel_id === 'PER-001') {
+            if (p.personnel_id === 'PER-001' && (!p.photo_url || p.photo_url === '' || p.photo_url === 'assets/img/logo.png')) {
               p.photo_url = 'assets/img/director_thongpoon.png';
               updatedAny = true;
             }
@@ -296,16 +296,25 @@ class DatabaseAdapter {
   autoSyncToLocalServer() {
     if (this._syncTimeout) clearTimeout(this._syncTimeout);
     this._syncTimeout = setTimeout(async () => {
-      try {
-        if (typeof window !== 'undefined' && typeof fetch === 'function') {
-          await fetch('/api/database', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ database: this.db })
-          });
-        }
-      } catch (_) { /* silent fallback */ }
+      await this.syncToCentralServer();
     }, 400);
+  }
+
+  async syncToCentralServer() {
+    this.saveLocal();
+    if (typeof window !== 'undefined' && typeof fetch === 'function') {
+      try {
+        const res = await fetch('/api/database', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ database: this.db })
+        });
+        return res.ok;
+      } catch (_) {
+        return false;
+      }
+    }
+    return true;
   }
 
   /**

@@ -1170,13 +1170,13 @@ class PublicViews {
                 </div>
               </div>
 
-              <!-- คำขวัญโรงเรียนในกรอบทองกระจกหรูหราสง่างาม -->
-              <div class="p-4 sm:p-5 rounded-2xl bg-black/25 backdrop-blur-md border border-amber-400/40 border-l-4 border-l-amber-400 shadow-sm">
-                <div class="text-[11px] font-extrabold uppercase tracking-wider text-amber-300 flex items-center gap-1.5">
+              <!-- คำขวัญประจำสถานศึกษา (แสดงเป็นข้อความสะอาดตา ไม่มีกรอบ) -->
+              <div class="space-y-1.5 pt-1">
+                <div class="text-xs font-extrabold uppercase tracking-wider text-amber-300 flex items-center gap-1.5">
                   <i data-lucide="sparkles" class="w-3.5 h-3.5 text-amber-300"></i>
                   <span>คำขวัญประจำสถานศึกษา</span>
                 </div>
-                <p class="text-sm sm:text-base font-bold text-white mt-1 italic leading-relaxed">
+                <p class="text-base sm:text-lg font-bold text-white italic tracking-wide leading-relaxed drop-shadow-xs">
                   “${window.authService.sanitizeHTML(profile.motto || 'เรียนรู้สู่ความเป็นเลิศ เชิดชูคุณธรรม นำพาชุมชน')}”
                 </p>
               </div>
@@ -2027,14 +2027,22 @@ class PublicViews {
             ${
               window.authService.isTeacherOrAbove()
                 ? `
-                <!-- ปุ่มเพิ่มบุคลากร / เปิดฟอร์มจัดการสำหรับ ครู / แอดมิน / ผู้พัฒนา -->
+                <!-- ปุ่มเพิ่มบุคลากร / บันทึกยืนยันข้อมูลสำหรับ ครู / แอดมิน / ผู้ดูแลระบบ -->
                 <div class="flex flex-wrap items-center gap-2.5 shrink-0">
                   <button
                     onclick="window.app.handleAdminPersonnelAddClick()"
-                    class="inline-flex items-center gap-2 px-4 py-3 rounded-2xl bg-slate-900 text-amber-300 hover:bg-amber-500 hover:text-slate-950 text-xs sm:text-sm font-bold shadow-xs transition cursor-pointer"
+                    class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-slate-900 text-amber-300 hover:bg-amber-500 hover:text-slate-950 text-xs sm:text-sm font-bold shadow-xs transition cursor-pointer"
                   >
                     <i data-lucide="user-plus" class="w-4 h-4"></i>
-                    <span>+ เพิ่มบุคลากร / อัปเดตข้อมูล</span>
+                    <span>+ เพิ่มบุคลากรใหม่</span>
+                  </button>
+                  <button
+                    onclick="window.app.saveAndConfirmPersonnelData()"
+                    class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white text-xs sm:text-sm font-bold shadow-xs transition cursor-pointer"
+                    title="บันทึกยืนยันข้อมูลทำเนียบบุคลากรทั้งหมด"
+                  >
+                    <i data-lucide="check-circle-2" class="w-4 h-4 text-emerald-200"></i>
+                    <span>บันทึกยืนยันข้อมูลบุคลากร</span>
                   </button>
                 </div>
                 `
@@ -2042,7 +2050,7 @@ class PublicViews {
             }
           </div>
 
-          <!-- แผงสรุปจำนวนบุคลากรรวม (คำนวณสดจากยอดรายชื่อด้านล่าง) -->
+          <!-- แผงสรุปจำนวนบุคลากรรวม (คำนวณสดจากยอดรายชื่อปัจจุบัน) -->
           <div class="grid grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-4 pt-2 border-t border-slate-100">
             <div class="p-3 sm:p-4 rounded-xl sm:rounded-2xl bg-gradient-to-br from-amber-50 to-white border border-amber-300/80 flex items-center justify-between min-w-0">
               <div class="min-w-0">
@@ -2085,27 +2093,6 @@ class PublicViews {
               <div class="text-right shrink-0 ml-1">
                 <span class="text-xl sm:text-2xl font-extrabold text-emerald-700">${supportStaffList.length}</span>
                 <span class="text-[10px] sm:text-xs font-semibold text-slate-500 ml-0.5">ท่าน</span>
-              </div>
-            </div>
-          </div>
-              <div>
-                <div class="text-xs font-bold text-slate-700">ข้าราชการครู</div>
-                <div class="text-[11px] text-slate-400 mt-0.5">สายงานการสอน</div>
-              </div>
-              <div class="text-right">
-                <span class="text-2xl font-extrabold text-sky-700">${teachersList.length}</span>
-                <span class="text-xs font-semibold text-slate-500 ml-1">ท่าน</span>
-              </div>
-            </div>
-
-            <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200/80 flex items-center justify-between">
-              <div>
-                <div class="text-xs font-bold text-slate-700">บุคลากรสนับสนุน</div>
-                <div class="text-[11px] text-slate-400 mt-0.5">ธุรการ / พี่เลี้ยง / ช่าง</div>
-              </div>
-              <div class="text-right">
-                <span class="text-2xl font-extrabold text-emerald-700">${supportStaffList.length}</span>
-                <span class="text-xs font-semibold text-slate-500 ml-1">ท่าน</span>
               </div>
             </div>
           </div>

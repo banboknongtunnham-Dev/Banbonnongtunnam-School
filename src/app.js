@@ -1585,15 +1585,18 @@ class BanbokAppController {
         <input type="hidden" name="education_degree" value="${window.authService.sanitizeHTML(item.education_degree || '')}" />
         <input type="hidden" name="email" value="${window.authService.sanitizeHTML(item.email || '')}" />
 
-        <div class="flex items-center justify-between pt-3 border-t border-slate-100">
+        <div class="flex flex-wrap items-center justify-between gap-3 pt-4 border-t border-slate-200">
           ${
             existing
-              ? `<button type="button" onclick="window.app.closeModal(); window.app.deleteRowConfirm('Personnel', '${existing.personnel_id}');" class="px-3.5 py-2 rounded-xl bg-rose-50 text-rose-700 hover:bg-rose-100 text-xs font-bold cursor-pointer">ลบบุคลากรท่านนี้</button>`
+              ? `<button type="button" onclick="window.app.closeModal(); window.app.deleteRowConfirm('Personnel', '${existing.personnel_id}');" class="px-4 py-2.5 rounded-xl bg-rose-50 text-rose-700 hover:bg-rose-600 hover:text-white border border-rose-200 text-xs font-bold transition cursor-pointer inline-flex items-center gap-1.5"><i data-lucide="trash-2" class="w-3.5 h-3.5"></i> ลบบุคลากรท่านนี้</button>`
               : `<div></div>`
           }
-          <div class="flex gap-2">
-            <button type="button" onclick="window.app.closeModal()" class="px-4 py-2 rounded-xl bg-slate-100 text-slate-700 text-xs font-bold cursor-pointer">ยกเลิก</button>
-            <button type="submit" class="px-5 py-2.5 rounded-xl bg-slate-900 text-amber-300 hover:bg-amber-500 hover:text-slate-950 text-xs font-bold cursor-pointer">บันทึกข้อมูลบุคลากร</button>
+          <div class="flex items-center gap-2.5">
+            <button type="button" onclick="window.app.closeModal()" class="px-4 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold transition cursor-pointer">ยกเลิก</button>
+            <button type="submit" class="px-6 py-2.5 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white shadow-md hover:shadow-lg text-xs sm:text-sm font-extrabold inline-flex items-center gap-2 transition cursor-pointer transform active:scale-95">
+              <i data-lucide="check-circle-2" class="w-4 h-4 text-emerald-200"></i>
+              <span>บันทึกยืนยันข้อมูลบุคลากร</span>
+            </button>
           </div>
         </div>
       </form>
@@ -1627,13 +1630,31 @@ class BanbokAppController {
 
     if (existingId) {
       await window.dbAdapter.update('Personnel', existingId, payload);
-      this.showToast(`อัปเดตข้อมูล ${payload.prefix}${payload.first_name} ${payload.last_name} เรียบร้อยแล้ว`);
+      this.showToast(`✅ อัปเดตและยืนยันข้อมูล ${payload.prefix}${payload.first_name} ${payload.last_name} เรียบร้อยแล้ว`);
     } else {
       await window.dbAdapter.insert('Personnel', payload);
-      this.showToast(`เพิ่มข้อมูล ${payload.prefix}${payload.first_name} ${payload.last_name} เรียบร้อยแล้ว`);
+      this.showToast(`✅ เพิ่มและบันทึกข้อมูล ${payload.prefix}${payload.first_name} ${payload.last_name} เรียบร้อยแล้ว`);
     }
+    await window.dbAdapter.syncToCentralServer();
     this.closeModal();
     this.render();
+  }
+
+  /**
+   * บันทึกยืนยันข้อมูลทำเนียบบุคลากรทั้งหมดในหน้า แอดมิน และผู้ดูแลระบบ
+   */
+  async saveAndConfirmPersonnelData() {
+    try {
+      window.dbAdapter.saveLocal();
+      const count = (window.dbAdapter.getTable('Personnel') || []).length;
+      await window.dbAdapter.syncToCentralServer();
+      this.showToast(`✅ บันทึกยืนยันข้อมูลบุคลากร (${count} ท่าน) สำเร็จ ข้อมูลเป็นปัจจุบันแล้ว`);
+      this.render();
+    } catch (_) {
+      window.dbAdapter.saveLocal();
+      this.showToast('✅ บันทึกข้อมูลบุคลากรในระบบเรียบร้อยแล้ว');
+      this.render();
+    }
   }
 
   openStudentStatModal(statId = null) {

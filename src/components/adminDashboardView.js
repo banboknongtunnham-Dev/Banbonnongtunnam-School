@@ -567,12 +567,23 @@ class AdminDashboardView {
             <h3 class="text-lg font-bold text-slate-900 mt-1.5">จัดการทำเนียบผู้บริหาร ครู และบุคลากร (ตาราง Personnel)</h3>
             <p class="text-xs text-slate-500">คลิกปุ่ม "แก้ไข / เปลี่ยนรูปภาพ" เพื่ออัปโหลดรูปถ่ายและแก้ไขชื่อ-ตำแหน่งได้ทันที</p>
           </div>
-          <button
-            onclick="window.app.openPersonnelModal()"
-            class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-slate-900 text-amber-300 hover:bg-amber-500 hover:text-slate-950 text-xs font-bold transition cursor-pointer"
-          >
-            <i data-lucide="user-plus" class="w-4 h-4"></i> + เพิ่มบุคลากรใหม่
-          </button>
+          <div class="flex flex-wrap items-center gap-2.5">
+            <button
+              onclick="window.app.openPersonnelModal()"
+              class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-slate-900 text-amber-300 hover:bg-amber-500 hover:text-slate-950 text-xs font-bold transition cursor-pointer shadow-xs"
+            >
+              <i data-lucide="user-plus" class="w-4 h-4"></i>
+              <span>+ เพิ่มบุคลากรใหม่</span>
+            </button>
+            <button
+              onclick="window.app.saveAndConfirmPersonnelData()"
+              class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white text-xs font-bold transition cursor-pointer shadow-xs"
+              title="บันทึกยืนยันข้อมูลบุคลากรทั้งหมดลงสู่ฐานข้อมูลหลัก"
+            >
+              <i data-lucide="check-circle-2" class="w-4 h-4 text-emerald-200"></i>
+              <span>บันทึกยืนยันข้อมูลบุคลากร</span>
+            </button>
+          </div>
         </div>
 
         <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5">
