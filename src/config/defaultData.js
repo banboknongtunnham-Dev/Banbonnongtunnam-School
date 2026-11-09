@@ -1,12 +1,12 @@
 /**
  * BANBOK DIGITAL SCHOOL PLATFORM - DEFAULT MASTER DATABASE
- * Updated automatically via Multi-Platform Sync at 2026-11-09T10:33:51.403Z
+ * Updated automatically via Multi-Platform Sync at 2026-11-09T10:48:17.999Z
  */
 
 window.BANBOK_DEFAULT_DB = {
   "_meta": {
-    "version": 1794220431403,
-    "updated_at": "2026-11-09T10:33:51.403Z"
+    "version": 1794221297999,
+    "updated_at": "2026-11-09T10:48:17.999Z"
   },
   "_tombstones": [
     "Gallery:GAL-SLIDE-01"
@@ -1944,20 +1944,20 @@ window.BANBOK_DEFAULT_DB = {
     {
       "setting_key": "total_visitors",
       "setting_group": "VISITOR_METRICS",
-      "setting_value": "1280",
+      "setting_value": "1281",
       "data_type": "number",
       "description": "ยอดผู้เข้าชมเว็บไซต์สะสมทั้งหมด",
       "updated_by": "SYSTEM",
-      "updated_at": "2026-11-04"
+      "updated_at": "2026-11-09T10:48:02.366Z"
     },
     {
       "setting_key": "today_visitors",
       "setting_group": "VISITOR_METRICS",
-      "setting_value": "48",
+      "setting_value": "49",
       "data_type": "number",
       "description": "ยอดผู้เข้าชมเว็บไซต์ประจำวัน",
       "updated_by": "SYSTEM",
-      "updated_at": "2026-11-04"
+      "updated_at": "2026-11-09T10:48:02.366Z"
     },
     {
       "setting_key": "today_visitor_date",
@@ -1971,11 +1971,11 @@ window.BANBOK_DEFAULT_DB = {
     {
       "setting_key": "visitor_history_json",
       "setting_group": "VISITOR_METRICS",
-      "setting_value": "{\"2026-11-04\":48}",
+      "setting_value": "{\"2026-11-04\":48,\"2026-11-09\":1}",
       "data_type": "string",
       "description": "ประวัติจำนวนผู้เข้าชมย้อนหลัง (JSON)",
       "updated_by": "SYSTEM",
-      "updated_at": "2026-11-04"
+      "updated_at": "2026-11-09T10:48:02.366Z"
     },
     {
       "setting_key": "last_daily_line_summary_date",
