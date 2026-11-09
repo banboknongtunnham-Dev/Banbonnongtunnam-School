@@ -1,9 +1,16 @@
 /**
  * BANBOK DIGITAL SCHOOL PLATFORM - DEFAULT MASTER DATABASE
- * Updated automatically via Multi-Platform Sync at 2026-11-09T10:15:55.523Z
+ * Updated automatically via Multi-Platform Sync at 2026-11-09T10:33:32.543Z
  */
 
 window.BANBOK_DEFAULT_DB = {
+  "_meta": {
+    "version": 1794220412543,
+    "updated_at": "2026-11-09T10:33:32.543Z"
+  },
+  "_tombstones": [
+    "Gallery:GAL-SLIDE-01"
+  ],
   "School_Profile": [
     {
       "profile_id": "SCH-BBK-001",
@@ -799,21 +806,6 @@ window.BANBOK_DEFAULT_DB = {
     }
   ],
   "Gallery": [
-    {
-      "gallery_id": "GAL-SLIDE-01",
-      "activity_id": "ACT-2569-01",
-      "title": "ขอแสดงความยินดี นางสาวนภาวรรณ ฉลูศรี ได้รับรางวัลครูผู้สอนต้นแบบ Active Learning ชนะเลิศอันดับ 1 ระดับดีเยี่ยม",
-      "category": "ผลงานครู & บุคลากรทางการศึกษา",
-      "occasion_tag": "ผลงานครู & บุคลากร",
-      "show_overlay": true,
-      "is_slider": true,
-      "facebook_url": "https://www.facebook.com/profile.php?id=100014526581847",
-      "image_url": "https://images.unsplash.com/photo-1509062522246-3755977927d7?auto=format&fit=crop&w=1400&q=85",
-      "drive_file_id": "DRIVE-SLIDE-001",
-      "caption": "ครูผู้สอน กลุ่มสาระการเรียนรู้คณิตศาสตร์ โรงเรียนบ้านบกหนองทันน้ำ ได้รับรางวัลชนะเลิศอันดับ 1 ระดับดีเยี่ยม ครูผู้สอนต้นแบบการส่งเสริมสนับสนุนการจัดการเรียนรู้เชิงรุก (Active Learning)",
-      "uploaded_by": "งานประชาสัมพันธ์",
-      "created_at": "2026-11-03"
-    },
     {
       "gallery_id": "GAL-SLIDE-02",
       "activity_id": "ACT-2569-02",
@@ -1620,8 +1612,9 @@ window.BANBOK_DEFAULT_DB = {
       "allowed_modules_json": "[\"*\"]",
       "avatar_url": "assets/img/icon_personnel.png",
       "is_active": true,
-      "last_login": "2026-11-09T08:30:00Z",
-      "created_at": "2026-01-01T00:00:00Z"
+      "last_login": "2026-11-09T10:33:32.257Z",
+      "created_at": "2026-01-01T00:00:00Z",
+      "updated_at": "2026-11-09T10:33:32.258Z"
     },
     {
       "user_id": "USR-DEV-001",
@@ -1969,11 +1962,11 @@ window.BANBOK_DEFAULT_DB = {
     {
       "setting_key": "today_visitor_date",
       "setting_group": "VISITOR_METRICS",
-      "setting_value": "2026-11-04",
+      "setting_value": "2026-11-09",
       "data_type": "string",
       "description": "วันที่บันทึกยอดผู้เข้าชมล่าสุด",
       "updated_by": "SYSTEM",
-      "updated_at": "2026-11-04"
+      "updated_at": "2026-11-09T10:33:24.216Z"
     },
     {
       "setting_key": "visitor_history_json",
@@ -2077,6 +2070,32 @@ window.BANBOK_DEFAULT_DB = {
   ],
   "Audit_Logs": [
     {
+      "log_id": "LOG-1794220412273-92",
+      "timestamp": "2026-11-09T10:33:32.273Z",
+      "user_id": "USR-ADM-001",
+      "user_name": "แอดมิน ภานุวัฒน์ คุณแรง",
+      "user_role": "ADMIN",
+      "action_type": "USER_LOGIN",
+      "target_table": "User_Accounts",
+      "target_id": "USR-ADM-001",
+      "details": "เข้าสู่ระบบสำเร็จ (แอดมิน ภานุวัฒน์ คุณแรง - สิทธิ์ ADMIN) ผ่าน PASSWORD_AUTH",
+      "ip_or_client": "Desktop Web Client",
+      "status": "SUCCESS"
+    },
+    {
+      "log_id": "LOG-1794220412258-96",
+      "timestamp": "2026-11-09T10:33:32.258Z",
+      "user_id": "USR-ADM-001",
+      "user_name": "แอดมิน ภานุวัฒน์ คุณแรง",
+      "user_role": "ADMIN",
+      "action_type": "UPDATE",
+      "target_table": "User_Accounts",
+      "target_id": "USR-ADM-001",
+      "details": "แก้ไขข้อมูลในตาราง User_Accounts รหัส USR-ADM-001",
+      "ip_or_client": "Desktop Web Client",
+      "status": "SUCCESS"
+    },
+    {
       "log_id": "LOG-20261101-001",
       "timestamp": "2026-11-01T08:30:00Z",
       "user_id": "USR-DEV-001",
@@ -2102,10 +2121,5 @@ window.BANBOK_DEFAULT_DB = {
       "ip_or_client": "Admin CMS Dashboard",
       "status": "SUCCESS"
     }
-  ],
-  "_meta": {
-    "version": 1794219355523,
-    "updated_at": "2026-11-09T10:15:55.523Z"
-  },
-  "_tombstones": []
+  ]
 };
