@@ -1,12 +1,12 @@
 /**
  * BANBOK DIGITAL SCHOOL PLATFORM - DEFAULT MASTER DATABASE
- * Updated automatically via Multi-Platform Sync at 2026-11-09T14:34:39.659Z
+ * Updated automatically via Multi-Platform Sync at 2026-11-09T14:34:55.648Z
  */
 
 window.BANBOK_DEFAULT_DB = {
   "_meta": {
-    "version": 1794234879659,
-    "updated_at": "2026-11-09T14:34:39.659Z"
+    "version": 1794234895648,
+    "updated_at": "2026-11-09T14:34:55.648Z"
   },
   "_tombstones": [
     "Personnel:PER-515461-60",
@@ -412,7 +412,7 @@ window.BANBOK_DEFAULT_DB = {
       "prefix": "นาง",
       "first_name": "วาสนา",
       "last_name": "อัปกาญจน์",
-      "position": "เจ้าหน้าที่ธุระการโรงเรียน",
+      "position": "เจ้าหน้าที่ธุรการโรงเรียน",
       "academic_standing": "-",
       "department": "บุคลากรสนับสนุนการสอน",
       "subject_group": "สายงานสนับสนุนการสอน",
@@ -421,9 +421,9 @@ window.BANBOK_DEFAULT_DB = {
       "email": "",
       "photo_url": "assets/img/personnel/per_016.png",
       "role_group": "STAFF",
-      "sort_order": 16,
+      "sort_order": 17,
       "status": "ปฏิบัติราชการ",
-      "updated_at": "2026-11-03T12:30:00Z"
+      "updated_at": "2026-11-09T14:34:54.369Z"
     },
     {
       "personnel_id": "PER-017",
@@ -2073,6 +2073,19 @@ window.BANBOK_DEFAULT_DB = {
     }
   ],
   "Audit_Logs": [
+    {
+      "log_id": "LOG-1794234894369-8",
+      "timestamp": "2026-11-09T14:34:54.369Z",
+      "user_id": "USR-DEV-001",
+      "user_name": "ผู้ดูแลระบบ ภานุวัฒน์ คุณแรง",
+      "user_role": "DEVELOPER",
+      "action_type": "UPDATE",
+      "target_table": "Personnel",
+      "target_id": "PER-016",
+      "details": "แก้ไขข้อมูลในตาราง Personnel รหัส PER-016",
+      "ip_or_client": "Desktop Web Client",
+      "status": "SUCCESS"
+    },
     {
       "log_id": "LOG-1794234878397-21",
       "timestamp": "2026-11-09T14:34:38.397Z",
