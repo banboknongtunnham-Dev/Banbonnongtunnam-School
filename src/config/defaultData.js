@@ -1,12 +1,12 @@
 /**
  * BANBOK DIGITAL SCHOOL PLATFORM - DEFAULT MASTER DATABASE
- * Updated automatically via Multi-Platform Sync at 2026-11-09T14:35:05.109Z
+ * Updated automatically via Multi-Platform Sync at 2026-11-09T14:35:11.541Z
  */
 
 window.BANBOK_DEFAULT_DB = {
   "_meta": {
-    "version": 1794234905109,
-    "updated_at": "2026-11-09T14:35:05.109Z"
+    "version": 1794234911541,
+    "updated_at": "2026-11-09T14:35:11.541Z"
   },
   "_tombstones": [
     "Personnel:PER-515461-60",
@@ -457,9 +457,9 @@ window.BANBOK_DEFAULT_DB = {
       "email": "",
       "photo_url": "assets/img/personnel/per_018.png",
       "role_group": "STAFF",
-      "sort_order": 18,
+      "sort_order": 20,
       "status": "ปฏิบัติราชการ",
-      "updated_at": "2026-11-03T12:30:00Z"
+      "updated_at": "2026-11-09T14:35:10.271Z"
     }
   ],
   "Students_Statistics": [
@@ -2073,6 +2073,19 @@ window.BANBOK_DEFAULT_DB = {
     }
   ],
   "Audit_Logs": [
+    {
+      "log_id": "LOG-1794234910271-90",
+      "timestamp": "2026-11-09T14:35:10.271Z",
+      "user_id": "USR-DEV-001",
+      "user_name": "ผู้ดูแลระบบ ภานุวัฒน์ คุณแรง",
+      "user_role": "DEVELOPER",
+      "action_type": "UPDATE",
+      "target_table": "Personnel",
+      "target_id": "PER-018",
+      "details": "แก้ไขข้อมูลในตาราง Personnel รหัส PER-018",
+      "ip_or_client": "Desktop Web Client",
+      "status": "SUCCESS"
+    },
     {
       "log_id": "LOG-1794234903809-88",
       "timestamp": "2026-11-09T14:35:03.809Z",
