@@ -1,17 +1,18 @@
 /**
  * BANBOK DIGITAL SCHOOL PLATFORM - DEFAULT MASTER DATABASE
- * Updated automatically via Multi-Platform Sync at 2026-11-09T14:26:55.327Z
+ * Updated automatically via Multi-Platform Sync at 2026-11-09T14:27:41.326Z
  */
 
 window.BANBOK_DEFAULT_DB = {
   "_meta": {
-    "version": 1794234415327,
-    "updated_at": "2026-11-09T14:26:55.327Z"
+    "version": 1794234622082,
+    "updated_at": "2026-11-09T14:27:41.326Z"
   },
   "_tombstones": [
     "Personnel:PER-515461-60",
     "Personnel:PER-019",
-    "Gallery:GAL-SLIDE-01"
+    "Gallery:GAL-SLIDE-01",
+    "Personnel:PER-020"
   ],
   "School_Profile": [
     {
@@ -423,24 +424,6 @@ window.BANBOK_DEFAULT_DB = {
       "sort_order": 18,
       "status": "ปฏิบัติราชการ",
       "updated_at": "2026-11-03T12:30:00Z"
-    },
-    {
-      "personnel_id": "PER-020",
-      "prefix": "นางสาว",
-      "first_name": "ลลิตา",
-      "last_name": "สุทนต์",
-      "position": "ครู",
-      "academic_standing": "-",
-      "department": "ข้าราชการครูและบุคลากรทางการศึกษา",
-      "subject_group": "",
-      "education_degree": "",
-      "phone": "",
-      "email": "",
-      "photo_url": "assets/img/personnel/per_020.png",
-      "role_group": "TEACHER",
-      "sort_order": 20,
-      "status": "ปฏิบัติราชการ",
-      "updated_at": "2026-11-04T12:30:00Z"
     }
   ],
   "Students_Statistics": [
@@ -1612,8 +1595,9 @@ window.BANBOK_DEFAULT_DB = {
       "allowed_modules_json": "[\"*\"]",
       "avatar_url": "assets/img/icon_personnel.png",
       "is_active": true,
-      "last_login": "2026-11-09T09:00:00Z",
-      "created_at": "2026-01-01T00:00:00Z"
+      "last_login": "2026-11-09T14:30:22.082Z",
+      "created_at": "2026-01-01T00:00:00Z",
+      "updated_at": "2026-11-09T14:30:22.082Z"
     }
   ],
   "User_Roles": [
@@ -2053,6 +2037,32 @@ window.BANBOK_DEFAULT_DB = {
     }
   ],
   "Audit_Logs": [
+    {
+      "log_id": "LOG-1794234622090-71",
+      "timestamp": "2026-11-09T14:30:22.090Z",
+      "user_id": "USR-DEV-001",
+      "user_name": "ผู้ดูแลระบบ ภานุวัฒน์ คุณแรง",
+      "user_role": "DEVELOPER",
+      "action_type": "USER_LOGIN",
+      "target_table": "User_Accounts",
+      "target_id": "USR-DEV-001",
+      "details": "เข้าสู่ระบบสำเร็จ (ผู้ดูแลระบบ ภานุวัฒน์ คุณแรง - สิทธิ์ DEVELOPER) ผ่าน PASSWORD_AUTH",
+      "ip_or_client": "Desktop Web Client",
+      "status": "SUCCESS"
+    },
+    {
+      "log_id": "LOG-1794234622082-20",
+      "timestamp": "2026-11-09T14:30:22.082Z",
+      "user_id": "USR-DEV-001",
+      "user_name": "ผู้ดูแลระบบ ภานุวัฒน์ คุณแรง",
+      "user_role": "DEVELOPER",
+      "action_type": "UPDATE",
+      "target_table": "User_Accounts",
+      "target_id": "USR-DEV-001",
+      "details": "แก้ไขข้อมูลในตาราง User_Accounts รหัส USR-DEV-001",
+      "ip_or_client": "Desktop Web Client",
+      "status": "SUCCESS"
+    },
     {
       "log_id": "LOG-1794234413026-13",
       "timestamp": "2026-11-09T14:26:53.026Z",
