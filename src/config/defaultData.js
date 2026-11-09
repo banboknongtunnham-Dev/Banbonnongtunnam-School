@@ -1,12 +1,12 @@
 /**
  * BANBOK DIGITAL SCHOOL PLATFORM - DEFAULT MASTER DATABASE
- * Updated automatically via Multi-Platform Sync at 2026-11-09T14:35:30.438Z
+ * Updated automatically via Multi-Platform Sync at 2026-11-09T14:37:56.000Z
  */
 
 window.BANBOK_DEFAULT_DB = {
   "_meta": {
-    "version": 1794234930438,
-    "updated_at": "2026-11-09T14:35:30.438Z"
+    "version": 1794235076000,
+    "updated_at": "2026-11-09T14:37:56.000Z"
   },
   "_tombstones": [
     "Personnel:PER-515461-60",
@@ -812,16 +812,18 @@ window.BANBOK_DEFAULT_DB = {
     {
       "gallery_id": "GAL-SLIDE-02",
       "activity_id": "ACT-2569-02",
-      "title": "ขอแสดงความยินดีและเชิดชูเกียรตินักเรียนที่มีผลงานดีเด่นด้านวิชาการและคุณธรรมจิตอาสา",
-      "category": "สไลด์โอกาสสำคัญนักเรียน",
-      "occasion_tag": "เชิดชูเกียรตินักเรียน",
+      "title": "ขอแสดงความยินดี โรงเรียนบ้านบกหนองทันน้ำ ได้รับคัดเลือกเป็นศูนย์การเรียนรู้ตามหลักปรัชญาของเศรษฐกิจพอเพียงด้านการศึกษา ปีการศึกษา 2566",
+      "category": "เกียรติยศ & รางวัลสถานศึกษา",
+      "occasion_tag": "เกียรติยศ & รางวัลสถานศึกษา",
       "is_slider": true,
       "facebook_url": "https://www.facebook.com/profile.php?id=100014526581847",
-      "image_url": "https://images.unsplash.com/photo-1523240795612-9a054b0db644?auto=format&fit=crop&w=1400&q=85",
+      "image_url": "https://ntfy.sh/file/3poP9JyPW7DH.jpg",
       "drive_file_id": "DRIVE-SLIDE-002",
-      "caption": "พื้นที่ประชาสัมพันธ์ภาพความสำเร็จ รางวัลการแข่งขัน และโอกาสสำคัญที่เกี่ยวกับนักเรียนโรงเรียนบ้านบกหนองทันน้ำ",
-      "uploaded_by": "กลุ่มบริหารงานวิชาการ",
-      "created_at": "2026-11-02"
+      "caption": "โรงเรียนบ้านบกหนองทันน้ำ ขอแสดงความภาคภูมิใจในโอกาสได้รับคัดเลือกให้เป็น “ศูนย์การเรียนรู้ตามหลักปรัชญาของเศรษฐกิจพอเพียงด้านการศึกษา” ปีการศึกษา 2566 จากกระทรวงศึกษาธิการ\n\nความสำเร็จในครั้งนี้สะท้อนถึงความมุ่งมั่นในการจัดการศึกษาโดยน้อมนำหลักปรัชญาของเศรษฐกิจพอเพียงมาประยุกต์ใช้ในการบริหารจัดการสถานศึกษาและการจัดการเรียนรู้ เพื่อส่งเสริมให้ผู้เรียนมีความรู้ ทักษะชีวิต มีคุณธรรม และสามารถดำเนินชีวิตได้อย่างสมดุลและยั่งยืน\n\nนับเป็นความภาคภูมิใจของผู้บริหาร คณะครู บุคลากรทางการศึกษา นักเรียน และชุมชน ที่ร่วมกันขับเคลื่อนการจัดการศึกษาตามหลักปรัชญาของเศรษฐกิจพอเพียงอย่างต่อเนื่อง",
+      "uploaded_by": "ผู้ดูแลระบบ ภานุวัฒน์ คุณแรง",
+      "created_at": "2026-11-02",
+      "show_overlay": true,
+      "updated_at": "2026-11-09T14:37:53.722Z"
     },
     {
       "gallery_id": "GAL-SLIDE-03",
@@ -2073,6 +2075,32 @@ window.BANBOK_DEFAULT_DB = {
     }
   ],
   "Audit_Logs": [
+    {
+      "log_id": "LOG-1794235073722-1",
+      "timestamp": "2026-11-09T14:37:53.722Z",
+      "user_id": "USR-DEV-001",
+      "user_name": "ผู้ดูแลระบบ ภานุวัฒน์ คุณแรง",
+      "user_role": "DEVELOPER",
+      "action_type": "UPDATE",
+      "target_table": "Gallery",
+      "target_id": "GAL-SLIDE-02",
+      "details": "แก้ไขข้อมูลในตาราง Gallery รหัส GAL-SLIDE-02",
+      "ip_or_client": "Desktop Web Client",
+      "status": "SUCCESS"
+    },
+    {
+      "log_id": "LOG-1794234999762-21",
+      "timestamp": "2026-11-09T14:36:39.762Z",
+      "user_id": "USR-DEV-001",
+      "user_name": "ผู้ดูแลระบบ ภานุวัฒน์ คุณแรง",
+      "user_role": "DEVELOPER",
+      "action_type": "DRIVE_WEB_UPLOAD",
+      "target_table": "Google_Drive_Sync",
+      "target_id": "DRV-83DD3BB34CA0",
+      "details": "อัปโหลดและซิงค์ภาพ 4.jpg เข้าสู่ไดร์ฟ (Banner_Images) และระบบคลาวด์สำเร็จ",
+      "ip_or_client": "Desktop Web Client",
+      "status": "SUCCESS"
+    },
     {
       "log_id": "LOG-1794234929149-56",
       "timestamp": "2026-11-09T14:35:29.149Z",
