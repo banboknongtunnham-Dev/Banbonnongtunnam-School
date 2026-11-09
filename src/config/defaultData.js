@@ -1,12 +1,12 @@
 /**
  * BANBOK DIGITAL SCHOOL PLATFORM - DEFAULT MASTER DATABASE
- * Updated automatically via Multi-Platform Sync at 2026-11-09T14:27:41.326Z
+ * Updated automatically via Multi-Platform Sync at 2026-11-09T14:27:52.488Z
  */
 
 window.BANBOK_DEFAULT_DB = {
   "_meta": {
-    "version": 1794234622082,
-    "updated_at": "2026-11-09T14:27:41.326Z"
+    "version": 1794234622083,
+    "updated_at": "2026-11-09T14:27:52.488Z"
   },
   "_tombstones": [
     "Personnel:PER-515461-60",
@@ -1595,9 +1595,9 @@ window.BANBOK_DEFAULT_DB = {
       "allowed_modules_json": "[\"*\"]",
       "avatar_url": "assets/img/icon_personnel.png",
       "is_active": true,
-      "last_login": "2026-11-09T14:30:22.082Z",
+      "last_login": "2026-11-09T14:27:51.252Z",
       "created_at": "2026-01-01T00:00:00Z",
-      "updated_at": "2026-11-09T14:30:22.082Z"
+      "updated_at": "2026-11-09T14:27:51.252Z"
     }
   ],
   "User_Roles": [
@@ -2037,6 +2037,32 @@ window.BANBOK_DEFAULT_DB = {
     }
   ],
   "Audit_Logs": [
+    {
+      "log_id": "LOG-1794234471260-71",
+      "timestamp": "2026-11-09T14:27:51.260Z",
+      "user_id": "USR-DEV-001",
+      "user_name": "ผู้ดูแลระบบ ภานุวัฒน์ คุณแรง",
+      "user_role": "DEVELOPER",
+      "action_type": "USER_LOGIN",
+      "target_table": "User_Accounts",
+      "target_id": "USR-DEV-001",
+      "details": "เข้าสู่ระบบสำเร็จ (ผู้ดูแลระบบ ภานุวัฒน์ คุณแรง - สิทธิ์ DEVELOPER) ผ่าน PASSWORD_AUTH",
+      "ip_or_client": "Desktop Web Client",
+      "status": "SUCCESS"
+    },
+    {
+      "log_id": "LOG-1794234471252-85",
+      "timestamp": "2026-11-09T14:27:51.252Z",
+      "user_id": "USR-DEV-001",
+      "user_name": "ผู้ดูแลระบบ ภานุวัฒน์ คุณแรง",
+      "user_role": "DEVELOPER",
+      "action_type": "UPDATE",
+      "target_table": "User_Accounts",
+      "target_id": "USR-DEV-001",
+      "details": "แก้ไขข้อมูลในตาราง User_Accounts รหัส USR-DEV-001",
+      "ip_or_client": "Desktop Web Client",
+      "status": "SUCCESS"
+    },
     {
       "log_id": "LOG-1794234622090-71",
       "timestamp": "2026-11-09T14:30:22.090Z",
