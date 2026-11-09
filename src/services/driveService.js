@@ -1,10 +1,14 @@
 /**
  * ============================================================================
- * BANBOK DIGITAL SCHOOL PLATFORM - GOOGLE DRIVE & FILE MANAGEMENT SERVICE
- * รองรับการอัปโหลดรูปภาพและเอกสารเข้าไดร์ฟ (Google Drive & Local Drive Sync)
- * พร้อมซิงค์ไฟล์ภาพขึ้นระบบเว็บอัตโนมัติเพื่อให้ทุกเครื่องที่เปิดดูเห็นภาพเดียวกัน 100%
+ * BANBOK DIGITAL SCHOOL PLATFORM - GOOGLE DRIVE & CLOUD FILE MANAGEMENT SERVICE
+ * รองรับการอัปโหลดรูปภาพและเอกสารจากทุกเครื่อง:
+ * 1) บันทึกลงไดร์ฟเครื่องทำเว็บ (Google_Drive_Sync) และโฟลเดอร์เว็บ (assets/img/uploads)
+ * 2) ซิงค์ผ่าน Cloud Relay เพื่อให้เครื่องอื่นทุกเครื่องเห็นรูปภาพทันทีภายใน 1–2 วินาที
+ * 3) รองรับการเชื่อมต่อ Google Drive Cloud (ผ่าน GAS API)
  * ============================================================================
  */
+
+const CLOUD_IMAGE_RELAY_URL = 'https://ntfy.sh/banbok_drive_img_1034710083_v6';
 
 class DriveService {
   /**
@@ -38,9 +42,6 @@ class DriveService {
     return trimmed;
   }
 
-  /**
-   * ตรวจสอบ URL ของเซิร์ฟเวอร์เครื่องที่ใช้ทำเว็บ (รองรับทั้งเปิดผ่าน localhost และเปิดผ่านลิงก์ GitHub Pages บนเครื่องทำเว็บ)
-   */
   getLocalBridgeEndpoints() {
     const endpoints = [];
     if (typeof window !== 'undefined' && window.location) {
@@ -55,14 +56,14 @@ class DriveService {
   }
 
   /**
-   * ส่งไฟล์ภาพไปบันทึกในไดร์ฟของเครื่องทำเว็บ (Google_Drive_Sync) และโฟลเดอร์ assets/img/uploads พร้อมซิงค์ขึ้นเว็บอัตโนมัติ
+   * ส่งไฟล์ภาพไปบันทึกในไดร์ฟของเครื่องทำเว็บ (Google_Drive_Sync) และโฟลเดอร์ assets/img/uploads
    */
   async uploadToLocalDriveBridge(fileName, mimeType, base64Data, folderCategory) {
     const endpoints = this.getLocalBridgeEndpoints();
     for (const endpoint of endpoints) {
       try {
         const controller = new AbortController();
-        const timer = setTimeout(() => controller.abort(), 4500);
+        const timer = setTimeout(() => controller.abort(), 3500);
         const res = await fetch(endpoint, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -89,10 +90,61 @@ class DriveService {
   }
 
   /**
-   * อัปโหลดไฟล์จากเครื่องผู้ใช้:
-   * 1. บันทึกลงไดร์ฟและโฟลเดอร์ระบบเว็บผ่าน Local Drive Sync Bridge (เพื่อให้เครื่องอื่นเปิดดูเห็นภาพเดียวกันทันที)
-   * 2. ซิงค์ขึ้น Google Drive Cloud (ผ่าน GAS API หากเชื่อมต่อไว้)
-   * 3. บีบอัดภาพอัจฉริยะกรณีออฟไลน์เพื่อไม่ให้เกินขนาดความจำเบราว์เซอร์
+   * แปลง Data URL เป็น Binary Blob สำหรับส่งขึ้น Cloud Relay ความเร็วสูง
+   */
+  dataURLToBlob(dataUrl) {
+    const parts = String(dataUrl).split(',');
+    const mimeMatch = parts[0].match(/:(.*?);/);
+    const mime = mimeMatch ? mimeMatch[1] : 'image/jpeg';
+    const bstr = atob(parts[1] || '');
+    let n = bstr.length;
+    const u8arr = new Uint8Array(n);
+    while (n--) {
+      u8arr[n] = bstr.charCodeAt(n);
+    }
+    return new Blob([u8arr], { type: mime });
+  }
+
+  /**
+   * อัปโหลดไฟล์ภาพขึ้น Cloud Image Relay เพื่อให้ทุกเครื่องเห็นภาพทันทีใน 1 วินาที
+   * (และเซิร์ฟเวอร์เครื่องทำเว็บจะดึงภาพนี้ไปเซฟลงโฟลเดอร์ Google_Drive_Sync และ assets/img/uploads อัตโนมัติ)
+   */
+  async uploadToCloudImageRelay(fileName, dataUrl) {
+    try {
+      const blob = this.dataURLToBlob(dataUrl);
+      let ext = 'jpg';
+      if (blob.type.includes('png')) ext = 'png';
+      else if (blob.type.includes('webp')) ext = 'webp';
+      else if (blob.type.includes('gif')) ext = 'gif';
+      else if (blob.type.includes('pdf')) ext = 'pdf';
+
+      const safeAsciiName = `banbok_${Date.now()}.${ext}`;
+      const controller = new AbortController();
+      const timer = setTimeout(() => controller.abort(), 8000);
+      const res = await fetch(CLOUD_IMAGE_RELAY_URL, {
+        method: 'PUT',
+        headers: {
+          'Filename': safeAsciiName
+        },
+        body: blob,
+        signal: controller.signal
+      });
+      clearTimeout(timer);
+      if (res.ok) {
+        const data = await res.json();
+        if (data && data.attachment && data.attachment.url) {
+          return {
+            fileId: `CLD-${data.id || Date.now()}`,
+            url: data.attachment.url
+          };
+        }
+      }
+    } catch (_) {}
+    return null;
+  }
+
+  /**
+   * อัปโหลดไฟล์จากเครื่องผู้ใช้ (รองรับทั้งอัปโหลดจากเครื่องทำเว็บ และอัปโหลดจากเครื่องอื่น/มือถือ)
    */
   async uploadFile(file, folderCategory = 'School_Images', isPublic = true) {
     if (!file) throw new Error('กรุณาเลือกไฟล์ที่ต้องการอัปโหลด');
@@ -100,19 +152,23 @@ class DriveService {
     const rawBase64 = await this.readFileAsDataURL(file);
     const isImage = Boolean(file.type && file.type.startsWith('image/'));
 
-    // ปรับขนาดภาพให้คมชัดและโหลดไว (สูงสุด 1400px) ก่อนส่งเข้าไดร์ฟและเว็บ
+    // ปรับขนาดภาพให้คมชัดและโหลดไว (สูงสุด 1400px)
     const optimizedBase64 = isImage
       ? await this.compressImage(rawBase64, 1400, 0.86, file.type)
       : rawBase64;
 
+    // 1. ส่งไปบันทึกในไดร์ฟและโฟลเดอร์ของเครื่องทำเว็บ (หากกำลังใช้งานบนเครื่องทำเว็บ)
+    const bridgePromise = this.uploadToLocalDriveBridge(file.name, file.type, optimizedBase64, folderCategory);
+
+    // 2. ส่งขึ้น Cloud Image Relay พร้อมกันเพื่อให้เครื่องอื่นๆ เปิดดูเห็นภาพได้ทันทีใน 1 วินาที (โดยไม่ต้องรอบิลด์ GitHub Pages)
+    const cloudRelayPromise = this.uploadToCloudImageRelay(file.name, optimizedBase64);
+
+    const [bridgeResult, cloudRelayResult] = await Promise.all([bridgePromise, cloudRelayPromise]);
+
+    // 3. หากตั้งค่า Google Apps Script API ไว้ ให้ส่งสำเนาเข้า Google Drive Cloud ด้วย
+    let cloudDriveResult = null;
     const gasUrl = window.dbAdapter ? window.dbAdapter.getSetting('gas_webapp_url', '').trim() : '';
     const driveEnabled = window.dbAdapter ? window.dbAdapter.getSetting('enable_google_drive', 'true') === 'true' : true;
-
-    // 1. ส่งไปบันทึกในไดร์ฟและระบบเว็บหลักของเครื่องทำเว็บก่อนเสมอ (แสดงผลได้ทุกเครื่อง 100%)
-    const bridgeResult = await this.uploadToLocalDriveBridge(file.name, file.type, optimizedBase64, folderCategory);
-
-    // 2. หากตั้งค่า Google Apps Script API ไว้ ให้ส่งสำเนาเข้า Google Drive Cloud ด้วย
-    let cloudDriveResult = null;
     if (gasUrl && driveEnabled) {
       try {
         const res = await fetch(gasUrl, {
@@ -143,51 +199,44 @@ class DriveService {
       }
     }
 
-    // หากบันทึกลงไดร์ฟเครื่องทำเว็บและระบบเว็บสำเร็จ ให้ใช้พาธไฟล์จริงที่ทุกเครื่องเปิดดูได้ทันที
-    if (bridgeResult && bridgeResult.url) {
+    // หากได้ URL จาก Cloud Relay ให้ใช้เป็น URL หลักเพื่อให้ทุกเครื่องเห็นภาพทันทีใน 1 วินาที
+    // (และ server.js บนเครื่องทำเว็บจะดูดไฟล์จาก URL นี้ไปบันทึกลง Google_Drive_Sync และ assets/img/uploads ให้อัตโนมัติ)
+    const primaryUrl =
+      (cloudRelayResult && cloudRelayResult.url) ||
+      (bridgeResult && bridgeResult.url) ||
+      (cloudDriveResult && (cloudDriveResult.thumbnailUrl || cloudDriveResult.viewUrl));
+
+    if (primaryUrl) {
+      const fileId =
+        (bridgeResult && bridgeResult.fileId) ||
+        (cloudRelayResult && cloudRelayResult.fileId) ||
+        (cloudDriveResult && cloudDriveResult.fileId) ||
+        `DRV-${Date.now().toString().slice(-6)}`;
+
       if (window.dbAdapter) {
         window.dbAdapter.logAudit(
           'DRIVE_WEB_UPLOAD',
           'Google_Drive_Sync',
-          bridgeResult.fileId,
-          `อัปโหลดและซิงค์ภาพ ${file.name} ลงไดร์ฟ (${bridgeResult.drivePath || folderCategory}) และระบบเว็บสำเร็จ`
+          fileId,
+          `อัปโหลดและซิงค์ภาพ ${file.name} เข้าสู่ไดร์ฟ (${folderCategory}) และระบบคลาวด์สำเร็จ`
         );
       }
       return {
-        fileId: (cloudDriveResult && cloudDriveResult.fileId) || bridgeResult.fileId,
+        fileId,
         fileName: file.name,
         fileSize: this.formatBytes(file.size),
         fileType: (file.name.split('.').pop() || 'FILE').toUpperCase(),
-        url: bridgeResult.url,
-        downloadUrl: (cloudDriveResult && cloudDriveResult.downloadUrl) || bridgeResult.downloadUrl || bridgeResult.url,
-        drivePath: bridgeResult.drivePath
+        url: primaryUrl,
+        localAssetUrl: bridgeResult ? bridgeResult.url : null,
+        downloadUrl: primaryUrl,
+        drivePath: bridgeResult ? bridgeResult.drivePath : `Google_Drive_Sync/${folderCategory}/${file.name}`
       };
     }
 
-    // หากอัปโหลดจากเครื่องอื่นที่ไม่ได้รัน Local Server แต่ Google Drive GAS ทำงานสำเร็จ
-    if (cloudDriveResult) {
-      if (window.dbAdapter) {
-        window.dbAdapter.logAudit(
-          'DRIVE_UPLOAD',
-          'Google_Drive',
-          cloudDriveResult.fileId,
-          `อัปโหลดไฟล์ ${file.name} ไปยัง Google Drive (${folderCategory})`
-        );
-      }
-      return {
-        fileId: cloudDriveResult.fileId,
-        fileName: file.name,
-        fileSize: this.formatBytes(file.size),
-        fileType: (file.name.split('.').pop() || 'FILE').toUpperCase(),
-        url: cloudDriveResult.thumbnailUrl || cloudDriveResult.viewUrl,
-        downloadUrl: cloudDriveResult.downloadUrl
-      };
-    }
-
-    // กรณีสำรอง (บีบอัดขนาดกะทัดรัดเพื่อไม่ให้เต็มพื้นที่ localStorage)
+    // กรณีออฟไลน์สมบูรณ์ (บีบอัดขนาดกะทัดรัดเพื่อไม่ให้เต็มพื้นที่ localStorage)
     let compactDataUrl = optimizedBase64;
     if (isImage) {
-      compactDataUrl = await this.compressImage(rawBase64, 900, 0.75, file.type);
+      compactDataUrl = await this.compressImage(rawBase64, 850, 0.74, file.type);
     }
 
     const mockDriveId = `DRV-${Date.now().toString().slice(-6)}`;
@@ -242,14 +291,12 @@ class DriveService {
           ctx.clearRect(0, 0, width, height);
           ctx.drawImage(img, 0, 0, width, height);
           const pngOut = canvas.toDataURL('image/png');
-          // หากไฟล์ PNG มีขนาดไม่ใหญ่เกินไป ให้คงพื้นหลังโปร่งใสไว้
           if (pngOut.length < 700000) {
             resolve(pngOut);
             return;
           }
         }
 
-        // สำหรับภาพถ่ายทั่วไป วาดพื้นหลังสีขาวก่อนแปลงเป็น JPEG เพื่อความคมชัดและขนาดไฟล์เล็ก
         ctx.fillStyle = '#FFFFFF';
         ctx.fillRect(0, 0, width, height);
         ctx.drawImage(img, 0, 0, width, height);
@@ -269,11 +316,10 @@ class DriveService {
   }
 
   /**
-   * ดาวน์โหลดเอกสารราชการของโรงเรียน (รองรับทั้งไฟล์จริงใน Google Drive และการสร้างเอกสารมาตรฐานพร้อมพิมพ์)
+   * ดาวน์โหลดเอกสารราชการของโรงเรียน
    */
   triggerDocumentDownload(docItem) {
     if (!docItem) return;
-    // อัปเดตจำนวนการดาวน์โหลดในฐานข้อมูลจริง
     const newCount = (Number(docItem.download_count) || 0) + 1;
     window.dbAdapter.update('Documents', docItem.doc_id, { download_count: newCount });
 
@@ -288,7 +334,6 @@ class DriveService {
       return;
     }
 
-    // สร้างหน้าต่างเอกสารราชการโรงเรียนบ้านบกหนองทันน้ำ สำหรับสั่งพิมพ์หรือบันทึกเป็น PDF ทันที
     const profile = (window.dbAdapter.getTable('School_Profile')[0]) || {};
     const printWin = window.open('', '_blank', 'width=900,height=750');
     if (!printWin) {

@@ -447,6 +447,115 @@ const server = http.createServer((req, res) => {
   });
 });
 
+const CLOUD_DB_SYNC_URL = 'https://ntfy.sh/banbok_db_sync_1034710083_v6';
+
+/**
+ * ดึงฐานข้อมูลที่แอดมินแก้ไขจากเครื่องอื่น (ผ่าน Cloud Realtime Sync Hub)
+ * มาบันทึกลงไดร์ฟ (Google_Drive_Sync), data_backup.json, defaultData.js และซิงค์ขึ้น GitHub Pages อัตโนมัติ
+ */
+async function pollCloudRelayAndSyncToDisk() {
+  try {
+    const res = await fetch(`${CLOUD_DB_SYNC_URL}/json?poll=1&t=${Date.now()}`);
+    if (!res.ok) return;
+    const text = await res.text();
+    if (!text || !text.trim()) return;
+
+    const lines = text.trim().split('\n');
+    let latestAttachmentUrl = null;
+    for (let i = lines.length - 1; i >= 0; i--) {
+      try {
+        const msg = JSON.parse(lines[i]);
+        if (msg && msg.attachment && msg.attachment.url) {
+          latestAttachmentUrl = msg.attachment.url;
+          break;
+        }
+      } catch (_) {}
+    }
+    if (!latestAttachmentUrl) return;
+
+    const fileRes = await fetch(latestAttachmentUrl);
+    if (!fileRes.ok) return;
+    const cloudDb = await fileRes.json();
+    if (!cloudDb || !Array.isArray(cloudDb.School_Profile)) return;
+
+    const cloudVer = (cloudDb._meta && Number(cloudDb._meta.version)) || 0;
+    const backupFile = path.join(ROOT, 'data_backup.json');
+    let localVer = 0;
+    if (fs.existsSync(backupFile)) {
+      try {
+        const localDb = JSON.parse(fs.readFileSync(backupFile, 'utf8'));
+        localVer = (localDb._meta && Number(localDb._meta.version)) || 0;
+      } catch (_) {}
+    }
+
+    if (cloudVer <= localVer) return;
+
+    // แปลงรูปภาพ Base64 และดาวน์โหลดรูปภาพที่อัปโหลดมาจากเครื่องอื่นลงโฟลเดอร์ Google_Drive_Sync และ assets/img/uploads
+    extractEmbeddedBase64FromDatabase(cloudDb);
+    await mirrorCloudRelayImagesToDrive(cloudDb);
+
+    const nowIso = (cloudDb._meta && cloudDb._meta.updated_at) || new Date().toISOString();
+    fs.writeFileSync(backupFile, JSON.stringify(cloudDb, null, 2), 'utf8');
+
+    try {
+      const driveDbDir = path.join(ROOT, 'Google_Drive_Sync', 'Database_Backups');
+      fs.mkdirSync(driveDbDir, { recursive: true });
+      fs.writeFileSync(path.join(driveDbDir, 'BANBOK_MASTER_DB_LATEST.json'), JSON.stringify(cloudDb, null, 2), 'utf8');
+    } catch (_) {}
+
+    const defaultDataFile = path.join(ROOT, 'src', 'config', 'defaultData.js');
+    const header = `/**\n * BANBOK DIGITAL SCHOOL PLATFORM - DEFAULT MASTER DATABASE\n * Updated automatically via Multi-Platform Sync at ${nowIso}\n */\n\n`;
+    fs.writeFileSync(defaultDataFile, `${header}window.BANBOK_DEFAULT_DB = ${JSON.stringify(cloudDb, null, 2)};\n`, 'utf8');
+
+    console.log(`[Cloud-to-Local Sync] Synced newer database version ${cloudVer} from remote device.`);
+    scheduleAutoGitSync(`chore(cms): auto-sync remote admin update v${cloudVer}`);
+  } catch (_) {}
+}
+
+/**
+ * หากมีการอัปโหลดภาพผ่าน Cloud Relay (https://ntfy.sh/file/...)
+ * ให้ดาวน์โหลดไฟล์ภาพมาเก็บสำรองไว้ในโฟลเดอร์ Google_Drive_Sync และ assets/img/uploads ของเครื่องทำเว็บอัตโนมัติ
+ */
+async function mirrorCloudRelayImagesToDrive(db) {
+  if (!db || typeof db !== 'object') return;
+  const categoryByTable = {
+    Gallery: 'Banner_Images',
+    Personnel: 'Personnel_Photos',
+    News: 'News_Attachments',
+    School_Profile: 'School_Profile',
+    Documents: 'Official_Documents',
+    Activities: 'Activity_Photos',
+    Academic_Data: 'Academic_Images'
+  };
+
+  for (const tableName of Object.keys(db)) {
+    if (tableName.startsWith('_')) continue;
+    const rows = db[tableName];
+    if (!Array.isArray(rows)) continue;
+    const folderCat = categoryByTable[tableName] || 'School_Images';
+
+    for (const row of rows) {
+      if (!row || typeof row !== 'object') continue;
+      for (const field of Object.keys(row)) {
+        const val = row[field];
+        if (typeof val === 'string' && val.startsWith('https://ntfy.sh/file/')) {
+          try {
+            const imgRes = await fetch(val);
+            if (imgRes.ok) {
+              const arrBuf = await imgRes.arrayBuffer();
+              const buf = Buffer.from(arrBuf);
+              const contentType = imgRes.headers.get('content-type') || 'image/jpeg';
+              const dataUrl = `data:${contentType};base64,${buf.toString('base64')}`;
+              saveBase64ToPhysicalDriveAndAssets(dataUrl, folderCat, `${tableName}_${field}`);
+            }
+          } catch (_) {}
+        }
+      }
+    }
+  }
+}
+
 server.listen(PORT, () => {
   console.log(`BANBOK DIGITAL SCHOOL PLATFORM running at http://localhost:${PORT}`);
+  setInterval(pollCloudRelayAndSyncToDisk, 6000);
 });
