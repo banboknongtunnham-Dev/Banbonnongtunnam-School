@@ -6,8 +6,10 @@
  * ============================================================================
  */
 
-const STORAGE_KEY = 'BANBOK_DIGITAL_PLATFORM_DB_V3';
+const STORAGE_KEY = 'BANBOK_DIGITAL_PLATFORM_DB_V4';
 const ERROR_LOG_KEY = 'BANBOK_SYSTEM_ERROR_LOGS_V1';
+const DB_BUILD_VERSION = '20261109_v4';
+const DB_VERSION_KEY = 'BANBOK_PLATFORM_BUILD_VERSION';
 
 const TABLE_PRIMARY_KEYS = {
   School_Profile: 'profile_id',
@@ -126,6 +128,19 @@ class DatabaseAdapter {
 
   init() {
     try {
+      const savedVersion = localStorage.getItem(DB_VERSION_KEY);
+      // ตรวจสอบเวอร์ชัน: หากเครื่องใดเปิดเว็บแล้วพบว่าแคชเดิมไม่ตรงกับเวอร์ชันปัจจุบัน (20261109_v4)
+      // ให้ล้างแคชเก่าทิ้งอัตโนมัติ แล้วโหลดฐานข้อมูลที่เป็นปัจจุบันที่สุด 100%
+      if (savedVersion !== DB_BUILD_VERSION) {
+        ['BANBOK_DIGITAL_PLATFORM_DB_V1', 'BANBOK_DIGITAL_PLATFORM_DB_V2', 'BANBOK_DIGITAL_PLATFORM_DB_V3', 'BANBOK_TOMBSTONES_V1', 'BANBOK_LOCAL_DB_V3'].forEach((k) => {
+          try { localStorage.removeItem(k); } catch (_) {}
+        });
+        localStorage.setItem(DB_VERSION_KEY, DB_BUILD_VERSION);
+        this.db = JSON.parse(JSON.stringify(window.BANBOK_DEFAULT_DB));
+        this.saveLocal();
+        return;
+      }
+
       const saved = localStorage.getItem(STORAGE_KEY);
       if (saved) {
         const parsed = JSON.parse(saved);
@@ -434,6 +449,28 @@ class DatabaseAdapter {
       }
     }
     return results;
+  }
+
+  /**
+   * บังคับรีเซ็ตแคชและดึงข้อมูลอัปเดตปัจจุบันจากฐานข้อมูลระบบ (Force Refresh to Current Data)
+   */
+  forceResetToCurrentData() {
+    try {
+      ['BANBOK_DIGITAL_PLATFORM_DB_V1', 'BANBOK_DIGITAL_PLATFORM_DB_V2', 'BANBOK_DIGITAL_PLATFORM_DB_V3', 'BANBOK_DIGITAL_PLATFORM_DB_V4', 'BANBOK_TOMBSTONES_V1', 'BANBOK_LOCAL_DB_V3'].forEach((k) => {
+        try { localStorage.removeItem(k); } catch (_) {}
+      });
+      localStorage.setItem(DB_VERSION_KEY, DB_BUILD_VERSION);
+      this.db = JSON.parse(JSON.stringify(window.BANBOK_DEFAULT_DB));
+      this.saveLocal();
+      if (window.app && typeof window.app.showToast === 'function') {
+        window.app.showToast('✅ อัปเดตข้อมูลเป็นปัจจุบันเรียบร้อยแล้ว', 'success');
+      }
+      if (window.app && typeof window.app.render === 'function') {
+        window.app.render();
+      }
+    } catch (e) {
+      console.error('forceResetToCurrentData error:', e);
+    }
   }
 
   subscribe(callback) {

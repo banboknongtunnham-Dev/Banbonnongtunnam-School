@@ -372,12 +372,22 @@ class NavbarComponent {
               © ${new Date().getFullYear()} <strong>${window.authService.sanitizeHTML(profile.school_name_th || 'โรงเรียนบ้านบกหนองทันน้ำ')}</strong> (${window.authService.sanitizeHTML(profile.school_name_en || 'BOKNONGTUNNAM')})
             </div>
 
-            <!-- กล่องสถิติผู้เข้าชมเว็บไซต์แบบเรียลไทม์ -->
-            <div class="inline-flex items-center gap-2.5 px-3.5 py-1.5 rounded-full bg-black/40 border border-white/15 text-xs text-slate-300">
-              <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-              <span>ผู้เข้าชมวันนี้: <strong class="text-yellow-400 font-mono">${(visitorStats.today || 0).toLocaleString()}</strong> คน</span>
-              <span class="text-white/20">•</span>
-              <span>ยอดเข้าชมสะสม: <strong class="text-white font-mono">${(visitorStats.total || 0).toLocaleString()}</strong> ครั้ง</span>
+            <!-- กล่องสถิติผู้เข้าชมเว็บไซต์แบบเรียลไทม์ & ปุ่มอัปเดตข้อมูลล่าสุด -->
+            <div class="flex flex-wrap items-center gap-2">
+              <div class="inline-flex items-center gap-2.5 px-3.5 py-1.5 rounded-full bg-black/40 border border-white/15 text-xs text-slate-300">
+                <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                <span>ผู้เข้าชมวันนี้: <strong class="text-yellow-400 font-mono">${(visitorStats.today || 0).toLocaleString()}</strong> คน</span>
+                <span class="text-white/20">•</span>
+                <span>ยอดเข้าชมสะสม: <strong class="text-white font-mono">${(visitorStats.total || 0).toLocaleString()}</strong> ครั้ง</span>
+              </div>
+              <button
+                onclick="window.dbAdapter.forceResetToCurrentData()"
+                title="คลิกเพื่ออัปเดตข้อมูลล่าสุดให้ตรงกับระบบหลักทันที"
+                class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-yellow-500/20 hover:bg-yellow-400 text-yellow-300 hover:text-slate-950 text-xs font-bold border border-yellow-400/40 transition cursor-pointer shadow-xs"
+              >
+                <i data-lucide="refresh-cw" class="w-3.5 h-3.5"></i>
+                <span>อัปเดตข้อมูลล่าสุด</span>
+              </button>
             </div>
 
             <div class="text-yellow-400/90 font-semibold flex items-center gap-2">
