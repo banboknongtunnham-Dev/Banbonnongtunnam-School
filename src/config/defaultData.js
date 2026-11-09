@@ -1,12 +1,12 @@
 /**
  * BANBOK DIGITAL SCHOOL PLATFORM - DEFAULT MASTER DATABASE
- * Updated automatically via Multi-Platform Sync at 2026-11-09T14:27:52.488Z
+ * Updated automatically via Multi-Platform Sync at 2026-11-09T14:28:16.250Z
  */
 
 window.BANBOK_DEFAULT_DB = {
   "_meta": {
-    "version": 1794234622083,
-    "updated_at": "2026-11-09T14:27:52.488Z"
+    "version": 1794234622085,
+    "updated_at": "2026-11-09T14:28:16.250Z"
   },
   "_tombstones": [
     "Personnel:PER-515461-60",
@@ -57,9 +57,9 @@ window.BANBOK_DEFAULT_DB = {
       "director_position": "ผู้อำนวยการโรงเรียนบ้านบกหนองทันน้ำ",
       "deputy_director_name": "นายเวชยัน สังฆวัตร",
       "deputy_director_position": "รองผู้อำนวยการโรงเรียนบ้านบกหนองทันน้ำ",
-      "director_photo_url": "",
+      "director_photo_url": "assets/img/director_thongpoon.png",
       "director_message": "ยินดีต้อนรับสู่เว็บไซต์โรงเรียนบ้านบกหนองทันน้ำ (BOKNONGTUNNAM) สังกัด สพป.อุบลราชธานี เขต 2 เรามุ่งมั่นพัฒนาผู้เรียนภายใต้คำขวัญ \"เรียนรู้สู่ความเป็นเลิศ เชิดชูคุณธรรม นำพาชุมชน\" เสริมสร้างอัตลักษณ์ \"มีวินัย ใส่ใจจิตอาสา\" ท่ามกลางโรงเรียนสะอาด บรรยากาศร่มรื่น",
-      "updated_at": "2026-11-03T12:55:00Z"
+      "updated_at": "2026-11-09T14:28:14.975Z"
     }
   ],
   "School_History": [
@@ -107,7 +107,7 @@ window.BANBOK_DEFAULT_DB = {
       "first_name": "ทองพูล",
       "last_name": "สิงห์บุตร",
       "position": "ผู้อำนวยการโรงเรียน",
-      "academic_standing": "ชำนาญการพิเศษ",
+      "academic_standing": "ผู้อำนวยการชำนาญการพิเศษ",
       "department": "คณะผู้บริหารสถานศึกษา",
       "subject_group": "ผู้บริหารสถานศึกษา",
       "education_degree": "",
@@ -117,7 +117,7 @@ window.BANBOK_DEFAULT_DB = {
       "role_group": "EXECUTIVE",
       "sort_order": 1,
       "status": "ปฏิบัติราชการ",
-      "updated_at": "2026-11-03T16:10:00Z"
+      "updated_at": "2026-11-09T14:28:14.965Z"
     },
     {
       "personnel_id": "PER-002",
@@ -2037,6 +2037,32 @@ window.BANBOK_DEFAULT_DB = {
     }
   ],
   "Audit_Logs": [
+    {
+      "log_id": "LOG-1794234494975-10",
+      "timestamp": "2026-11-09T14:28:14.975Z",
+      "user_id": "USR-DEV-001",
+      "user_name": "ผู้ดูแลระบบ ภานุวัฒน์ คุณแรง",
+      "user_role": "DEVELOPER",
+      "action_type": "UPDATE",
+      "target_table": "School_Profile",
+      "target_id": "SCH-BBK-001",
+      "details": "แก้ไขข้อมูลในตาราง School_Profile รหัส SCH-BBK-001",
+      "ip_or_client": "Desktop Web Client",
+      "status": "SUCCESS"
+    },
+    {
+      "log_id": "LOG-1794234494965-3",
+      "timestamp": "2026-11-09T14:28:14.965Z",
+      "user_id": "USR-DEV-001",
+      "user_name": "ผู้ดูแลระบบ ภานุวัฒน์ คุณแรง",
+      "user_role": "DEVELOPER",
+      "action_type": "UPDATE",
+      "target_table": "Personnel",
+      "target_id": "PER-001",
+      "details": "แก้ไขข้อมูลในตาราง Personnel รหัส PER-001",
+      "ip_or_client": "Desktop Web Client",
+      "status": "SUCCESS"
+    },
     {
       "log_id": "LOG-1794234471260-71",
       "timestamp": "2026-11-09T14:27:51.260Z",
