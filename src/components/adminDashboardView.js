@@ -757,7 +757,7 @@ class AdminDashboardView {
                     <span class="text-[10px] font-bold px-2 py-0.5 rounded bg-amber-100 text-amber-900">${window.authService.sanitizeHTML(g.category)}</span>
                     <h4 class="text-xs font-bold text-slate-900 mt-1 line-clamp-1">${window.authService.sanitizeHTML(g.title)}</h4>
                     <div class="mt-2 pt-2 border-t border-slate-200/60 flex justify-end gap-1.5">
-                      <button onclick="window.app.openGenericModal('Gallery', '${g.gallery_id}')" class="px-2.5 py-1 rounded bg-white border border-slate-200 text-xs font-semibold cursor-pointer">แก้ไข</button>
+                      <button onclick="window.app.openSlideUploadModal('${g.gallery_id}')" class="px-2.5 py-1 rounded bg-white border border-slate-200 hover:border-amber-400 text-xs font-semibold cursor-pointer">แก้ไข / เปลี่ยนภาพ</button>
                       <button onclick="window.app.deleteRowConfirm('Gallery', '${g.gallery_id}')" class="px-2.5 py-1 rounded bg-rose-50 text-rose-700 text-xs font-semibold cursor-pointer">ลบ</button>
                     </div>
                   </div>

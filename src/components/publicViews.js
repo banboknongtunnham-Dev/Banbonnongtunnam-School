@@ -1129,8 +1129,8 @@ class PublicViews {
     const profile = (window.dbAdapter.getTable('School_Profile')[0]) || {};
     const stats = this.getLiveOverviewStats();
     const logoUrl = window.driveService.resolveDriveImageUrl(window.dbAdapter.getSetting('logo_url', 'assets/img/logo.png'));
-    const heroBadge = window.dbAdapter.getSetting('hero_badge_text', profile.affiliation || 'สำนักงานเขตพื้นที่การศึกษาประถมศึกษาอุบลราชธานี เขต 2');
-    const heroTitle = window.dbAdapter.getSetting('hero_welcome_title', profile.school_name_th || 'โรงเรียนบ้านบกหนองทันน้ำ');
+    const heroBadge = profile.affiliation || window.dbAdapter.getSetting('hero_badge_text', 'สำนักงานเขตพื้นที่การศึกษาประถมศึกษาอุบลราชธานี เขต 2');
+    const heroTitle = profile.school_name_th || window.dbAdapter.getSetting('hero_welcome_title', 'โรงเรียนบ้านบกหนองทันน้ำ');
 
     const allNews = window.dbAdapter.getTable('News').filter((n) => n.publish_status !== 'DRAFT');
     allNews.sort((a, b) => (b.is_pinned ? 1 : 0) - (a.is_pinned ? 1 : 0));

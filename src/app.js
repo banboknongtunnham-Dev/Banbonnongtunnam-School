@@ -1275,12 +1275,13 @@ class BanbokAppController {
 
     if (existingId) {
       await window.dbAdapter.update('News', existingId, payload);
-      this.showToast('อัปเดตข่าวประชาสัมพันธ์เรียบร้อยแล้ว');
+      this.showToast('✅ อัปเดตข่าวประชาสัมพันธ์เรียบร้อยแล้ว');
     } else {
       payload.views_count = 1;
       await window.dbAdapter.insert('News', payload);
-      this.showToast('เพิ่มข่าวประชาสัมพันธ์ใหม่เรียบร้อยแล้ว');
+      this.showToast('✅ เพิ่มข่าวประชาสัมพันธ์ใหม่เรียบร้อยแล้ว');
     }
+    await window.dbAdapter.syncToCentralServer();
     this.closeModal();
     this.render();
   }
@@ -1289,6 +1290,7 @@ class BanbokAppController {
     const item = window.dbAdapter.getTable('News').find((n) => n.news_id === newsId);
     if (!item) return;
     await window.dbAdapter.update('News', newsId, { is_pinned: !item.is_pinned });
+    await window.dbAdapter.syncToCentralServer();
     this.showToast(item.is_pinned ? 'ยกเลิกการปักหมุดข่าวแล้ว' : 'ปักหมุดข่าวขึ้นหน้าแรกแล้ว');
     this.render();
   }
@@ -1429,11 +1431,12 @@ class BanbokAppController {
 
     if (existingId) {
       await window.dbAdapter.update('System_Modules', existingId, payload);
-      this.showToast(`อัปเดต ${payload.module_code} เรียบร้อยแล้ว`);
+      this.showToast(`✅ อัปเดต ${payload.module_code} เรียบร้อยแล้ว`);
     } else {
       await window.dbAdapter.insert('System_Modules', payload);
-      this.showToast(`เพิ่มโปรแกรมย่อย ${payload.module_code} สำเร็จ`);
+      this.showToast(`✅ เพิ่มโปรแกรมย่อย ${payload.module_code} สำเร็จ`);
     }
+    await window.dbAdapter.syncToCentralServer();
     this.closeModal();
     this.render();
   }
@@ -1442,6 +1445,7 @@ class BanbokAppController {
     const mod = window.dbAdapter.getTable('System_Modules').find((m) => m.module_id === moduleId);
     if (!mod) return;
     await window.dbAdapter.update('System_Modules', moduleId, { is_enabled: !mod.is_enabled });
+    await window.dbAdapter.syncToCentralServer();
     this.showToast(`${mod.module_code}: ${!mod.is_enabled ? 'เปิดใช้งานแล้ว' : 'ปิดใช้งานชั่วคราว'}`);
     this.render();
   }
@@ -1648,6 +1652,21 @@ class BanbokAppController {
       await window.dbAdapter.insert('Personnel', payload);
       this.showToast(`✅ เพิ่มและบันทึกข้อมูล ${payload.prefix}${payload.first_name} ${payload.last_name} เรียบร้อยแล้ว`);
     }
+
+    // หากเป็นการแก้ไขข้อมูลผู้อำนวยการโรงเรียน ให้ซิงค์ชื่อและรูปภาพไปยัง School_Profile อัตโนมัติ
+    if (existingId === 'PER-001' || String(payload.position).includes('ผู้อำนวยการโรงเรียน')) {
+      const profile = (window.dbAdapter.getTable('School_Profile') || [])[0];
+      if (profile && profile.profile_id) {
+        const profileUpdates = {
+          director_name: `${payload.prefix}${payload.first_name} ${payload.last_name}`.trim()
+        };
+        if (payload.photo_url) {
+          profileUpdates.director_photo_url = payload.photo_url;
+        }
+        await window.dbAdapter.update('School_Profile', profile.profile_id, profileUpdates);
+      }
+    }
+
     await window.dbAdapter.syncToCentralServer();
     this.closeModal();
     this.render();
@@ -1751,13 +1770,55 @@ class BanbokAppController {
 
     if (existingId) {
       await window.dbAdapter.update('Students_Statistics', existingId, payload);
-      this.showToast(`อัปเดตจำนวนนักเรียนชั้น ${payload.grade_level} (รวม ${payload.total_count} คน) เรียบร้อยแล้ว`);
+      this.showToast(`✅ อัปเดตจำนวนนักเรียนชั้น ${payload.grade_level} (รวม ${payload.total_count} คน) เรียบร้อยแล้ว`);
     } else {
       await window.dbAdapter.insert('Students_Statistics', payload);
-      this.showToast('เพิ่มข้อมูลสถิตินักเรียนเรียบร้อยแล้ว');
+      this.showToast('✅ เพิ่มข้อมูลสถิตินักเรียนเรียบร้อยแล้ว');
     }
+
+    // คำนวณยอดนักเรียนรวมของปีการศึกษานี้ใหม่ แล้วซิงค์เข้าตาราง School_Statistics (STUDENT_TREND) ทันทีเพื่อให้หน้าแรกอัปเดตตรงกัน
+    await this.recalculateAndSyncStudentTrend(payload.academic_year || '2569');
+    await window.dbAdapter.syncToCentralServer();
     this.closeModal();
     this.render();
+  }
+
+  async recalculateAndSyncStudentTrend(academicYear = '2569') {
+    try {
+      const targetYear = String(academicYear || '2569').trim();
+      const allGradeRows = window.dbAdapter
+        .getTable('Students_Statistics')
+        .filter((r) => String(r.academic_year || '2569').trim() === targetYear);
+      if (allGradeRows.length === 0) return;
+
+      const sumTotal = allGradeRows.reduce(
+        (sum, r) => sum + (Number(r.total_count) || (Number(r.male_count || 0) + Number(r.female_count || 0))),
+        0
+      );
+      if (sumTotal <= 0) return;
+
+      const stats = window.dbAdapter.getTable('School_Statistics');
+      const existingTrend = stats.find(
+        (k) => k.metric_group === 'STUDENT_TREND' && String(k.academic_year).trim() === targetYear
+      );
+      if (existingTrend) {
+        await window.dbAdapter.update('School_Statistics', existingTrend.kpi_id, {
+          metric_value: sumTotal,
+          notes: `ปีการศึกษา ${targetYear} จำนวน ${sumTotal} คน`
+        });
+      } else {
+        await window.dbAdapter.insert('School_Statistics', {
+          kpi_id: `KPI-TREND-${targetYear}`,
+          academic_year: targetYear,
+          metric_group: 'STUDENT_TREND',
+          metric_name: `จำนวนนักเรียนรวมปีการศึกษา ${targetYear}`,
+          metric_value: sumTotal,
+          target_value: sumTotal,
+          metric_unit: 'คน',
+          notes: `ปีการศึกษา ${targetYear} จำนวน ${sumTotal} คน`
+        });
+      }
+    } catch (_) {}
   }
 
   /**
@@ -2168,8 +2229,9 @@ class BanbokAppController {
       }
     }
 
+    await window.dbAdapter.syncToCentralServer();
     this.closeModal();
-    this.showToast(`อัปเดตข้อมูล ${cfg.short} เรียบร้อยแล้ว`);
+    this.showToast(`✅ อัปเดตข้อมูล ${cfg.short} เรียบร้อยแล้ว`);
     this.render();
   }
 
@@ -2250,8 +2312,9 @@ class BanbokAppController {
     await upsertYear('2568', val2568, 'KPI-TREND-2568');
     await upsertYear('2569', val2569, 'KPI-TREND-2569');
 
+    await window.dbAdapter.syncToCentralServer();
     this.closeModal();
-    this.showToast('อัปเดตกราฟจำนวนนักเรียน 3 ปีย้อนหลัง (2567–2569) เรียบร้อยแล้ว');
+    this.showToast('✅ อัปเดตกราฟจำนวนนักเรียน 3 ปีย้อนหลัง (2567–2569) เรียบร้อยแล้ว');
     this.render();
   }
 
@@ -2298,8 +2361,9 @@ class BanbokAppController {
       uploaded_by: user ? user.full_name : 'Admin',
       created_at: new Date().toISOString().slice(0, 10)
     });
+    await window.dbAdapter.syncToCentralServer();
     this.closeModal();
-    this.showToast('อัปโหลดภาพกิจกรรมเข้าสู่ระบบเรียบร้อยแล้ว');
+    this.showToast('✅ อัปโหลดภาพกิจกรรมเข้าสู่ระบบเรียบร้อยแล้ว');
     this.render();
   }
 
@@ -2365,8 +2429,9 @@ class BanbokAppController {
       uploaded_by: user ? user.full_name : 'Admin',
       published_date: new Date().toISOString().slice(0, 10)
     });
+    await window.dbAdapter.syncToCentralServer();
     this.closeModal();
-    this.showToast('อัปโหลดเอกสารเผยแพร่สำเร็จ');
+    this.showToast('✅ อัปโหลดเอกสารเผยแพร่สำเร็จ');
     this.render();
   }
 
@@ -2448,11 +2513,12 @@ class BanbokAppController {
 
     if (existingId) {
       await window.dbAdapter.update('User_Accounts', existingId, payload);
-      this.showToast('อัปเดตบัญชีผู้ใช้งานสำเร็จ');
+      this.showToast('✅ อัปเดตบัญชีผู้ใช้งานสำเร็จ');
     } else {
       await window.dbAdapter.insert('User_Accounts', payload);
-      this.showToast('สร้างบัญชีผู้ใช้ใหม่พร้อมเข้ารหัส SHA-256 สำเร็จ');
+      this.showToast('✅ สร้างบัญชีผู้ใช้ใหม่พร้อมเข้ารหัส SHA-256 สำเร็จ');
     }
+    await window.dbAdapter.syncToCentralServer();
     this.closeModal();
     this.render();
   }
@@ -2505,11 +2571,15 @@ class BanbokAppController {
 
     if (existingPk) {
       await window.dbAdapter.update(tableName, existingPk, obj);
-      this.showToast(`แก้ไขข้อมูลตาราง ${tableName} เรียบร้อยแล้ว`);
+      this.showToast(`✅ แก้ไขข้อมูลตาราง ${tableName} เรียบร้อยแล้ว`);
     } else {
       await window.dbAdapter.insert(tableName, obj);
-      this.showToast(`เพิ่มข้อมูลในตาราง ${tableName} เรียบร้อยแล้ว`);
+      this.showToast(`✅ เพิ่มข้อมูลในตาราง ${tableName} เรียบร้อยแล้ว`);
     }
+    if (tableName === 'Students_Statistics') {
+      await this.recalculateAndSyncStudentTrend(obj.academic_year || '2569');
+    }
+    await window.dbAdapter.syncToCentralServer();
     this.closeModal();
     this.render();
   }
@@ -2517,6 +2587,9 @@ class BanbokAppController {
   async deleteRowConfirm(tableName, pkValue) {
     if (!confirm(`ยืนยันการลบข้อมูลรหัส ${pkValue} ออกจากตาราง ${tableName} หรือไม่?`)) return;
     await window.dbAdapter.remove(tableName, pkValue);
+    if (tableName === 'Students_Statistics') {
+      await this.recalculateAndSyncStudentTrend('2569');
+    }
     await window.dbAdapter.syncToCentralServer();
     this.showToast(`✅ ลบข้อมูล ${pkValue} ออกจาก ${tableName} เรียบร้อยแล้ว`);
     this.render();
@@ -2534,7 +2607,17 @@ class BanbokAppController {
     });
     const currentProfile = window.dbAdapter.getTable('School_Profile')[0];
     await window.dbAdapter.update('School_Profile', currentProfile.profile_id, updates);
-    this.showToast('บันทึกข้อมูลพื้นฐานโรงเรียนบ้านบกหนองทันน้ำเรียบร้อยแล้ว');
+
+    // ซิงค์ชื่อโรงเรียนและสังกัดไปยัง System_Settings เพื่อให้แบนเนอร์หน้าแรก (Hero Section) อัปเดตตรงกันทันที
+    if (updates.school_name_th) {
+      await window.dbAdapter.setSetting('hero_welcome_title', updates.school_name_th);
+    }
+    if (updates.affiliation) {
+      await window.dbAdapter.setSetting('hero_badge_text', updates.affiliation);
+    }
+
+    await window.dbAdapter.syncToCentralServer();
+    this.showToast('✅ บันทึกข้อมูลพื้นฐานโรงเรียนบ้านบกหนองทันน้ำเรียบร้อยแล้ว');
     this.render();
   }
 
@@ -2555,8 +2638,19 @@ class BanbokAppController {
       }
     }
 
+    // ซิงค์ชื่อหัวข้อหน้าแรกกลับไปยัง School_Profile ด้วยเพื่อให้ตรงกันทุกจุด
+    if (f.hero_welcome_title && f.hero_welcome_title.value.trim()) {
+      const currentProfile = (window.dbAdapter.getTable('School_Profile') || [])[0];
+      if (currentProfile && currentProfile.profile_id) {
+        await window.dbAdapter.update('School_Profile', currentProfile.profile_id, {
+          school_name_th: f.hero_welcome_title.value.trim()
+        });
+      }
+    }
+
+    await window.dbAdapter.syncToCentralServer();
     this.applyDynamicTheme();
-    this.showToast('บันทึกการตั้งค่าเว็บไซต์และอัปเดตธีมเรียบร้อยแล้ว');
+    this.showToast('✅ บันทึกการตั้งค่าเว็บไซต์และอัปเดตธีมเรียบร้อยแล้ว');
     this.render();
   }
 
@@ -2580,7 +2674,8 @@ class BanbokAppController {
     if (f.line_target_id) {
       await window.dbAdapter.setSetting('line_target_id', f.line_target_id.value.trim());
     }
-    this.showToast('บันทึกการตั้งค่า Google Workspace & LINE API เรียบร้อยแล้ว');
+    await window.dbAdapter.syncToCentralServer();
+    this.showToast('✅ บันทึกการตั้งค่า Google Workspace & LINE API เรียบร้อยแล้ว');
     this.render();
   }
 
@@ -2825,17 +2920,13 @@ class BanbokAppController {
 
   async syncCurrentDatabaseToMaster() {
     try {
-      this.showToast('กำลังส่งข้อมูลจากเครื่องนี้เข้าสู่ระบบหลัก...', 'info');
-      const res = await fetch('/api/sync-database', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ database: window.dbAdapter.db })
-      });
-      const data = await res.json();
-      if (data.success) {
-        this.showToast('✅ ซิงค์ข้อมูลเข้าสู่ระบบหลักสำเร็จแล้ว!');
+      this.showToast('กำลังส่งข้อมูลจากเครื่องนี้เข้าสู่ระบบหลักและอัปเดตทุกเครื่อง...', 'info');
+      const ok = await window.dbAdapter.syncToCentralServer();
+      if (ok) {
+        this.showToast('✅ ซิงค์ข้อมูลเข้าสู่ระบบหลักและอัปเดตขึ้นเว็บสำหรับทุกเครื่องสำเร็จแล้ว!');
+        this.render();
       } else {
-        throw new Error(data.error || 'ซิงค์ไม่สำเร็จ');
+        throw new Error('ไม่สามารถติดต่อเซิร์ฟเวอร์เครื่องทำเว็บได้');
       }
     } catch (err) {
       console.warn('Sync to local server failed, offering JSON download fallback:', err);

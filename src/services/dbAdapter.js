@@ -1,14 +1,14 @@
 /**
  * ============================================================================
  * BANBOK DIGITAL SCHOOL PLATFORM - DATABASE ABSTRACTION LAYER (dbAdapter.js)
- * แยกชั้นฐานข้อมูลออกจาก Frontend รองรับการเชื่อมต่อ Google Sheets API (ผ่าน GAS)
- * และระบบ Persistent Storage พร้อมบันทึก Audit Logs ทุกการเปลี่ยนแปลง
+ * แยกชั้นฐานข้อมูลออกจาก Frontend รองรับการซิงค์ข้อมูลข้ามอุปกรณ์แบบ Real-Time
+ * (Central Server + GitHub Pages Live JSON + Google Drive/Sheets + Local Cache)
  * ============================================================================
  */
 
 const STORAGE_KEY = 'BANBOK_DIGITAL_PLATFORM_DB_V4';
 const ERROR_LOG_KEY = 'BANBOK_SYSTEM_ERROR_LOGS_V1';
-const DB_BUILD_VERSION = '20261109_v4';
+const DB_BUILD_VERSION = '20261109_v5';
 const DB_VERSION_KEY = 'BANBOK_PLATFORM_BUILD_VERSION';
 
 const TABLE_PRIMARY_KEYS = {
@@ -51,7 +51,9 @@ class DatabaseAdapter {
   getTombstones() {
     try {
       if (typeof localStorage === 'undefined') return [];
-      return JSON.parse(localStorage.getItem('BANBOK_TOMBSTONES_V1') || '[]');
+      const localList = JSON.parse(localStorage.getItem('BANBOK_TOMBSTONES_V1') || '[]');
+      const dbList = (this.db && Array.isArray(this.db._tombstones)) ? this.db._tombstones : [];
+      return [...new Set([...localList, ...dbList])];
     } catch (_) {
       return [];
     }
@@ -59,11 +61,15 @@ class DatabaseAdapter {
 
   markDeleted(tableName, pkValue) {
     try {
-      if (typeof localStorage === 'undefined') return;
       const list = this.getTombstones();
       const key = `${tableName}:${String(pkValue).trim()}`;
       if (!list.includes(key)) {
         list.push(key);
+      }
+      if (this.db) {
+        this.db._tombstones = list;
+      }
+      if (typeof localStorage !== 'undefined') {
         localStorage.setItem('BANBOK_TOMBSTONES_V1', JSON.stringify(list));
       }
     } catch (_) {}
@@ -71,11 +77,15 @@ class DatabaseAdapter {
 
   unmarkDeleted(tableName, pkValue) {
     try {
-      if (typeof localStorage === 'undefined') return;
       let list = this.getTombstones();
       const key = `${tableName}:${String(pkValue).trim()}`;
       list = list.filter((k) => k !== key);
-      localStorage.setItem('BANBOK_TOMBSTONES_V1', JSON.stringify(list));
+      if (this.db) {
+        this.db._tombstones = list;
+      }
+      if (typeof localStorage !== 'undefined') {
+        localStorage.setItem('BANBOK_TOMBSTONES_V1', JSON.stringify(list));
+      }
     } catch (_) {}
   }
 
@@ -88,6 +98,28 @@ class DatabaseAdapter {
     }
   }
 
+  /**
+   * อัปเดตหมายเลขเวอร์ชันเวลา (_meta.version) ทุกครั้งที่แอดมิน/ผู้ดูแลระบบแก้ไขข้อมูล
+   * เพื่อใช้เปรียบเทียบและป้องกันข้อมูลเก่าทับข้อมูลใหม่เด็ดขาด
+   */
+  touchMeta() {
+    if (!this.db || typeof this.db !== 'object') return;
+    const nowMs = Date.now();
+    const prevVer = (this.db._meta && Number(this.db._meta.version)) || 0;
+    this.db._meta = {
+      version: Math.max(nowMs, prevVer + 1),
+      updated_at: new Date(nowMs).toISOString()
+    };
+  }
+
+  getDbVersion(dbObj) {
+    if (!dbObj || typeof dbObj !== 'object') return 0;
+    if (dbObj._meta && Number(dbObj._meta.version) > 0) {
+      return Number(dbObj._meta.version);
+    }
+    return 0;
+  }
+
   initStorageListener() {
     if (typeof window !== 'undefined') {
       // 1. Cross-Tab Real-time Broadcast Synchronization
@@ -96,9 +128,16 @@ class DatabaseAdapter {
           this.broadcastChannel = new BroadcastChannel('banbok_platform_sync');
           this.broadcastChannel.onmessage = (event) => {
             if (event.data && event.data.type === 'DB_UPDATED' && event.data.database) {
-              this.db = event.data.database;
-              try { localStorage.setItem(STORAGE_KEY, JSON.stringify(this.db)); } catch (e) {}
-              this.notifyListeners();
+              const incomingVer = this.getDbVersion(event.data.database);
+              const currentVer = this.getDbVersion(this.db);
+              if (incomingVer >= currentVer) {
+                this.db = event.data.database;
+                try { localStorage.setItem(STORAGE_KEY, JSON.stringify(this.db)); } catch (e) {}
+                this.notifyListeners();
+                if (window.app && typeof window.app.render === 'function' && !this.isModalOpen()) {
+                  window.app.render();
+                }
+              }
             }
           };
         } catch (e) { /* ignore */ }
@@ -109,8 +148,14 @@ class DatabaseAdapter {
         window.addEventListener('storage', (event) => {
           if (event.key === STORAGE_KEY && event.newValue) {
             try {
-              this.db = JSON.parse(event.newValue);
-              this.notifyListeners();
+              const incomingDb = JSON.parse(event.newValue);
+              if (this.getDbVersion(incomingDb) >= this.getDbVersion(this.db)) {
+                this.db = incomingDb;
+                this.notifyListeners();
+                if (window.app && typeof window.app.render === 'function' && !this.isModalOpen()) {
+                  window.app.render();
+                }
+              }
             } catch (e) { /* ignore */ }
           }
         });
@@ -118,74 +163,61 @@ class DatabaseAdapter {
     }
   }
 
+  isModalOpen() {
+    if (typeof document === 'undefined') return false;
+    const modalRoot = document.getElementById('modal-root');
+    return Boolean(modalRoot && modalRoot.innerHTML && modalRoot.innerHTML.trim() !== '');
+  }
+
   startAutoRevalidation() {
     if (typeof window === 'undefined') return;
-    // ตรวจสอบและดึงข้อมูลอัปเดตจาก Cloud / Google Workspace / Central Server ทุก 20 วินาทีแบบ Real-Time Polling
+    // ตรวจสอบและดึงข้อมูลอัปเดตจาก Central Server / GitHub Pages ทุก 12 วินาทีแบบ Real-Time Polling
     setInterval(() => {
       this.backgroundRevalidateFromGoogleWorkspace();
-    }, 20000);
+    }, 12000);
   }
 
   init() {
     try {
       const savedVersion = localStorage.getItem(DB_VERSION_KEY);
-      // ตรวจสอบเวอร์ชัน: หากเครื่องใดเปิดเว็บแล้วพบว่าแคชเดิมไม่ตรงกับเวอร์ชันปัจจุบัน (20261109_v4)
-      // ให้ล้างแคชเก่าทิ้งอัตโนมัติ แล้วโหลดฐานข้อมูลที่เป็นปัจจุบันที่สุด 100%
       if (savedVersion !== DB_BUILD_VERSION) {
-        ['BANBOK_DIGITAL_PLATFORM_DB_V1', 'BANBOK_DIGITAL_PLATFORM_DB_V2', 'BANBOK_DIGITAL_PLATFORM_DB_V3', 'BANBOK_TOMBSTONES_V1', 'BANBOK_LOCAL_DB_V3'].forEach((k) => {
+        ['BANBOK_DIGITAL_PLATFORM_DB_V1', 'BANBOK_DIGITAL_PLATFORM_DB_V2', 'BANBOK_DIGITAL_PLATFORM_DB_V3', 'BANBOK_LOCAL_DB_V3'].forEach((k) => {
           try { localStorage.removeItem(k); } catch (_) {}
         });
         localStorage.setItem(DB_VERSION_KEY, DB_BUILD_VERSION);
-        this.db = JSON.parse(JSON.stringify(window.BANBOK_DEFAULT_DB));
-        this.saveLocal();
-        return;
       }
 
+      const defaultDb = JSON.parse(JSON.stringify(window.BANBOK_DEFAULT_DB || {}));
       const saved = localStorage.getItem(STORAGE_KEY);
+
       if (saved) {
         const parsed = JSON.parse(saved);
-        // ตรวจสอบให้ครบทั้ง 17 ตาราง หากตารางไหนขาดให้เติมจากค่าเริ่มต้น พร้อมกรองรายการที่ถูกลบออก
-        this.db = {};
+        const savedVer = this.getDbVersion(parsed);
+        const defaultVer = this.getDbVersion(defaultDb);
+
+        // หากไฟล์ defaultData.js บนเซิร์ฟเวอร์มีเวอร์ชันใหม่กว่าในแคชของเครื่องนี้ ให้ใช้ข้อมูลใหม่จากเซิร์ฟเวอร์เป็นหลักทันที
+        const baseSource = defaultVer > savedVer ? defaultDb : parsed;
+
+        if (Array.isArray(baseSource._tombstones)) {
+          try {
+            const mergedTombstones = [...new Set([...this.getTombstones(), ...baseSource._tombstones])];
+            localStorage.setItem('BANBOK_TOMBSTONES_V1', JSON.stringify(mergedTombstones));
+          } catch (_) {}
+        }
+
+        this.db = {
+          _meta: baseSource._meta || defaultDb._meta || { version: Date.now(), updated_at: new Date().toISOString() },
+          _tombstones: this.getTombstones()
+        };
+
         Object.keys(TABLE_PRIMARY_KEYS).forEach((table) => {
           const pk = TABLE_PRIMARY_KEYS[table];
-          const rawList = Array.isArray(parsed[table])
-            ? parsed[table]
-            : JSON.parse(JSON.stringify(window.BANBOK_DEFAULT_DB[table] || []));
+          const rawList = Array.isArray(baseSource[table])
+            ? baseSource[table]
+            : JSON.parse(JSON.stringify(defaultDb[table] || []));
           this.db[table] = rawList.filter((r) => !this.isDeleted(table, r[pk]));
         });
-        // อัปเดต URL ของ Google Apps Script อัตโนมัติหากในแคชเดิมยังว่างอยู่
-        const currentGasUrl = this.getSetting('gas_webapp_url', '');
-        const defaultGasSetting = (window.BANBOK_DEFAULT_DB.System_Settings || []).find((s) => s.setting_key === 'gas_webapp_url');
-        if (!currentGasUrl && defaultGasSetting && defaultGasSetting.setting_value) {
-          const idx = this.db.System_Settings.findIndex((s) => s.setting_key === 'gas_webapp_url');
-          if (idx > -1) {
-            this.db.System_Settings[idx].setting_value = defaultGasSetting.setting_value;
-          } else {
-            this.db.System_Settings.push(defaultGasSetting);
-          }
-          this.saveLocal();
-        }
-        // อัปเดต LINE Messaging API Token อัตโนมัติหากในแคชเดิมยังว่างอยู่
-        const currentLineToken = this.getSetting('line_channel_access_token', '');
-        const defaultLineTokenSetting = (window.BANBOK_DEFAULT_DB.System_Settings || []).find((s) => s.setting_key === 'line_channel_access_token');
-        if (!currentLineToken && defaultLineTokenSetting && defaultLineTokenSetting.setting_value) {
-          const idx = this.db.System_Settings.findIndex((s) => s.setting_key === 'line_channel_access_token');
-          if (idx > -1) {
-            this.db.System_Settings[idx].setting_value = defaultLineTokenSetting.setting_value;
-          } else {
-            this.db.System_Settings.push(defaultLineTokenSetting);
-          }
-          this.saveLocal();
-        }
-        // ตรวจสอบและเพิ่มโพสต์ฝัง Facebook ล่าสุด (NEWS-FB-EMBED-001) เข้าสู่แคชเดิมอัตโนมัติ
-        const defaultFbEmbedNews = (window.BANBOK_DEFAULT_DB.News || []).find((n) => n.news_id === 'NEWS-FB-EMBED-001');
-        if (defaultFbEmbedNews && Array.isArray(this.db.News)) {
-          const existsFb = this.db.News.some((n) => n.news_id === 'NEWS-FB-EMBED-001');
-          if (!existsFb) {
-            this.db.News.unshift(JSON.parse(JSON.stringify(defaultFbEmbedNews)));
-            this.saveLocal();
-          }
-        }
+
         // ล้างบัญชีผู้ใช้ชื่อแปลกๆ/ตัวอย่างเดิมออก และซิงค์บัญชีจริงของ 'Panuwat' (ภานุวัฒน์ คุณแรง - รหัส 001)
         if (Array.isArray(this.db.User_Accounts)) {
           const dummyUsernames = ['teacher', 'admin', 'developer', 'usr-tch-001', 'usr-adm-001', 'usr-dev-001'];
@@ -196,86 +228,34 @@ class DatabaseAdapter {
             String(u.full_name || '').includes('System Architect')
           );
           if (hasDummy || this.db.User_Accounts.length === 0 || !this.db.User_Accounts.some((u) => String(u.username || '').toLowerCase().includes('panuwat'))) {
-            this.db.User_Accounts = JSON.parse(JSON.stringify(window.BANBOK_DEFAULT_DB.User_Accounts || []));
-            this.saveLocal();
-          }
-        }
-        // อัปเดตภาพถ่ายบุคลากรทั้งหมดอัตโนมัติหากในแคชเดิมยังว่างอยู่
-        if (Array.isArray(this.db.Personnel)) {
-          let updatedAny = false;
-          this.db.Personnel.forEach((p) => {
-            const def = (window.BANBOK_DEFAULT_DB.Personnel || []).find((dp) => dp.personnel_id === p.personnel_id);
-            if (def && def.photo_url && (!p.photo_url || p.photo_url === '' || p.photo_url === 'assets/img/logo.png')) {
-              p.photo_url = def.photo_url;
-              updatedAny = true;
-            }
-            if (p.personnel_id === 'PER-001' && (!p.photo_url || p.photo_url === '' || p.photo_url === 'assets/img/logo.png')) {
-              p.photo_url = 'assets/img/director_thongpoon.png';
-              updatedAny = true;
-            }
-            if (def && def.academic_standing && def.academic_standing !== '-' && (!p.academic_standing || p.academic_standing === '-')) {
-              p.academic_standing = def.academic_standing;
-              updatedAny = true;
-            }
-          });
-          if (updatedAny) {
-            this.saveLocal();
+            this.db.User_Accounts = JSON.parse(JSON.stringify(defaultDb.User_Accounts || []));
           }
         }
 
-        // ตรวจสอบและอัปเดตสถิติ School_Statistics (กราฟ 3 ปีย้อนหลัง และผลสอบระดับชาติ O-NET, RT, NT)
-        if (Array.isArray(this.db.School_Statistics)) {
-          let updatedStats = false;
-          // อัปเดตสถิตินักเรียน 3 ปีย้อนหลังให้ตรงความจริง: 295 (ปี 67), 281 (ปี 68), 285 (ปี 69)
-          const s67 = this.db.School_Statistics.find((s) => s.metric_group === 'STUDENT_TREND' && String(s.academic_year) === '2567');
-          if (s67 && (s67.metric_value === '-' || !s67.metric_value || s67.metric_value === 0)) {
-            s67.metric_value = 295;
-            updatedStats = true;
-          }
-          const s68 = this.db.School_Statistics.find((s) => s.metric_group === 'STUDENT_TREND' && String(s.academic_year) === '2568');
-          if (s68 && (s68.metric_value === '-' || !s68.metric_value || s68.metric_value === 0)) {
-            s68.metric_value = 281;
-            updatedStats = true;
-          }
-          const s69 = this.db.School_Statistics.find((s) => s.metric_group === 'STUDENT_TREND' && String(s.academic_year) === '2569');
-          if (s69 && (s69.metric_value === '-' || !s69.metric_value || s69.metric_value === 0)) {
-            s69.metric_value = 285;
-            updatedStats = true;
-          }
-
-          // เติมผลสอบระดับชาติ O-NET, RT, NT หากในเครื่องยังไม่มี
-          (window.BANBOK_DEFAULT_DB.School_Statistics || []).forEach((defS) => {
-            if (String(defS.metric_group || '').startsWith('EXAM_')) {
-              const exists = this.db.School_Statistics.some((s) => s.kpi_id === defS.kpi_id);
-              if (!exists) {
-                this.db.School_Statistics.push(JSON.parse(JSON.stringify(defS)));
-                updatedStats = true;
-              }
-            }
-          });
-
-          if (updatedStats) {
-            this.saveLocal();
-          }
-        }
+        this.saveLocal(false);
       } else {
-        this.db = JSON.parse(JSON.stringify(window.BANBOK_DEFAULT_DB));
-        this.saveLocal();
+        this.db = defaultDb;
+        if (!this.db._meta) {
+          this.db._meta = { version: Date.now(), updated_at: new Date().toISOString() };
+        }
+        this.db._tombstones = this.getTombstones();
+        this.saveLocal(false);
       }
-      // Stale-While-Revalidate: ซิงค์ข้อมูลเบื้องหลังจาก Google Workspace โดยไม่บล็อกหน้าเว็บ
-      setTimeout(() => this.backgroundRevalidateFromGoogleWorkspace(), 150);
+
+      // ดึงข้อมูลสดจากเซิร์ฟเวอร์กลางและไฟล์ data_backup.json ทันทีที่เปิดหน้าเว็บ
+      setTimeout(() => this.backgroundRevalidateFromGoogleWorkspace(), 80);
     } catch (err) {
       this.recordError('DB_INIT_ERROR', err.message);
-      this.db = JSON.parse(JSON.stringify(window.BANBOK_DEFAULT_DB));
+      this.db = JSON.parse(JSON.stringify(window.BANBOK_DEFAULT_DB || {}));
     }
   }
 
   /**
-   * ดึงข้อมูลสดจาก Google Workspace และ Central Server เบื้องหลังอัตโนมัติ (Stale-While-Revalidate)
+   * ดึงข้อมูลสดจาก Central Server / GitHub Pages data_backup.json / Google Workspace เบื้องหลังอัตโนมัติ
    */
   async backgroundRevalidateFromGoogleWorkspace() {
     try {
-      // 1. ซิงค์กับ Central Server ก่อนเสมอเพื่ออัปเดตข้อมูลล่าสุดข้ามอุปกรณ์
+      // 1. ซิงค์กับ Central Server และไฟล์ฐานข้อมูลกลาง (data_backup.json) ก่อนเสมอเพื่ออัปเดตข้อมูลล่าสุดข้ามอุปกรณ์
       await this.syncWithCentralServer();
 
       const gasUrl = this.getSetting('gas_webapp_url', '').trim();
@@ -283,27 +263,23 @@ class DatabaseAdapter {
       const sheetsEnabled = this.getSetting('enable_google_sheets', 'true') === 'true';
       if (!sheetsEnabled) return;
 
-      let gasSuccess = false;
-      if (gasUrl) {
-        try {
-          await this.pullFromGoogleSheets(true);
-          gasSuccess = true;
-        } catch (e) {
-          gasSuccess = false;
+      // หากมีการระบุ Spreadsheet ID จริงไว้ จึงค่อยดึงจาก Google Sheets
+      if (sheetId && sheetId.length > 15 && window.googleWorkspaceClient) {
+        if (gasUrl) {
+          try {
+            await this.pullFromGoogleSheets(true);
+            return;
+          } catch (_) {}
         }
-      }
-
-      // หาก GAS ติดขัด หรือไม่ได้ตั้งค่า แต่มี Spreadsheet ID ให้ดึงผ่าน Google Sheets Edge GViz CDN อัตโนมัติ
-      if (!gasSuccess && sheetId && window.googleWorkspaceClient) {
         await this.pullFromGoogleSheetsEdgeGviz(sheetId, true);
       }
     } catch (e) {
-      // ทำงานต่อด้วย Local Cache อย่างราบรื่นหากออฟไลน์
+      // ทำงานต่อด้วยฐานข้อมูลปัจจุบันอย่างราบรื่น
     }
   }
 
   async pullFromGoogleSheetsEdgeGviz(spreadsheetId, silent = false) {
-    if (!window.googleWorkspaceClient) return;
+    if (!window.googleWorkspaceClient || !spreadsheetId) return 0;
     const start = performance.now();
     const publicTables = [
       'School_Profile', 'School_History', 'Personnel', 'Students_Statistics',
@@ -332,17 +308,31 @@ class DatabaseAdapter {
         latencyMs: Math.round(performance.now() - start),
         errorCount: this.getErrorLogs().length
       };
-      this.saveLocal();
+      this.saveLocal(false);
       if (!silent && window.app) window.app.render();
     }
     return updatedCount;
   }
 
-  saveLocal() {
+  /**
+   * บันทึกข้อมูลลง LocalStorage อย่างปลอดภัย (ป้องกัน QuotaExceededError 100%)
+   */
+  saveLocal(triggerServerSync = true) {
     try {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(this.db));
     } catch (err) {
-      this.recordError('DB_LOCAL_STORAGE_QUOTA_ERROR', err.message);
+      // กรณีหน่วยความจำ localStorage เต็ม ให้ล้างแคชรุ่นเก่าและตัด Audit_Logs ให้กระชับแล้วบันทึกใหม่ทันที
+      try {
+        ['BANBOK_DIGITAL_PLATFORM_DB_V1', 'BANBOK_DIGITAL_PLATFORM_DB_V2', 'BANBOK_DIGITAL_PLATFORM_DB_V3', 'BANBOK_LOCAL_DB_V3', ERROR_LOG_KEY].forEach((k) => {
+          try { localStorage.removeItem(k); } catch (_) {}
+        });
+        if (this.db && Array.isArray(this.db.Audit_Logs) && this.db.Audit_Logs.length > 25) {
+          this.db.Audit_Logs = this.db.Audit_Logs.slice(0, 25);
+        }
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(this.db));
+      } catch (retryErr) {
+        this.recordError('DB_LOCAL_STORAGE_QUOTA_ERROR', retryErr.message);
+      }
     }
 
     try {
@@ -355,73 +345,175 @@ class DatabaseAdapter {
       this.notifyListeners();
     } catch (e) {}
 
-    try {
-      this.autoSyncToLocalServer();
-    } catch (e) {}
+    if (triggerServerSync) {
+      try {
+        this.autoSyncToLocalServer();
+      } catch (e) {}
+    }
   }
 
   autoSyncToLocalServer() {
     if (this._syncTimeout) clearTimeout(this._syncTimeout);
     this._syncTimeout = setTimeout(async () => {
       await this.syncToCentralServer();
-    }, 400);
+    }, 250);
   }
 
-  async syncToCentralServer() {
-    if (typeof window !== 'undefined' && typeof fetch === 'function') {
-      try {
-        const res = await fetch('/api/database', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ database: this.db })
-        });
-        return res.ok;
-      } catch (_) {
-        return false;
+  getSyncServerEndpoints() {
+    const endpoints = [];
+    if (typeof window !== 'undefined' && window.location) {
+      const host = window.location.hostname;
+      if (host === 'localhost' || host === '127.0.0.1') {
+        endpoints.push('/api/database');
       }
     }
-    return true;
+    endpoints.push('http://localhost:8080/api/database');
+    endpoints.push('http://127.0.0.1:8080/api/database');
+    return [...new Set(endpoints)];
   }
 
   /**
-   * ดึงฐานข้อมูลหลักจากเซิร์ฟเวอร์กลาง (Central / Local Server Sync)
+   * ส่งฐานข้อมูลที่แอดมินแก้ไขไปบันทึกที่เซิร์ฟเวอร์เครื่องทำเว็บ (พร้อมแปลงภาพเข้าไดร์ฟและ git push อัตโนมัติ)
    */
-  async syncWithCentralServer() {
-    try {
-      if (typeof window !== 'undefined' && typeof fetch === 'function') {
-        const res = await fetch('/api/database', { cache: 'no-cache' });
+  async syncToCentralServer() {
+    if (typeof window === 'undefined' || typeof fetch !== 'function') return false;
+    const endpoints = this.getSyncServerEndpoints();
+    const payloadStr = JSON.stringify({
+      database: this.db,
+      tombstones: this.getTombstones()
+    });
+
+    for (const endpoint of endpoints) {
+      try {
+        const controller = new AbortController();
+        const timer = setTimeout(() => controller.abort(), 4000);
+        const res = await fetch(endpoint, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: payloadStr,
+          signal: controller.signal
+        });
+        clearTimeout(timer);
         if (res.ok) {
-          const remoteDb = await res.json();
-          if (remoteDb && remoteDb.School_Profile && Array.isArray(remoteDb.School_Profile)) {
-            Object.keys(TABLE_PRIMARY_KEYS).forEach((tbl) => {
-              if (Array.isArray(remoteDb[tbl])) {
-                const pk = this.getPrimaryKeyName(tbl);
-                remoteDb[tbl] = remoteDb[tbl].filter((r) => !this.isDeleted(tbl, r[pk]));
-              }
-            });
-            const remoteStr = JSON.stringify(remoteDb);
-            const currentStr = JSON.stringify(this.db);
-            if (remoteStr !== currentStr) {
-              this.db = remoteDb;
-              localStorage.setItem(STORAGE_KEY, remoteStr);
-              if (this.broadcastChannel) {
-                try {
-                  this.broadcastChannel.postMessage({ type: 'DB_UPDATED', database: this.db, timestamp: Date.now() });
-                } catch (_) {}
-              }
-              this.notifyListeners();
-            }
-            return true;
+          const data = await res.json();
+          // หากเซิร์ฟเวอร์แปลง Base64 เป็นพาธไฟล์ภาพในไดร์ฟ/assets ให้แล้ว ให้อัปเดตพาธกลับมาที่เครื่องทันที
+          if (data && data.database && data.extractedImagesCount > 0) {
+            this.db = data.database;
+            try { localStorage.setItem(STORAGE_KEY, JSON.stringify(this.db)); } catch (_) {}
+          } else if (data && data._meta) {
+            this.db._meta = data._meta;
+            try { localStorage.setItem(STORAGE_KEY, JSON.stringify(this.db)); } catch (_) {}
           }
+          this.lastSyncStatus = {
+            mode: 'CENTRAL_SERVER_AUTO_GIT_SYNC',
+            connectedToCloud: true,
+            lastSyncedAt: new Date().toISOString(),
+            latencyMs: 10,
+            errorCount: this.getErrorLogs().length
+          };
+          return true;
         }
+      } catch (_) {
+        // ลอง endpoint ถัดไป
       }
-    } catch (e) {}
+    }
     return false;
   }
 
   /**
+   * ดึงฐานข้อมูลหลักล่าสุดจากทั้งเซิร์ฟเวอร์เครื่องทำเว็บ และไฟล์ data_backup.json บน GitHub Pages
+   * เพื่อให้เครื่องอื่นทุกเครื่องที่เปิดเว็บเห็นข้อมูลและรูปภาพตรงกับคนที่อัปเดต 100%
+   */
+  async syncWithCentralServer(forceAcceptRemote = false) {
+    if (typeof window === 'undefined' || typeof fetch !== 'function') return false;
+
+    const candidateUrls = [];
+    if (window.location && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')) {
+      candidateUrls.push(`/api/database?t=${Date.now()}`);
+    }
+    candidateUrls.push(`./data_backup.json?t=${Date.now()}`);
+    candidateUrls.push(`http://localhost:8080/api/database?t=${Date.now()}`);
+
+    let bestRemoteDb = null;
+    let bestRemoteVer = -1;
+
+    for (const url of candidateUrls) {
+      try {
+        const controller = new AbortController();
+        const timer = setTimeout(() => controller.abort(), 2500);
+        const res = await fetch(url, {
+          cache: 'no-store',
+          signal: controller.signal
+        });
+        clearTimeout(timer);
+        if (res.ok) {
+          const text = await res.text();
+          if (text && text.trim().startsWith('{')) {
+            const parsed = JSON.parse(text);
+            const dbCandidate = parsed.database || parsed;
+            if (dbCandidate && Array.isArray(dbCandidate.School_Profile)) {
+              const ver = this.getDbVersion(dbCandidate);
+              if (ver > bestRemoteVer) {
+                bestRemoteVer = ver;
+                bestRemoteDb = dbCandidate;
+              }
+            }
+          }
+        }
+      } catch (_) {
+        // ข้ามแหล่งที่ติดต่อไม่ได้
+      }
+    }
+
+    if (!bestRemoteDb) return false;
+
+    const localVer = this.getDbVersion(this.db);
+
+    // กรณีเครื่องนี้ (แอดมิน) เพิ่งแก้ไขข้อมูลใหม่กว่าบนเซิร์ฟเวอร์ ให้ส่งข้อมูลใหม่จากเครื่องนี้ขึ้นเซิร์ฟเวอร์แทนการเขียนทับ!
+    if (!forceAcceptRemote && localVer > bestRemoteVer && bestRemoteVer > 0) {
+      await this.syncToCentralServer();
+      return true;
+    }
+
+    // กรณีเซิร์ฟเวอร์มีข้อมูลใหม่กว่า (เช่น เครื่องอื่นเปิดดูเว็บหลังจากแอดมินอัปเดต) หรือสั่งดึงข้อมูลล่าสุด
+    if (forceAcceptRemote || bestRemoteVer > localVer) {
+      if (Array.isArray(bestRemoteDb._tombstones)) {
+        try {
+          const mergedTombstones = [...new Set([...this.getTombstones(), ...bestRemoteDb._tombstones])];
+          localStorage.setItem('BANBOK_TOMBSTONES_V1', JSON.stringify(mergedTombstones));
+        } catch (_) {}
+      }
+
+      Object.keys(TABLE_PRIMARY_KEYS).forEach((tbl) => {
+        if (Array.isArray(bestRemoteDb[tbl])) {
+          const pk = this.getPrimaryKeyName(tbl);
+          bestRemoteDb[tbl] = bestRemoteDb[tbl].filter((r) => !this.isDeleted(tbl, r[pk]));
+        }
+      });
+
+      const remoteStr = JSON.stringify(bestRemoteDb);
+      const currentStr = JSON.stringify(this.db);
+      if (remoteStr !== currentStr) {
+        this.db = bestRemoteDb;
+        try { localStorage.setItem(STORAGE_KEY, remoteStr); } catch (_) {}
+        if (this.broadcastChannel) {
+          try {
+            this.broadcastChannel.postMessage({ type: 'DB_UPDATED', database: this.db, timestamp: Date.now() });
+          } catch (_) {}
+        }
+        this.notifyListeners();
+        if (window.app && typeof window.app.render === 'function' && !this.isModalOpen()) {
+          window.app.render();
+        }
+      }
+      return true;
+    }
+
+    return true;
+  }
+
+  /**
    * ซิงค์เชื่อมโยงทุกแพลตฟอร์มแบบครบวงจร (Universal Multi-Platform Sync)
-   * โยงทั้ง Central Server, Google Sheets Edge GViz / GAS, และ Local Cache
    */
   async syncAllPlatforms(silent = false) {
     const results = {
@@ -430,13 +522,12 @@ class DatabaseAdapter {
       timestamp: new Date().toISOString()
     };
 
-    // 1. ซิงค์กับ Central Server
     try {
+      await this.syncToCentralServer();
       const serverUpdated = await this.syncWithCentralServer();
       results.serverConnected = serverUpdated;
     } catch (_) {}
 
-    // 2. ซิงค์กับ Google Workspace / Sheets
     try {
       await this.backgroundRevalidateFromGoogleWorkspace();
       results.googleSheetsConnected = Boolean(this.lastSyncStatus && this.lastSyncStatus.connectedToCloud);
@@ -445,23 +536,36 @@ class DatabaseAdapter {
     if (!silent && window.app) {
       window.app.render();
       if (typeof window.app.showToast === 'function') {
-        window.app.showToast('✅ ซิงค์เชื่อมโยงทุกแพลตฟอร์มเป็นปัจจุบันแล้ว', 'success');
+        window.app.showToast('✅ ซิงค์เชื่อมโยงข้อมูลทุกเครื่องเป็นปัจจุบันแล้ว', 'success');
       }
     }
     return results;
   }
 
   /**
-   * บังคับรีเซ็ตแคชและดึงข้อมูลอัปเดตปัจจุบันจากฐานข้อมูลระบบ (Force Refresh to Current Data)
+   * ปุ่ม "อัปเดตข้อมูลล่าสุด" บนแถบเมนูด้านบน:
+   * ดึงฐานข้อมูลล่าสุดจากเซิร์ฟเวอร์กลาง / GitHub Pages (data_backup.json) โดยไม่ลบข้อมูลใหม่ของแอดมิน
    */
-  forceResetToCurrentData() {
+  async forceResetToCurrentData() {
     try {
-      ['BANBOK_DIGITAL_PLATFORM_DB_V1', 'BANBOK_DIGITAL_PLATFORM_DB_V2', 'BANBOK_DIGITAL_PLATFORM_DB_V3', 'BANBOK_DIGITAL_PLATFORM_DB_V4', 'BANBOK_TOMBSTONES_V1', 'BANBOK_LOCAL_DB_V3'].forEach((k) => {
+      ['BANBOK_DIGITAL_PLATFORM_DB_V1', 'BANBOK_DIGITAL_PLATFORM_DB_V2', 'BANBOK_DIGITAL_PLATFORM_DB_V3', 'BANBOK_LOCAL_DB_V3'].forEach((k) => {
         try { localStorage.removeItem(k); } catch (_) {}
       });
       localStorage.setItem(DB_VERSION_KEY, DB_BUILD_VERSION);
-      this.db = JSON.parse(JSON.stringify(window.BANBOK_DEFAULT_DB));
-      this.saveLocal();
+
+      // หากแอดมินเพิ่งแก้ไขบนเครื่องทำเว็บ ให้ส่งข้อมูลขึ้นเซิร์ฟเวอร์ก่อน
+      await this.syncToCentralServer();
+
+      // ดึงข้อมูลสดล่าสุดจากเซิร์ฟเวอร์ / data_backup.json
+      const pulled = await this.syncWithCentralServer(true);
+      if (!pulled) {
+        const defaultVer = this.getDbVersion(window.BANBOK_DEFAULT_DB);
+        if (defaultVer > this.getDbVersion(this.db)) {
+          this.db = JSON.parse(JSON.stringify(window.BANBOK_DEFAULT_DB));
+          this.saveLocal(false);
+        }
+      }
+
       if (window.app && typeof window.app.showToast === 'function') {
         window.app.showToast('✅ อัปเดตข้อมูลเป็นปัจจุบันเรียบร้อยแล้ว', 'success');
       }
@@ -484,11 +588,11 @@ class DatabaseAdapter {
   }
 
   /**
-   * บันทึกและนับจำนวนผู้เข้าชมเว็บไซต์ (Visitor Analytics & Daily Tracking)
+   * บันทึกและนับจำนวนผู้เข้าชมเว็บไซต์ (ทำงานแบบ Silent เพื่อไม่ให้เปลี่ยน _meta.version ทับข้อมูลแอดมิน)
    */
   recordVisitor() {
     try {
-      const todayStr = new Date().toLocaleDateString('en-CA'); // YYYY-MM-DD
+      const todayStr = new Date().toLocaleDateString('en-CA');
       let totalVisitors = parseInt(this.getSetting('total_visitors', '1280'), 10);
       let todayVisitors = parseInt(this.getSetting('today_visitors', '0'), 10);
       const lastRecordedDate = this.getSetting('today_visitor_date', '');
@@ -499,13 +603,11 @@ class DatabaseAdapter {
         history = {};
       }
 
-      // เมื่อขึ้นวันใหม่ รีเซ็ตยอดวันนี้
       if (lastRecordedDate !== todayStr) {
         todayVisitors = 0;
-        this.setSetting('today_visitor_date', todayStr);
+        this.setSettingSilent('today_visitor_date', todayStr);
       }
 
-      // ตรวจสอบ session (นับ 1 ครั้งต่อ 1 เซสชันบราวเซอร์ เพื่อความแม่นยำ)
       const sessionKey = 'bbk_visited_session';
       if (!sessionStorage.getItem(sessionKey)) {
         totalVisitors++;
@@ -513,9 +615,10 @@ class DatabaseAdapter {
         history[todayStr] = (history[todayStr] || 0) + 1;
         sessionStorage.setItem(sessionKey, todayStr);
 
-        this.setSetting('total_visitors', String(totalVisitors));
-        this.setSetting('today_visitors', String(todayVisitors));
-        this.setSetting('visitor_history_json', JSON.stringify(history));
+        this.setSettingSilent('total_visitors', String(totalVisitors));
+        this.setSettingSilent('today_visitors', String(todayVisitors));
+        this.setSettingSilent('visitor_history_json', JSON.stringify(history));
+        try { localStorage.setItem(STORAGE_KEY, JSON.stringify(this.db)); } catch (_) {}
       }
 
       return {
@@ -525,6 +628,27 @@ class DatabaseAdapter {
       };
     } catch (e) {
       return { total: 1280, today: 1, todayDate: '' };
+    }
+  }
+
+  setSettingSilent(key, value) {
+    if (!this.db || !Array.isArray(this.db.System_Settings)) return;
+    const now = new Date().toISOString();
+    const list = this.db.System_Settings;
+    const idx = list.findIndex((s) => s.setting_key === key);
+    if (idx > -1) {
+      list[idx].setting_value = String(value);
+      list[idx].updated_at = now;
+    } else {
+      list.push({
+        setting_key: key,
+        setting_group: 'ANALYTICS',
+        setting_value: String(value),
+        data_type: 'string',
+        description: key,
+        updated_by: 'SYSTEM',
+        updated_at: now
+      });
     }
   }
 
@@ -545,11 +669,12 @@ class DatabaseAdapter {
   }
 
   getTable(tableName) {
-    if (!this.db[tableName]) return [];
+    if (!this.db || !this.db[tableName]) return [];
     return JSON.parse(JSON.stringify(this.db[tableName]));
   }
 
   getSetting(key, fallback = '') {
+    if (!this.db) return fallback;
     const settings = this.db.System_Settings || [];
     const item = settings.find((s) => s.setting_key === key);
     return item ? item.setting_value : fallback;
@@ -557,6 +682,7 @@ class DatabaseAdapter {
 
   getSettingsMap() {
     const map = {};
+    if (!this.db) return map;
     (this.db.System_Settings || []).forEach((s) => {
       map[s.setting_key] = s.setting_value;
     });
@@ -584,6 +710,7 @@ class DatabaseAdapter {
         updated_at: now
       });
     }
+    this.touchMeta();
     this.saveLocal();
     await this.pushChangeToCloud('updateRow', 'System_Settings', 'setting_key', key, list[idx] || { setting_key: key, setting_value: String(value) }, actor);
     return true;
@@ -605,8 +732,12 @@ class DatabaseAdapter {
     newRow.updated_at = now;
 
     this.unmarkDeleted(tableName, newRow[pk]);
+    if (!Array.isArray(this.db[tableName])) {
+      this.db[tableName] = [];
+    }
     this.db[tableName].unshift(newRow);
     this.logAudit('INSERT', tableName, newRow[pk], `เพิ่มข้อมูลใหม่ในตาราง ${tableName} (${newRow.title || newRow.first_name || newRow.module_name || newRow[pk]})`, 'SUCCESS', actor);
+    this.touchMeta();
     this.saveLocal();
 
     await this.pushChangeToCloud('insertRow', tableName, pk, newRow[pk], newRow, actor);
@@ -633,6 +764,7 @@ class DatabaseAdapter {
     list[idx] = updatedRow;
 
     this.logAudit('UPDATE', tableName, pkValue, `แก้ไขข้อมูลในตาราง ${tableName} รหัส ${pkValue}`, 'SUCCESS', actor);
+    this.touchMeta();
     this.saveLocal();
 
     await this.pushChangeToCloud('updateRow', tableName, pk, pkValue, updatedRow, actor);
@@ -653,6 +785,7 @@ class DatabaseAdapter {
 
     const label = target ? (target.title || target.first_name || target.module_name || cleanPk) : cleanPk;
     this.logAudit('DELETE', tableName, cleanPk, `ลบข้อมูลจากตาราง ${tableName}: ${label}`, 'SUCCESS', actor);
+    this.touchMeta();
     this.saveLocal();
     await this.syncToCentralServer();
 
@@ -677,14 +810,14 @@ class DatabaseAdapter {
       target_table: targetTable,
       target_id: targetId,
       details: details,
-      ip_or_client: navigator.userAgent.includes('Mobile') ? 'Mobile Web Client' : 'Desktop Web Client',
+      ip_or_client: (typeof navigator !== 'undefined' && navigator.userAgent && navigator.userAgent.includes('Mobile')) ? 'Mobile Web Client' : 'Desktop Web Client',
       status: status
     };
 
     if (!this.db.Audit_Logs) this.db.Audit_Logs = [];
     this.db.Audit_Logs.unshift(entry);
-    if (this.db.Audit_Logs.length > 300) {
-      this.db.Audit_Logs = this.db.Audit_Logs.slice(0, 300);
+    if (this.db.Audit_Logs.length > 150) {
+      this.db.Audit_Logs = this.db.Audit_Logs.slice(0, 150);
     }
   }
 
@@ -697,7 +830,7 @@ class DatabaseAdapter {
         code,
         message
       });
-      localStorage.setItem(ERROR_LOG_KEY, JSON.stringify(logs.slice(0, 100)));
+      localStorage.setItem(ERROR_LOG_KEY, JSON.stringify(logs.slice(0, 50)));
       this.lastSyncStatus.errorCount = logs.length;
     } catch (e) { /* ignore */ }
   }
@@ -748,7 +881,6 @@ class DatabaseAdapter {
       }
     };
 
-    // ใช้ Write-Behind Queue ของ GoogleWorkspaceClient เพื่อให้ UI ตอบสนองทันที 0ms และ Retry อัตโนมัติ
     if (window.googleWorkspaceClient) {
       const txId = window.googleWorkspaceClient.enqueueTransaction(txPayload);
       this.lastSyncStatus = {
@@ -813,13 +945,11 @@ class DatabaseAdapter {
       throw new Error(payload.message || 'ไม่สามารถดึงข้อมูลจาก Google Sheets ได้');
     }
 
-    // ตรวจสอบว่าตารางบน Google Sheets มีรหัสโรงเรียนจริง 1034710083 และรายชื่อบุคลากรจริง 18 ท่านแล้วหรือยัง
     const cloudProfileRows = payload.data.School_Profile || [];
     const cloudPersonnelRows = payload.data.Personnel || [];
     const hasRealDirectorInCloud = cloudPersonnelRows.some((p) => String(p.first_name || '').includes('ทองพูล'));
     const hasRealSchoolCodeInCloud = cloudProfileRows.some((p) => String(p.school_code_10 || p.school_code || '').includes('1034710083'));
     if (cloudProfileRows.length === 0 || !hasRealDirectorInCloud || !hasRealSchoolCodeInCloud) {
-      // ส่งข้อมูลจริงทั้ง 17 ตาราง (รหัสโรงเรียน 1034710083, นักเรียน 285 คน, บุคลากร 18 ท่าน) ขึ้นไปบรรจุใน Google Sheets อัตโนมัติทันที!
       await this.syncAllToGoogleSheets();
       return payload;
     }
@@ -841,7 +971,7 @@ class DatabaseAdapter {
     if (!silent) {
       this.logAudit('CLOUD_PULL', 'ALL_17_TABLES', 'GOOGLE_SHEETS', 'ดึงข้อมูลล่าสุดจาก Google Sheets สำเร็จ', 'SUCCESS');
     }
-    this.saveLocal();
+    this.saveLocal(false);
     if (!silent && window.app) window.app.render();
     return payload;
   }
@@ -894,6 +1024,7 @@ class DatabaseAdapter {
    */
   resetToFactoryDefault() {
     this.db = JSON.parse(JSON.stringify(window.BANBOK_DEFAULT_DB));
+    this.touchMeta();
     this.logAudit('FACTORY_RESET', 'ALL_17_TABLES', 'DEFAULT', 'รีเซ็ตฐานข้อมูลกลับสู่ค่าเริ่มต้นของโรงเรียนบ้านบกหนองทันน้ำ', 'SUCCESS');
     this.saveLocal();
     return true;
@@ -904,7 +1035,7 @@ class DatabaseAdapter {
    */
   exportBackupJSON() {
     this.logAudit('EXPORT_BACKUP', 'ALL_17_TABLES', 'JSON_FILE', 'ดาวน์โหลดไฟล์สำรองฐานข้อมูล (Full JSON Snapshot)', 'SUCCESS');
-    this.saveLocal();
+    this.saveLocal(false);
     return JSON.stringify({
       platform: 'BANBOK DIGITAL SCHOOL PLATFORM',
       school: 'โรงเรียนบ้านบกหนองทันน้ำ (สพป.อุบลราชธานี เขต 2)',
@@ -925,6 +1056,7 @@ class DatabaseAdapter {
         this.db[table] = sourceDb[table];
       }
     });
+    this.touchMeta();
     this.logAudit('IMPORT_BACKUP', 'ALL_17_TABLES', 'JSON_RESTORE', 'กู้คืนฐานข้อมูลจากไฟล์สำรองสำเร็จ', 'SUCCESS');
     this.saveLocal();
     return true;
