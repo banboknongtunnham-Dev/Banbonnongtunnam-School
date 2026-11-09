@@ -548,7 +548,7 @@ class PublicViews {
         <!-- ส่วนหัวบอร์ดโทนกรมท่า-ทอง เรียบหรู สะอาดตา -->
         <div class="px-5 py-4 bg-slate-900 text-white flex items-center justify-between gap-2 border-b border-amber-500/30">
           <div class="flex items-center gap-2.5">
-            <span class="w-2 h-2 rounded-full bg-amber-400"></span>
+            <img src="assets/img/icon_megaphone.png" alt="โทรโข่งประกาศ" class="w-6 h-6 object-contain shrink-0" />
             <div>
               <h4 class="text-sm sm:text-base font-bold text-white tracking-wide">OFFICIAL NOTICES • ประกาศทางการ</h4>
             </div>
@@ -611,8 +611,9 @@ class PublicViews {
               class="mx-4 mt-4 p-3.5 sm:p-4 rounded-2xl bg-slate-50/80 border-l-4 border-l-amber-600 border border-slate-200/80 shadow-2xs cursor-pointer transition hover:bg-white h-[115px] flex flex-col justify-between overflow-hidden shrink-0"
             >
               <div class="flex items-center justify-between gap-2 mb-1">
-                <span class="px-2.5 py-0.5 rounded-full bg-slate-900 text-amber-300 text-[10px] font-bold">
-                  ${window.authService.sanitizeHTML(activeItem.badge)}
+                <span class="px-2.5 py-0.5 rounded-full bg-slate-900 text-amber-300 text-[10px] font-bold inline-flex items-center gap-1.5 shadow-2xs">
+                  <img src="assets/img/icon_megaphone.png" alt="โทรโข่ง" class="w-3.5 h-3.5 object-contain" />
+                  <span>${window.authService.sanitizeHTML(activeItem.badge)}</span>
                 </span>
                 <span class="text-[11px] font-semibold text-slate-500">📅 ${window.authService.sanitizeHTML(activeItem.date)}</span>
               </div>
@@ -1227,14 +1228,12 @@ class PublicViews {
                 </p>
               </div>
 
-              <!-- 4 Clean Bento KPI Metric Cards (Glass on Red Theme - ชัดเจน สว่าง สมส่วน) -->
+              <!-- 4 Clean Bento KPI Metric Cards (Glass on Red Theme - ชัดเจน สว่าง สมส่วน พร้อมไอคอนภาพตามต้นฉบับ) -->
               <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-1">
-                <div onclick="window.app.navigate('dashboard')" class="bbk-glass-on-red p-3.5 sm:p-4 rounded-2xl cursor-pointer transition flex flex-col justify-between">
+                <div onclick="window.app.navigate('dashboard')" class="bbk-glass-on-red p-3.5 sm:p-4 rounded-2xl cursor-pointer transition flex flex-col justify-between group hover:scale-[1.02]">
                   <div class="flex items-center justify-between mb-2">
                     <span class="text-[10px] font-bold uppercase tracking-wider text-rose-100">นักเรียนปี 2569</span>
-                    <span class="w-7 h-7 rounded-lg bg-amber-400/25 border border-amber-300/40 text-amber-300 flex items-center justify-center shadow-2xs">
-                      <i data-lucide="graduation-cap" class="w-4 h-4"></i>
-                    </span>
+                    <img src="assets/img/icon_students.png" alt="นักเรียน" class="w-8 h-8 sm:w-9 sm:h-9 object-contain drop-shadow-md shrink-0 group-hover:scale-110 transition" />
                   </div>
                   <div>
                     <div class="text-2xl sm:text-3xl font-extrabold text-white font-mono tracking-tight leading-none">
@@ -1245,12 +1244,10 @@ class PublicViews {
                   </div>
                 </div>
 
-                <div onclick="window.app.navigate('personnel')" class="bbk-glass-on-red p-3.5 sm:p-4 rounded-2xl cursor-pointer transition flex flex-col justify-between">
+                <div onclick="window.app.navigate('personnel')" class="bbk-glass-on-red p-3.5 sm:p-4 rounded-2xl cursor-pointer transition flex flex-col justify-between group hover:scale-[1.02]">
                   <div class="flex items-center justify-between mb-2">
                     <span class="text-[10px] font-bold uppercase tracking-wider text-rose-100">บุคลากร</span>
-                    <span class="w-7 h-7 rounded-lg bg-emerald-400/25 border border-emerald-300/40 text-emerald-300 flex items-center justify-center shadow-2xs">
-                      <i data-lucide="users" class="w-4 h-4"></i>
-                    </span>
+                    <img src="assets/img/icon_personnel.png" alt="บุคลากร" class="w-8 h-8 sm:w-9 sm:h-9 object-contain drop-shadow-md shrink-0 group-hover:scale-110 transition" />
                   </div>
                   <div>
                     <div class="text-2xl sm:text-3xl font-extrabold text-white font-mono tracking-tight leading-none">
@@ -1261,12 +1258,10 @@ class PublicViews {
                   </div>
                 </div>
 
-                <div onclick="window.app.navigate('about')" class="bbk-glass-on-red p-3.5 sm:p-4 rounded-2xl cursor-pointer transition flex flex-col justify-between">
+                <div onclick="window.app.navigate('about')" class="bbk-glass-on-red p-3.5 sm:p-4 rounded-2xl cursor-pointer transition flex flex-col justify-between group hover:scale-[1.02]">
                   <div class="flex items-center justify-between mb-2">
                     <span class="text-[10px] font-bold uppercase tracking-wider text-rose-100">รหัสสถานศึกษา</span>
-                    <span class="w-7 h-7 rounded-lg bg-sky-400/25 border border-sky-300/40 text-sky-300 flex items-center justify-center shadow-2xs">
-                      <i data-lucide="shield-check" class="w-4 h-4"></i>
-                    </span>
+                    <img src="assets/img/icon_school.png" alt="รหัสสถานศึกษา" class="w-8 h-8 sm:w-9 sm:h-9 object-contain drop-shadow-md shrink-0 group-hover:scale-110 transition" />
                   </div>
                   <div>
                     <div class="text-base sm:text-lg font-extrabold text-white font-mono tracking-tight leading-snug">
@@ -1276,12 +1271,10 @@ class PublicViews {
                   </div>
                 </div>
 
-                <div onclick="window.app.navigate('news')" class="bbk-glass-on-red p-3.5 sm:p-4 rounded-2xl cursor-pointer transition flex flex-col justify-between">
+                <div onclick="window.app.navigate('news')" class="bbk-glass-on-red p-3.5 sm:p-4 rounded-2xl cursor-pointer transition flex flex-col justify-between group hover:scale-[1.02]">
                   <div class="flex items-center justify-between mb-2">
                     <span class="text-[10px] font-bold uppercase tracking-wider text-rose-100">ข่าวสาร & ผลงาน</span>
-                    <span class="w-7 h-7 rounded-lg bg-rose-400/25 border border-rose-300/40 text-rose-300 flex items-center justify-center shadow-2xs">
-                      <i data-lucide="newspaper" class="w-4 h-4"></i>
-                    </span>
+                    <img src="assets/img/icon_megaphone.png" alt="ข่าวสาร & ผลงาน" class="w-8 h-8 sm:w-9 sm:h-9 object-contain drop-shadow-md shrink-0 group-hover:scale-110 transition" />
                   </div>
                   <div>
                     <div class="text-2xl sm:text-3xl font-extrabold text-white font-mono tracking-tight leading-none">
@@ -1414,8 +1407,8 @@ class PublicViews {
       <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 pb-6">
         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-6">
           <div class="flex items-center gap-3">
-            <div class="w-10 h-10 rounded-xl bg-slate-900 text-amber-400 flex items-center justify-center shadow-xs shrink-0 text-xl font-bold">
-              <i data-lucide="sparkles" class="w-5 h-5"></i>
+            <div class="w-10 h-10 rounded-xl bg-slate-900 text-amber-400 flex items-center justify-center shadow-xs shrink-0 text-xl font-bold p-1">
+              <img src="assets/img/icon_megaphone.png" alt="โทรโข่งประกาศ" class="w-7 h-7 object-contain drop-shadow-sm" />
             </div>
             <div>
               <span class="text-[11px] font-extrabold uppercase tracking-widest text-amber-700">
@@ -2598,7 +2591,10 @@ class PublicViews {
         <div class="bg-white p-6 rounded-3xl border border-slate-200/90 shadow-2xs space-y-4">
           <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
             <div>
-              <span class="text-xs font-bold text-amber-700 uppercase">FACEBOOK & SCHOOL PR CENTER</span>
+              <span class="text-xs font-bold text-amber-700 uppercase inline-flex items-center gap-1.5">
+                <img src="assets/img/icon_megaphone.png" alt="โทรโข่ง" class="w-4 h-4 object-contain" />
+                <span>FACEBOOK & SCHOOL PR CENTER</span>
+              </span>
               <h3 class="text-xl sm:text-2xl font-extrabold text-slate-900">ศูนย์ข่าวประชาสัมพันธ์ (เชื่อมโยง Facebook โรงเรียนบ้านบกหนองทันน้ำ)</h3>
             </div>
             <div class="flex flex-wrap items-center gap-2">

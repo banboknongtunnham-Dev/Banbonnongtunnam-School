@@ -292,15 +292,15 @@ class BanbokAppController {
 
         <form onsubmit="window.app.handleLoginSubmit(event)" class="space-y-4">
           <div>
-            <label class="block text-xs font-bold text-slate-700 mb-1">ชื่อผู้ใช้งาน (Username) หรือ อีเมลโรงเรียน *</label>
+            <label class="block text-xs font-bold text-slate-700 mb-1">ชื่อผู้ใช้งาน (Username / ID) *</label>
             <input
               type="text"
               id="login-username"
               name="username"
               required
-              value="admin"
+              value="Panuwat"
               oninput="window.app.syncLoginRoleFromInput(this.value)"
-              placeholder="เช่น teacher, admin หรืออีเมล"
+              placeholder="ระบุ Panuwat หรืออีเมล"
               class="w-full px-4 py-2.5 rounded-xl border border-slate-200 text-sm font-semibold focus:outline-none focus:border-red-600 focus:ring-2 focus:ring-red-500/20"
             />
           </div>
@@ -311,9 +311,9 @@ class BanbokAppController {
               id="login-password"
               name="password"
               required
-              value="admin1234"
-              placeholder="••••••••"
-              class="w-full px-4 py-2.5 rounded-xl border border-slate-200 text-sm focus:outline-none focus:border-red-600 focus:ring-2 focus:ring-red-500/20"
+              value="001"
+              placeholder="ระบุ 001"
+              class="w-full px-4 py-2.5 rounded-xl border border-slate-200 text-sm focus:outline-none focus:border-red-600 focus:ring-2 focus:ring-red-500/20 font-mono"
             />
           </div>
           <button
@@ -323,7 +323,7 @@ class BanbokAppController {
             class="w-full py-3.5 px-4 rounded-xl bg-gradient-to-r from-red-700 to-red-600 text-white hover:from-red-600 hover:to-red-500 font-extrabold text-sm shadow-md transition flex items-center justify-center gap-2 cursor-pointer"
           >
             <span>🛡️</span>
-            <span id="login-submit-btn-label">คลิกเข้าสู่ระบบในฐานะ: แอดมินเว็บ (Admin)</span>
+            <span id="login-submit-btn-label">คลิกเข้าสู่ระบบ: แอดมิน ภานุวัฒน์ คุณแรง (Admin)</span>
           </button>
         </form>
       </div>
@@ -418,22 +418,22 @@ class BanbokAppController {
   selectLoginRole(roleKey) {
     const roleCredentials = {
       teacher: {
-        user: 'teacher',
-        pass: 'teacher1234',
+        user: 'Panuwat',
+        pass: '001',
         btnClass: 'w-full py-3.5 px-4 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 text-white hover:from-emerald-500 hover:to-teal-500 font-extrabold text-sm shadow-md transition flex items-center justify-center gap-2 cursor-pointer',
-        submitHtml: '<span>👩‍🏫</span><span>คลิกเข้าสู่ระบบในฐานะ: ครู / บุคลากร (Teacher)</span>'
+        submitHtml: '<span>👨‍🏫</span><span>คลิกเข้าสู่ระบบ: ครู ภานุวัฒน์ คุณแรง (Teacher)</span>'
       },
       admin: {
-        user: 'admin',
-        pass: 'admin1234',
+        user: 'Panuwat',
+        pass: '001',
         btnClass: 'w-full py-3.5 px-4 rounded-xl bg-gradient-to-r from-red-700 to-red-600 text-white hover:from-red-600 hover:to-red-500 font-extrabold text-sm shadow-md transition flex items-center justify-center gap-2 cursor-pointer',
-        submitHtml: '<span>🛡️</span><span>คลิกเข้าสู่ระบบในฐานะ: แอดมินเว็บ (Admin)</span>'
+        submitHtml: '<span>🛡️</span><span>คลิกเข้าสู่ระบบ: แอดมิน ภานุวัฒน์ คุณแรง (Admin)</span>'
       },
       developer: {
-        user: 'developer',
-        pass: 'dev1234',
+        user: 'Panuwat',
+        pass: '001',
         btnClass: 'w-full py-3.5 px-4 rounded-xl bg-gradient-to-r from-indigo-700 to-blue-600 text-white hover:from-indigo-600 hover:to-blue-500 font-extrabold text-sm shadow-md transition flex items-center justify-center gap-2 cursor-pointer',
-        submitHtml: '<span>💻</span><span>คลิกเข้าสู่ระบบในฐานะ: ผู้พัฒนาระบบ (Developer)</span>'
+        submitHtml: '<span>💻</span><span>คลิกเข้าสู่ระบบ: ผู้ดูแลระบบ ภานุวัฒน์ คุณแรง (Developer)</span>'
       }
     };
 

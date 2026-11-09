@@ -50,8 +50,8 @@ class NavbarComponent {
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-1.5 flex items-center justify-between gap-4">
           <div class="flex items-center gap-2.5 flex-1 overflow-hidden">
             <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-md text-[11px] font-extrabold bg-yellow-400 text-red-950 shrink-0 shadow-xs">
-              <span class="w-1.5 h-1.5 rounded-full bg-red-600 animate-ping"></span>
-              <span>LIVE NEWS</span>
+              <img src="assets/img/icon_megaphone.png" alt="โทรโข่งประกาศ" class="w-4 h-4 object-contain shrink-0" />
+              <span>LIVE NOTICES</span>
             </span>
             <div class="overflow-hidden flex-1 relative">
               <div class="bbk-marquee-track whitespace-nowrap text-xs">

@@ -171,6 +171,20 @@ class DatabaseAdapter {
             this.saveLocal();
           }
         }
+        // ล้างบัญชีผู้ใช้ชื่อแปลกๆ/ตัวอย่างเดิมออก และซิงค์บัญชีจริงของ 'Panuwat' (ภานุวัฒน์ คุณแรง - รหัส 001)
+        if (Array.isArray(this.db.User_Accounts)) {
+          const dummyUsernames = ['teacher', 'admin', 'developer', 'usr-tch-001', 'usr-adm-001', 'usr-dev-001'];
+          const hasDummy = this.db.User_Accounts.some((u) =>
+            dummyUsernames.includes(String(u.username || '').toLowerCase()) ||
+            String(u.full_name || '').includes('สุดารัตน์') ||
+            String(u.full_name || '').includes('ณัฐพงศ์') ||
+            String(u.full_name || '').includes('System Architect')
+          );
+          if (hasDummy || this.db.User_Accounts.length === 0 || !this.db.User_Accounts.some((u) => String(u.username || '').toLowerCase().includes('panuwat'))) {
+            this.db.User_Accounts = JSON.parse(JSON.stringify(window.BANBOK_DEFAULT_DB.User_Accounts || []));
+            this.saveLocal();
+          }
+        }
         // อัปเดตภาพถ่ายบุคลากรทั้งหมดอัตโนมัติหากในแคชเดิมยังว่างอยู่
         if (Array.isArray(this.db.Personnel)) {
           let updatedAny = false;
