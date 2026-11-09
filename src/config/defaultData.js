@@ -1,12 +1,12 @@
 /**
  * BANBOK DIGITAL SCHOOL PLATFORM - DEFAULT MASTER DATABASE
- * Updated automatically via Multi-Platform Sync at 2026-11-09T14:28:58.457Z
+ * Updated automatically via Multi-Platform Sync at 2026-11-09T14:29:40.586Z
  */
 
 window.BANBOK_DEFAULT_DB = {
   "_meta": {
-    "version": 1794234622088,
-    "updated_at": "2026-11-09T14:28:58.457Z"
+    "version": 1794234622089,
+    "updated_at": "2026-11-09T14:29:40.586Z"
   },
   "_tombstones": [
     "Personnel:PER-515461-60",
@@ -101,6 +101,24 @@ window.BANBOK_DEFAULT_DB = {
     }
   ],
   "Personnel": [
+    {
+      "prefix": "นางสาว",
+      "first_name": "สวิญชญา",
+      "last_name": "ชินพงษธร",
+      "position": "ครู",
+      "academic_standing": "-",
+      "role_group": "TEACHER",
+      "department": "ข้าราชการครูและบุคลากรทางการศึกษา",
+      "subject_group": "",
+      "education_degree": "",
+      "email": "",
+      "photo_url": "https://ntfy.sh/file/SV9b89arSVz5.jpg",
+      "sort_order": 14,
+      "status": "ปฏิบัติราชการ",
+      "personnel_id": "PER-579325-10",
+      "created_at": "2026-11-09T14:29:39.325Z",
+      "updated_at": "2026-11-09T14:29:39.325Z"
+    },
     {
       "personnel_id": "PER-001",
       "prefix": "นาย",
@@ -2037,6 +2055,32 @@ window.BANBOK_DEFAULT_DB = {
     }
   ],
   "Audit_Logs": [
+    {
+      "log_id": "LOG-1794234579325-35",
+      "timestamp": "2026-11-09T14:29:39.325Z",
+      "user_id": "USR-DEV-001",
+      "user_name": "ผู้ดูแลระบบ ภานุวัฒน์ คุณแรง",
+      "user_role": "DEVELOPER",
+      "action_type": "INSERT",
+      "target_table": "Personnel",
+      "target_id": "PER-579325-10",
+      "details": "เพิ่มข้อมูลใหม่ในตาราง Personnel (สวิญชญา)",
+      "ip_or_client": "Desktop Web Client",
+      "status": "SUCCESS"
+    },
+    {
+      "log_id": "LOG-1794234557811-72",
+      "timestamp": "2026-11-09T14:29:17.811Z",
+      "user_id": "USR-DEV-001",
+      "user_name": "ผู้ดูแลระบบ ภานุวัฒน์ คุณแรง",
+      "user_role": "DEVELOPER",
+      "action_type": "DRIVE_WEB_UPLOAD",
+      "target_table": "Google_Drive_Sync",
+      "target_id": "DRV-DDC84924B48B",
+      "details": "อัปโหลดและซิงค์ภาพ 16.png เข้าสู่ไดร์ฟ (Personnel_Photos) และระบบคลาวด์สำเร็จ",
+      "ip_or_client": "Desktop Web Client",
+      "status": "SUCCESS"
+    },
     {
       "log_id": "LOG-1794234537185-55",
       "timestamp": "2026-11-09T14:28:57.185Z",
