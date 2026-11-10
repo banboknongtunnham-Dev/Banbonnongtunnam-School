@@ -9,10 +9,18 @@
 
 const STORAGE_KEY = 'BANBOK_DIGITAL_PLATFORM_DB_V4';
 const ERROR_LOG_KEY = 'BANBOK_SYSTEM_ERROR_LOGS_V1';
-const DB_BUILD_VERSION = '20261109_v6';
+const DB_BUILD_VERSION = '20261110_v1';
 const DB_VERSION_KEY = 'BANBOK_PLATFORM_BUILD_VERSION';
 const CLOUD_DB_SYNC_TOPIC = 'banbok_db_sync_1034710083_v6';
 const CLOUD_DB_SYNC_URL = `https://ntfy.sh/${CLOUD_DB_SYNC_TOPIC}`;
+
+const EXPIRED_RELAY_URL_MAP = {
+  'https://ntfy.sh/file/28am0QLDhums.jpg': 'assets/img/uploads/Banner_Images/2_60400c10b255.jpg',
+  'https://ntfy.sh/file/3poP9JyPW7DH.jpg': 'assets/img/uploads/Banner_Images/4_83dd3bb34ca0.jpg',
+  'https://ntfy.sh/file/rx9KRa6hdLEH.jpg': 'assets/img/uploads/Banner_Images/5_124c5d1a4032.jpg',
+  'https://ntfy.sh/file/tch5Lha2lKka.jpg': 'assets/img/uploads/Personnel_Photos/20_1bb663f97502.jpg',
+  'https://ntfy.sh/file/SV9b89arSVz5.jpg': 'assets/img/uploads/Personnel_Photos/16_ddc84924b48b.jpg'
+};
 
 const TABLE_PRIMARY_KEYS = {
   School_Profile: 'profile_id',
@@ -199,10 +207,43 @@ class DatabaseAdapter {
     } catch (_) {}
   }
 
+  repairExpiredRelayUrls(dbObj) {
+    if (!dbObj || typeof dbObj !== 'object') return false;
+    let changed = false;
+    const defaultDb = (typeof window !== 'undefined' && window.BANBOK_DEFAULT_DB) ? window.BANBOK_DEFAULT_DB : {};
+
+    Object.keys(TABLE_PRIMARY_KEYS).forEach((table) => {
+      if (!Array.isArray(dbObj[table])) return;
+      const pk = TABLE_PRIMARY_KEYS[table];
+      const defaultRows = Array.isArray(defaultDb[table]) ? defaultDb[table] : [];
+
+      dbObj[table].forEach((row) => {
+        if (!row || typeof row !== 'object') return;
+        Object.keys(row).forEach((field) => {
+          const val = row[field];
+          if (typeof val === 'string' && val.startsWith('https://ntfy.sh/file/')) {
+            if (EXPIRED_RELAY_URL_MAP[val]) {
+              row[field] = EXPIRED_RELAY_URL_MAP[val];
+              changed = true;
+            } else if (row[pk]) {
+              const defMatch = defaultRows.find((d) => d && d[pk] === row[pk]);
+              if (defMatch && typeof defMatch[field] === 'string' && !defMatch[field].startsWith('https://ntfy.sh/file/')) {
+                row[field] = defMatch[field];
+                changed = true;
+              }
+            }
+          }
+        });
+      });
+    });
+    return changed;
+  }
+
   applyRemoteDatabaseIfNewer(remoteDb, forceAccept = false) {
     if (!remoteDb || typeof remoteDb !== 'object' || !Array.isArray(remoteDb.School_Profile)) {
       return false;
     }
+    this.repairExpiredRelayUrls(remoteDb);
     const remoteVer = this.getDbVersion(remoteDb);
     const localVer = this.getDbVersion(this.db);
 
@@ -286,7 +327,7 @@ class DatabaseAdapter {
         }
 
         this.db = {
-          _meta: baseSource._meta || defaultDb._meta || { version: Date.now(), updated_at: new Date().toISOString() },
+          _meta: baseSource._meta || defaultDb._meta || { version: 1, updated_at: '2026-11-01T00:00:00Z' },
           _tombstones: this.getTombstones()
         };
 
@@ -297,6 +338,8 @@ class DatabaseAdapter {
             : JSON.parse(JSON.stringify(defaultDb[table] || []));
           this.db[table] = rawList.filter((r) => !this.isDeleted(table, r[pk]));
         });
+
+        this.repairExpiredRelayUrls(this.db);
 
         // ล้างบัญชีผู้ใช้ชื่อแปลกๆ/ตัวอย่างเดิมออก และซิงค์บัญชีจริงของ 'Panuwat' (ภานุวัฒน์ คุณแรง - รหัส 001)
         if (Array.isArray(this.db.User_Accounts)) {
@@ -317,8 +360,9 @@ class DatabaseAdapter {
       } else {
         this.db = defaultDb;
         if (!this.db._meta) {
-          this.db._meta = { version: Date.now(), updated_at: new Date().toISOString() };
+          this.db._meta = { version: 1, updated_at: '2026-11-01T00:00:00Z' };
         }
+        this.repairExpiredRelayUrls(this.db);
         this.db._tombstones = this.getTombstones();
         this._lastCloudPushedVersion = this.getDbVersion(this.db);
         this.saveLocal(false);

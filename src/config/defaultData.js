@@ -1,12 +1,12 @@
 /**
  * BANBOK DIGITAL SCHOOL PLATFORM - DEFAULT MASTER DATABASE
- * Updated automatically via Multi-Platform Sync at 2026-11-09T14:40:25.032Z
+ * Updated automatically via Multi-Platform Sync at 2026-11-10T01:43:20.000Z
  */
 
 window.BANBOK_DEFAULT_DB = {
   "_meta": {
-    "version": 1794235225032,
-    "updated_at": "2026-11-09T14:40:25.032Z"
+    "version": 1794275000000,
+    "updated_at": "2026-11-10T01:43:20.000Z"
   },
   "_tombstones": [
     "Personnel:PER-515461-60",
@@ -112,7 +112,7 @@ window.BANBOK_DEFAULT_DB = {
       "subject_group": "",
       "education_degree": "",
       "email": "",
-      "photo_url": "https://ntfy.sh/file/tch5Lha2lKka.jpg",
+      "photo_url": "assets/img/uploads/Personnel_Photos/20_1bb663f97502.jpg",
       "sort_order": 19,
       "status": "ปฏิบัติราชการ",
       "personnel_id": "PER-878396-83",
@@ -130,7 +130,7 @@ window.BANBOK_DEFAULT_DB = {
       "subject_group": "",
       "education_degree": "",
       "email": "",
-      "photo_url": "https://ntfy.sh/file/SV9b89arSVz5.jpg",
+      "photo_url": "assets/img/uploads/Personnel_Photos/16_ddc84924b48b.jpg",
       "sort_order": 15,
       "status": "ปฏิบัติราชการ",
       "personnel_id": "PER-579325-10",
@@ -814,7 +814,7 @@ window.BANBOK_DEFAULT_DB = {
       "category": "ผลงานครู & บุคลากรทางการศึกษา",
       "occasion_tag": "ผลงานครู & บุคลากรทางการศึกษา",
       "caption": "โรงเรียนบ้านบกหนองทันน้ำ ขอแสดงความยินดีและร่วมชื่นชม นางกชพร กระพัฒน์ ในโอกาสได้รับรางวัลผู้วิจัยและพัฒนานวัตกรรมสร้างสรรค์คนดี ตามโครงการโรงเรียนคุณธรรม สพฐ. ระดับดีเยี่ยม ด้านการจัดการเรียนการสอน ระดับเขตพื้นที่การศึกษา จากสำนักงานเขตพื้นที่การศึกษาประถมศึกษาอุบลราชธานี เขต 2\n\nความสำเร็จในครั้งนี้สะท้อนถึงความมุ่งมั่นในการพัฒนาการจัดการเรียนรู้ การวิจัยและสร้างสรรค์นวัตกรรมทางการศึกษา ตลอดจนการส่งเสริมคุณธรรม จริยธรรม และคุณลักษณะที่พึงประสงค์ให้เกิดขึ้นกับผู้เรียน\n\nนับเป็นความภาคภูมิใจของโรงเรียนบ้านบกหนองทันน้ำ ที่บุคลากรได้สร้างสรรค์ผลงานอันทรงคุณค่าและเป็นแบบอย่างที่ดีในการพัฒนาคุณภาพการศึกษา",
-      "image_url": "https://ntfy.sh/file/28am0QLDhums.jpg",
+      "image_url": "assets/img/uploads/Banner_Images/2_60400c10b255.jpg",
       "facebook_url": "",
       "show_overlay": true,
       "is_slider": true,
@@ -831,7 +831,7 @@ window.BANBOK_DEFAULT_DB = {
       "occasion_tag": "เกียรติยศ & รางวัลสถานศึกษา",
       "is_slider": true,
       "facebook_url": "https://www.facebook.com/profile.php?id=100014526581847",
-      "image_url": "https://ntfy.sh/file/3poP9JyPW7DH.jpg",
+      "image_url": "assets/img/uploads/Banner_Images/4_83dd3bb34ca0.jpg",
       "drive_file_id": "DRIVE-SLIDE-002",
       "caption": "โรงเรียนบ้านบกหนองทันน้ำ ขอแสดงความภาคภูมิใจในโอกาสได้รับคัดเลือกให้เป็น “ศูนย์การเรียนรู้ตามหลักปรัชญาของเศรษฐกิจพอเพียงด้านการศึกษา” ปีการศึกษา 2566 จากกระทรวงศึกษาธิการ\n\nความสำเร็จในครั้งนี้สะท้อนถึงความมุ่งมั่นในการจัดการศึกษาโดยน้อมนำหลักปรัชญาของเศรษฐกิจพอเพียงมาประยุกต์ใช้ในการบริหารจัดการสถานศึกษาและการจัดการเรียนรู้ เพื่อส่งเสริมให้ผู้เรียนมีความรู้ ทักษะชีวิต มีคุณธรรม และสามารถดำเนินชีวิตได้อย่างสมดุลและยั่งยืน\n\nนับเป็นความภาคภูมิใจของผู้บริหาร คณะครู บุคลากรทางการศึกษา นักเรียน และชุมชน ที่ร่วมกันขับเคลื่อนการจัดการศึกษาตามหลักปรัชญาของเศรษฐกิจพอเพียงอย่างต่อเนื่อง",
       "uploaded_by": "ผู้ดูแลระบบ ภานุวัฒน์ คุณแรง",
@@ -847,7 +847,7 @@ window.BANBOK_DEFAULT_DB = {
       "occasion_tag": "ผลงานผู้บริหารสถานศึกษา",
       "is_slider": true,
       "facebook_url": "https://www.facebook.com/profile.php?id=100014526581847",
-      "image_url": "https://ntfy.sh/file/rx9KRa6hdLEH.jpg",
+      "image_url": "assets/img/uploads/Banner_Images/5_124c5d1a4032.jpg",
       "drive_file_id": "DRIVE-SLIDE-003",
       "caption": "โรงเรียนบ้านบกหนองทันน้ำ ขอแสดงความยินดีและร่วมเชิดชูเกียรติ นายทองพูล สิงห์บุตร ผู้อำนวยการโรงเรียนบ้านบกหนองทันน้ำ ในโอกาสได้รับรางวัลผู้บริหารสถานศึกษาต้นแบบการส่งเสริมสนับสนุนการจัดการเรียนรู้เชิงรุก (Active Learning) ระดับดีเยี่ยม ประเภทผู้บริหารสถานศึกษาระดับกลาง จากสำนักงานเขตพื้นที่การศึกษาประถมศึกษาอุบลราชธานี เขต 2 ประจำปีการศึกษา 2569\n\nความสำเร็จในครั้งนี้สะท้อนถึงความมุ่งมั่นในการบริหารจัดการสถานศึกษา การส่งเสริมและสนับสนุนการจัดการเรียนรู้เชิงรุก ตลอดจนการพัฒนาคุณภาพการศึกษาเพื่อยกระดับศักยภาพของครูและผู้เรียนอย่างต่อเนื่อง",
       "uploaded_by": "ผู้ดูแลระบบ ภานุวัฒน์ คุณแรง",

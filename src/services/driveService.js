@@ -8,9 +8,19 @@
  * ============================================================================
  */
 
-const CLOUD_IMAGE_RELAY_URL = 'https://ntfy.sh/banbok_drive_img_1034710083_v6';
+const EXPIRED_RELAY_IMAGE_MAP = {
+  'https://ntfy.sh/file/28am0QLDhums.jpg': 'assets/img/uploads/Banner_Images/2_60400c10b255.jpg',
+  'https://ntfy.sh/file/3poP9JyPW7DH.jpg': 'assets/img/uploads/Banner_Images/4_83dd3bb34ca0.jpg',
+  'https://ntfy.sh/file/rx9KRa6hdLEH.jpg': 'assets/img/uploads/Banner_Images/5_124c5d1a4032.jpg',
+  'https://ntfy.sh/file/tch5Lha2lKka.jpg': 'assets/img/uploads/Personnel_Photos/20_1bb663f97502.jpg',
+  'https://ntfy.sh/file/SV9b89arSVz5.jpg': 'assets/img/uploads/Personnel_Photos/16_ddc84924b48b.jpg'
+};
 
 class DriveService {
+  constructor() {
+    this.recentUploadPreviewCache = {};
+  }
+
   /**
    * แปลงลิงก์แชร์ของ Google Drive และพาธไฟล์ให้เป็น Direct Image URL ที่แสดงผลบนหน้าเว็บได้ทุกเครื่อง 100%
    */
@@ -19,6 +29,11 @@ class DriveService {
     const trimmed = String(url).trim();
     if (!trimmed) return 'assets/img/logo.png';
 
+    // แปลง URL ชั่วคราวที่หมดอายุให้ชี้ไปยังไฟล์ถาวรใน assets/img/uploads ทันที
+    if (EXPIRED_RELAY_IMAGE_MAP[trimmed]) {
+      return EXPIRED_RELAY_IMAGE_MAP[trimmed];
+    }
+
     // กรณีเป็น Base64 Data URL
     if (trimmed.startsWith('data:image')) {
       return trimmed;
@@ -26,7 +41,11 @@ class DriveService {
 
     // กรณีเป็นพาธไฟล์ในโปรเจกต์ (assets/...) ปรับให้เป็น relative path มาตรฐานเดียวกันทุกเครื่อง
     if (trimmed.startsWith('assets/') || trimmed.startsWith('./assets/') || trimmed.startsWith('/assets/')) {
-      return trimmed.replace(/^(\.\/|\/)+/, '');
+      const cleanRel = trimmed.replace(/^(\.\/|\/)+/, '');
+      if (this.recentUploadPreviewCache && this.recentUploadPreviewCache[cleanRel]) {
+        return this.recentUploadPreviewCache[cleanRel];
+      }
+      return cleanRel;
     }
 
     // กรณีเป็นลิงก์ Google Drive ทุกรูปแบบ
@@ -157,15 +176,10 @@ class DriveService {
       ? await this.compressImage(rawBase64, 1400, 0.86, file.type)
       : rawBase64;
 
-    // 1. ส่งไปบันทึกในไดร์ฟและโฟลเดอร์ของเครื่องทำเว็บ (หากกำลังใช้งานบนเครื่องทำเว็บ)
-    const bridgePromise = this.uploadToLocalDriveBridge(file.name, file.type, optimizedBase64, folderCategory);
+    // 1. ส่งไปบันทึกในไดร์ฟและโฟลเดอร์ของเครื่องทำเว็บ (Google_Drive_Sync และ assets/img/uploads ถาวร 100%)
+    const bridgeResult = await this.uploadToLocalDriveBridge(file.name, file.type, optimizedBase64, folderCategory);
 
-    // 2. ส่งขึ้น Cloud Image Relay พร้อมกันเพื่อให้เครื่องอื่นๆ เปิดดูเห็นภาพได้ทันทีใน 1 วินาที (โดยไม่ต้องรอบิลด์ GitHub Pages)
-    const cloudRelayPromise = this.uploadToCloudImageRelay(file.name, optimizedBase64);
-
-    const [bridgeResult, cloudRelayResult] = await Promise.all([bridgePromise, cloudRelayPromise]);
-
-    // 3. หากตั้งค่า Google Apps Script API ไว้ ให้ส่งสำเนาเข้า Google Drive Cloud ด้วย
+    // 2. หากตั้งค่า Google Apps Script API ไว้ ให้ส่งสำเนาเข้า Google Drive Cloud ด้วย
     let cloudDriveResult = null;
     const gasUrl = window.dbAdapter ? window.dbAdapter.getSetting('gas_webapp_url', '').trim() : '';
     const driveEnabled = window.dbAdapter ? window.dbAdapter.getSetting('enable_google_drive', 'true') === 'true' : true;
@@ -199,17 +213,19 @@ class DriveService {
       }
     }
 
-    // หากได้ URL จาก Cloud Relay ให้ใช้เป็น URL หลักเพื่อให้ทุกเครื่องเห็นภาพทันทีใน 1 วินาที
-    // (และ server.js บนเครื่องทำเว็บจะดูดไฟล์จาก URL นี้ไปบันทึกลง Google_Drive_Sync และ assets/img/uploads ให้อัตโนมัติ)
+    // ใช้พาธไฟล์ถาวรในโปรเจกต์ (assets/img/uploads/...) เป็นอันดับแรก เพื่อไม่ให้ลิงก์รูปภาพหมดอายุเมื่อข้ามวัน
     const primaryUrl =
-      (cloudRelayResult && cloudRelayResult.url) ||
       (bridgeResult && bridgeResult.url) ||
       (cloudDriveResult && (cloudDriveResult.thumbnailUrl || cloudDriveResult.viewUrl));
 
     if (primaryUrl) {
+      if (bridgeResult && bridgeResult.url) {
+        const cleanKey = String(bridgeResult.url).replace(/^(\.\/|\/)+/, '');
+        this.recentUploadPreviewCache[cleanKey] = optimizedBase64;
+      }
+
       const fileId =
         (bridgeResult && bridgeResult.fileId) ||
-        (cloudRelayResult && cloudRelayResult.fileId) ||
         (cloudDriveResult && cloudDriveResult.fileId) ||
         `DRV-${Date.now().toString().slice(-6)}`;
 
@@ -233,10 +249,11 @@ class DriveService {
       };
     }
 
-    // กรณีออฟไลน์สมบูรณ์ (บีบอัดขนาดกะทัดรัดเพื่อไม่ให้เต็มพื้นที่ localStorage)
+    // กรณีอัปโหลดจากเครื่องอื่น/มือถือที่ไม่ได้รันเซิร์ฟเวอร์เครื่องทำเว็บ:
+    // เก็บเป็นภาพ Base64 ถาวรที่บีบอัดคมชัด (ไม่มีวันหมดอายุ และ server.js จะแปลงเป็นไฟล์จริงในไดร์ฟให้อัตโนมัติ)
     let compactDataUrl = optimizedBase64;
     if (isImage) {
-      compactDataUrl = await this.compressImage(rawBase64, 850, 0.74, file.type);
+      compactDataUrl = await this.compressImage(rawBase64, 1100, 0.80, file.type);
     }
 
     const mockDriveId = `DRV-${Date.now().toString().slice(-6)}`;

@@ -320,7 +320,7 @@ const server = http.createServer((req, res) => {
   if (req.method === 'POST' && (cleanUrl === '/api/sync-database' || cleanUrl === '/api/database')) {
     const chunks = [];
     req.on('data', (chunk) => chunks.push(chunk));
-    req.on('end', () => {
+    req.on('end', async () => {
       try {
         const bodyData = Buffer.concat(chunks).toString('utf8');
         const payload = JSON.parse(bodyData || '{}');
@@ -331,8 +331,10 @@ const server = http.createServer((req, res) => {
           return;
         }
 
-        // แปลงรูปภาพ Base64 ที่อาจฝังอยู่ในตารางต่างๆ ให้เป็นไฟล์จริงในโฟลเดอร์ไดร์ฟและ assets อัตโนมัติ
-        const extractedImagesCount = extractEmbeddedBase64FromDatabase(db);
+        // แปลงรูปภาพ Base64 หรือลิงก์ชั่วคราวที่อาจฝังอยู่ในตารางต่างๆ ให้เป็นไฟล์จริงถาวรในโฟลเดอร์ไดร์ฟและ assets อัตโนมัติ
+        const extractedBase64Count = extractEmbeddedBase64FromDatabase(db);
+        const mirroredRelayCount = await mirrorCloudRelayImagesToDrive(db);
+        const extractedImagesCount = extractedBase64Count + mirroredRelayCount;
 
         const nowMs = Date.now();
         const nowIso = new Date(nowMs).toISOString();
@@ -517,7 +519,8 @@ async function pollCloudRelayAndSyncToDisk() {
  * ให้ดาวน์โหลดไฟล์ภาพมาเก็บสำรองไว้ในโฟลเดอร์ Google_Drive_Sync และ assets/img/uploads ของเครื่องทำเว็บอัตโนมัติ
  */
 async function mirrorCloudRelayImagesToDrive(db) {
-  if (!db || typeof db !== 'object') return;
+  if (!db || typeof db !== 'object') return 0;
+  let mirroredCount = 0;
   const categoryByTable = {
     Gallery: 'Banner_Images',
     Personnel: 'Personnel_Photos',
@@ -546,16 +549,22 @@ async function mirrorCloudRelayImagesToDrive(db) {
               const buf = Buffer.from(arrBuf);
               const contentType = imgRes.headers.get('content-type') || 'image/jpeg';
               const dataUrl = `data:${contentType};base64,${buf.toString('base64')}`;
-              saveBase64ToPhysicalDriveAndAssets(dataUrl, folderCat, `${tableName}_${field}`);
+              const saved = saveBase64ToPhysicalDriveAndAssets(dataUrl, folderCat, `${tableName}_${field}`);
+              if (saved && saved.relativeUrl) {
+                row[field] = saved.relativeUrl;
+                mirroredCount++;
+              }
             }
           } catch (_) {}
         }
       }
     }
   }
+  return mirroredCount;
 }
 
 server.listen(PORT, () => {
   console.log(`BANBOK DIGITAL SCHOOL PLATFORM running at http://localhost:${PORT}`);
+  pollCloudRelayAndSyncToDisk();
   setInterval(pollCloudRelayAndSyncToDisk, 6000);
 });
