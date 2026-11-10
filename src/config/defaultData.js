@@ -1,12 +1,12 @@
 /**
  * BANBOK DIGITAL SCHOOL PLATFORM - DEFAULT MASTER DATABASE
- * Updated automatically via Multi-Platform Sync at 2026-11-10T05:38:26.833Z
+ * Updated automatically via Multi-Platform Sync at 2026-11-10T06:17:11.421Z
  */
 
 window.BANBOK_DEFAULT_DB = {
   "_meta": {
-    "version": 1794289106833,
-    "updated_at": "2026-11-10T05:38:26.833Z"
+    "version": 1794291431421,
+    "updated_at": "2026-11-10T06:17:11.421Z"
   },
   "_tombstones": [
     "Personnel:PER-515461-60",
@@ -1633,9 +1633,9 @@ window.BANBOK_DEFAULT_DB = {
       "allowed_modules_json": "[\"*\"]",
       "avatar_url": "assets/img/icon_personnel.png",
       "is_active": true,
-      "last_login": "2026-11-10T05:38:08.521Z",
+      "last_login": "2026-11-10T06:17:10.888Z",
       "created_at": "2026-01-01T00:00:00Z",
-      "updated_at": "2026-11-10T05:38:08.522Z"
+      "updated_at": "2026-11-10T06:17:10.888Z"
     },
     {
       "user_id": "USR-DEV-001",
@@ -1984,11 +1984,11 @@ window.BANBOK_DEFAULT_DB = {
     {
       "setting_key": "today_visitor_date",
       "setting_group": "VISITOR_METRICS",
-      "setting_value": "2026-11-09",
+      "setting_value": "2026-11-10",
       "data_type": "string",
       "description": "วันที่บันทึกยอดผู้เข้าชมล่าสุด",
       "updated_by": "SYSTEM",
-      "updated_at": "2026-11-09T10:33:24.216Z"
+      "updated_at": "2026-11-10T05:38:29.597Z"
     },
     {
       "setting_key": "visitor_history_json",
@@ -2091,6 +2091,45 @@ window.BANBOK_DEFAULT_DB = {
     }
   ],
   "Audit_Logs": [
+    {
+      "log_id": "LOG-1794291430900-66",
+      "timestamp": "2026-11-10T06:17:10.900Z",
+      "user_id": "USR-ADM-001",
+      "user_name": "แอดมิน ภานุวัฒน์ คุณแรง",
+      "user_role": "ADMIN",
+      "action_type": "USER_LOGIN",
+      "target_table": "User_Accounts",
+      "target_id": "USR-ADM-001",
+      "details": "เข้าสู่ระบบสำเร็จ (แอดมิน ภานุวัฒน์ คุณแรง - สิทธิ์ ADMIN) ผ่าน PASSWORD_AUTH",
+      "ip_or_client": "Desktop Web Client",
+      "status": "SUCCESS"
+    },
+    {
+      "log_id": "LOG-1794291430888-9",
+      "timestamp": "2026-11-10T06:17:10.888Z",
+      "user_id": "USR-ADM-001",
+      "user_name": "แอดมิน ภานุวัฒน์ คุณแรง",
+      "user_role": "ADMIN",
+      "action_type": "UPDATE",
+      "target_table": "User_Accounts",
+      "target_id": "USR-ADM-001",
+      "details": "แก้ไขข้อมูลในตาราง User_Accounts รหัส USR-ADM-001",
+      "ip_or_client": "Desktop Web Client",
+      "status": "SUCCESS"
+    },
+    {
+      "log_id": "LOG-1794291404634-52",
+      "timestamp": "2026-11-10T06:16:44.634Z",
+      "user_id": "USR-ADM-001",
+      "user_name": "แอดมิน ภานุวัฒน์ คุณแรง",
+      "user_role": "ADMIN",
+      "action_type": "USER_LOGOUT",
+      "target_table": "User_Accounts",
+      "target_id": "USR-ADM-001",
+      "details": "ออกจากระบบ (แอดมิน ภานุวัฒน์ คุณแรง)",
+      "ip_or_client": "Desktop Web Client",
+      "status": "SUCCESS"
+    },
     {
       "log_id": "LOG-1794289100404-2",
       "timestamp": "2026-11-10T05:38:20.404Z",
